@@ -1,0 +1,50 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+const pageTitle = "About Me";
+const identity = {
+  name: "Will",
+  country: "UK",
+  role: "Software Developer",
+  bio: "A passionate developer journaling my journey through code and creativity.",
+  hobbies: ["Astrophotography", "Archery", "Juggling", "Gaming", "Music (cello, guitar)", "Ice Skating"],
+};
+const skills = ["JavaScript", "TypeScript", "Testing", "React", "Node.js", "CSS", "HTML"];
+const skillColour = "crimson";
+---
+<style define:vars={{skillColour}}>
+      h2 {
+        color: purple;
+        font-size: 2rem;
+      }
+
+      .skill {
+        color: var(--skillColour);
+        font-weight: bold;
+      }
+    </style>
+<BaseLayout pageTitle={pageTitle}>
+  <p>This is my blog about tech and music and whatever else crosses my mind. It was written to be a personal log of my thoughts, a journal for my hobbies, a place to place notes on research and tech I study while working, and a place to put down ideas on self improvement.</p>
+
+  <p>There are no rules about what I post, the above was the intent when I started this project but I have decided that I will not allow that to stop me writing a post if I think that it will help me or others.</p>
+
+  <h2>Me</h2>
+  <p>Hi, I am me. I am a human in my late 30s. I enjoy many hobbies including astrophotography, archery, bbqs, calligraphy, drawing, listening to music, playing music, board games, video games, reading, table top role playing games, and many others. I live by myself in a small village in the eastern UK, I like the quiet and the lack of light pollution for my stargazing.</p>
+  <p>Here are a few facts about me:</p>
+  <ul>
+    <li>My name is {identity.name}.</li>
+    <li>I live in {identity.country} and I work as a {identity.role}.</li>
+    {identity.hobbies.length >= 2 &&
+      <li>Two of my hobbies are: {identity.hobbies[0]} and {identity.hobbies[1]}</li>
+    }
+  </ul>
+  <p>My skills are:</p>
+  <ul>
+    {skills.map((skill) => <li class="skill">{skill}</li>)}
+  </ul>
+  <h2>Current Goals</h2>
+  <ul>
+    <li><input type="checkbox" disabled /> Finish sorting Irish FBR</li>
+    <li><input type="checkbox" disabled /> Lose weight</li>
+    <li><input type="checkbox" disabled /> Blog Improvements</li>
+  </ul>
+</BaseLayout>
