@@ -1,0 +1,80 @@
+---
+import { Image } from 'astro:assets';
+import avatar from './assets/avatar.jpg';
+---
+<header>
+  <a href="/" class="avatar">
+    <Image src={avatar} width="112" height="112" alt="avatar">
+  </a>
+  <h1 class="site-title">
+    <a href="/">Will's Tech Blog</a>
+  </h1>
+  <p class="site-subtitle">Tech, Music and Life</p>
+</header>
+<style>
+  header {
+    margin-top: 2.5rem;
+    margin-bottom: 2.5rem;
+    padding-left: 2.5rem;
+    padding-right: 1.25rem;
+    width: 100%;
+    transition: all .3s ease-in-out;
+  }
+
+  .avatar {
+    display: block;
+    width: 7rem;
+    height: 7rem;
+    overflow: hidden;
+    box-shadow: var(--ctp-mocha-surface1) 0 0 0 2px;
+    transform: translateZ(0);
+    border-radius: 50%;
+
+    img {
+      transition: transform 0.5s;
+
+      &:hover {
+        transform: scale(1.2);
+      }
+    }
+  }
+
+  .site-title {
+    font-family: inherit;
+    font-weight: 900;
+    font-size: 1.75rem;
+    line-height: 1.2;
+    letter-spacing: .25px;
+    margin-top: 1.25rem;
+    margin-bottom: .5rem;
+    transition: all .3s ease-in-out;
+    user-select: none;
+    text-decoration: none;
+    
+    a {
+      color: var(--ctp-mocha-text);
+      transition: all .3s ease-in-out;
+      user-select: none;
+    }
+    :hover {
+      color: var(--ctp-mocha-peach);
+    }
+  }
+
+  .site-subtitle {
+    font-size: 95%;
+    color: var(--ctp-mocha-subtext1);
+    margin-top: .25rem;
+    margin-bottom: 0;
+    word-spacing: 1px;
+    user-select: none;
+    text-align: start;
+    font-style: italic;
+  }
+
+  @media (min-width: 850px) {
+    header {
+      margin-top: 3rem;
+    }
+  }
+</style>

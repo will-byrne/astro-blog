@@ -1,6 +1,12 @@
 ---
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
+// TODO: make sure to remove unused imports;
+import '@fontsource/source-sans-pro/400.css';
+import '@fontsource/source-sans-pro/600.css';
+import '@fontsource/source-sans-pro/700.css';
+import '@fontsource/source-sans-pro/900.css';
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import Aside from '../components/aside/Aside.astro';
+import '@catppuccin/palette/css/catppuccin.css';
 import '../styles/global.css';
 const { pageTitle } = Astro.props;
 ---
@@ -13,12 +19,54 @@ const { pageTitle } = Astro.props;
     <title>{pageTitle}</title>
   </head>
   <body>
-    <Header />
-    <h1>{pageTitle}</h1>
-    <slot />
-    <Footer />
+    <div class="grid-container">
+      <Aside />
+      <main class="main-content">
+        <button class="menu-toggle" aria-label="Toggle menu">
+          <i class="fas fa-bars"></i>
+        </button>
+        <h1>{pageTitle}</h1>
+        <slot />
+      </main>
+    </div>
     <script>
       import "../scripts/menu.js";
     </script>
   </body>
 </html>
+<style>
+  .grid-container {
+    display: grid;
+    width: 100vw;
+    grid-template-columns: 1fr;
+    min-height: 100vh;
+  }
+
+  .main-content {
+    grid-column: 1;
+  }
+
+  .menu-toggle {
+    display: block;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 100;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+
+  @media screen and (min-width: 850px) {
+    .main-content {
+      grid-column: 2;
+    }
+    .menu-toggle {
+      display: none;
+    }
+    .grid-container {
+      grid-template-columns: 16.25rem 1fr;
+    }
+  }
+</style>

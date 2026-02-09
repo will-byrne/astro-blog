@@ -1,0 +1,82 @@
+<nav class="header-nav">
+    <ul class="nav-list">
+      <li class="nav-item active">
+        <a href="/" class="nav-link">
+          <i class="fa-fw fas fa-home"></i>
+          <span>HOME</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="/tags/" class="nav-link">
+          <i class="fa-fw fas fa-tag"></i>
+          <span>TAGS</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="/gallery/" class="nav-link">
+          <i class="fa-fw fas fa-images"></i>
+          <span>GALLERY</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="/resume/" class="nav-link">
+          <i class="fa-fw fas fa-file-pdf"></i>
+          <span>RESUME</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="/about/" class="nav-link">
+          <i class="fa-fw fas fa-info-circle"></i>
+          <span>ABOUT</span>
+        </a>
+      </li>
+    </ul>
+    <!-- <div class="sidebar-socials">
+      <a href="https://github.com/will-byrne" aria-label="github" target="_blank" rel="noopener noreferrer">
+        <i class="fab fa-github"></i>
+      </a>
+      <a href="https://twitter.com/LunaTheAstro" aria-label="twitter" target="_blank" rel="noopener noreferrer">
+        <i class="fab fa-twitter"></i>
+      </a>
+      <a href="javascript:location.href = 'mailto:' + ['blog+will.alex.byrne','gmail.com'].join('@')" aria-label="email">
+        <i class="fas fa-envelope"></i>
+      </a>
+      <a href="/feed.xml" aria-label="rss">
+        <i class="fas fa-rss"></i>
+      </a>
+    </div> -->
+  </nav>
+  <style>
+    .header-nav {
+      margin-bottom: 1.5rem;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+      height: 112px;
+      width: 60%;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+      padding-top: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 1.5rem;
+    }
+
+    .nav-list {
+      height: 33px;
+      list-style: none;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    i {
+      display: none;
+    }
+
+    @media screen and (min-width: 800px) {
+      i {
+        display: inline-block;;
+      }
+    }
+  </style>

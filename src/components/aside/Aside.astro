@@ -1,0 +1,44 @@
+---
+import Header from './Header.astro';
+import Nav from './Nav.astro';
+---
+<aside aria-label="Sidebar" class="sidebar">
+  <Header />
+  <Nav />
+  <div class="sidebar-bottom d-flex flex-wrap align-items-center w-100">
+    <a href="https://github.com/will-byrne" aria-label="github" target="_blank" rel="noopener noreferrer">
+      <i class="fab fa-github"></i>
+    </a>
+    <a href="https://twitter.com/LunaTheAstro" aria-label="twitter" target="_blank" rel="noopener noreferrer">
+      <i class="fab fa-twitter"></i>
+    </a>
+    <a href="javascript:location.href = 'mailto:' + ['blog+will.alex.byrne','gmail.com'].join('@')" aria-label="email">
+      <i class="fas fa-envelope"></i>
+    </a>
+    <a href="/feed.xml" aria-label="rss">
+      <i class="fas fa-rss"></i>
+    </a>
+  </div>
+</aside>
+<style>
+  .sidebar {
+    grid-column: 1;
+    scrollbar-width: none;
+    padding-left 0;
+    height: 100vh;
+    overflow-y: auto;
+    width: 16.25rem;
+    z-index: 99;
+    background: var(--ctp-mocha-base);
+    border-right: 1px solid var(--ctp-mocha-surface1);
+    display: none;
+    align-items: flex-end;
+    flex-direction: column;
+  }
+
+  @media screen and (min-width: 850px) {
+    .sidebar {
+      display: flex;;
+    }
+  }
+</style>
