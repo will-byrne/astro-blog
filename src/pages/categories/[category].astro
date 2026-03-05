@@ -5,26 +5,26 @@ import PostCard from '../../components/PostCard.astro';
 export async function getStaticPaths() {
   const allPosts = Object.values(import.meta.glob('../posts/*.md', { eager: true }));
 
-  const uniqueTags = [...new Set(allPosts.map((post: any) => post.frontmatter.tags).flat())];
+  const uniqueCategories = [...new Set(allPosts.map((post: any) => post.frontmatter.category).filter(Boolean))];
   
-  return uniqueTags.map((tag) => {
+  return uniqueCategories.map((category) => {
     const filteredPosts = allPosts
-      .filter((post: any) => post.frontmatter.tags.includes(tag))
+      .filter((post: any) => post.frontmatter.category === category)
       .sort((a: any, b: any) => new Date(b.frontmatter.pubDate).getTime() - new Date(a.frontmatter.pubDate).getTime());
     return {
-      params: { tag },
+      params: { category },
       props: { posts: filteredPosts },
     };
   });
 }
 
-const { tag } = Astro.params;
+const { category } = Astro.params;
 const { posts } = Astro.props;
 ---
 
-<BaseLayout pageTitle={`Tag: ${tag}`}>
-  <div class="tag-page">
-    <p class="tag-description">Showing {posts.length} {posts.length === 1 ? 'post' : 'posts'} tagged with <strong>"{tag}"</strong></p>
+<BaseLayout pageTitle={`Category: ${category}`}>
+  <div class="category-page">
+    <p class="category-description">Showing {posts.length} {posts.length === 1 ? 'post' : 'posts'} in the <strong>"{category}"</strong> category</p>
     <div class="posts">
       {posts.map((post: any) => (
         <PostCard post={post} />
@@ -34,21 +34,21 @@ const { posts } = Astro.props;
 </BaseLayout>
 
 <style>
-  .tag-page {
+  .category-page {
     max-width: 900px;
   }
 
-  .tag-description {
+  .category-description {
     font-size: 1.1rem;
     color: var(--text-muted-color);
     margin-bottom: 2rem;
     padding: 1rem;
     background-color: var(--sidebar-hover-bg);
-    border-left: 3px solid var(--link-color);
+    border-left: 3px solid var(--accent-color);
     border-radius: 0.25rem;
   }
 
-  .tag-description strong {
+  .category-description strong {
     color: var(--heading-color);
   }
 

@@ -1,6 +1,14 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-const pageTitle = "Home Page";
+import PostCard from '../components/PostCard.astro';
+const allPosts = Object.values(import.meta.glob('./posts/*.md', { eager: true }));
+const sortedPosts = allPosts.sort((a: any, b: any) => new Date(b.frontmatter.pubDate).getTime() - new Date(a.frontmatter.pubDate).getTime());
+const pageTitle = "Will's Tech Blog";
 ---
 <BaseLayout pageTitle={pageTitle}>
+  <div class="posts">
+    {sortedPosts.map((post: any) => (
+      <PostCard post={post} />
+    ))}
+  </div>
 </BaseLayout>

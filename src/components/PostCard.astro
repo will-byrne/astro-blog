@@ -1,0 +1,135 @@
+---
+const { post } = Astro.props;
+
+// Handle both string and Date types for pubDate
+const pubDate = typeof post.frontmatter.pubDate === 'string' 
+  ? new Date(post.frontmatter.pubDate) 
+  : post.frontmatter.pubDate;
+
+const formattedDate = pubDate.toLocaleDateString('en-US', { 
+  year: 'numeric', 
+  month: 'long', 
+  day: 'numeric' 
+});
+---
+
+<article class="post-card">
+  {post.frontmatter.image && (
+    <div class="post-image">
+      <img src={post.frontmatter.image.url} alt={post.frontmatter.image.alt} />
+    </div>
+  )}
+  <div class="post-content">
+    <h2 class="post-title">
+      <a href={post.url}>{post.frontmatter.title}</a>
+    </h2>
+    <div class="post-meta">
+      <time datetime={pubDate.toISOString()}>
+        {formattedDate}
+      </time>
+      {post.frontmatter.tags && post.frontmatter.tags.length > 0 && (
+        <span class="post-category"> • {post.frontmatter.tags[0]}</span>
+      )}
+    </div>
+    <p class="post-excerpt">{post.frontmatter.description}</p>
+    <a href={post.url} class="read-more">Read more →</a>
+  </div>
+</article>
+
+<style>
+  .post-card {
+    border: 1px solid var(--main-border-color);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background-color: var(--sidebar-hover-bg);
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .post-card:hover {
+    border-color: var(--link-color);
+    box-shadow: 0 4px 12px rgba(137, 180, 250, 0.15);
+    transform: translateY(-2px);
+  }
+
+  .post-image {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    background-color: var(--highlight-bg-color);
+  }
+
+  .post-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .post-card:hover .post-image img {
+    transform: scale(1.05);
+  }
+
+  .post-content {
+    padding: 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .post-title {
+    font-size: 1.4rem;
+    margin: 0 0 0.75rem 0;
+    line-height: 1.3;
+    font-weight: 600;
+  }
+
+  .post-title a {
+    text-decoration: none;
+    color: var(--heading-color);
+    transition: color 0.3s ease;
+  }
+
+  .post-title a:hover {
+    color: var(--link-color);
+  }
+
+  .post-meta {
+    font-size: 0.85rem;
+    color: var(--text-muted-color);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .post-category {
+    color: var(--accent-color);
+    font-weight: 500;
+  }
+
+  .post-excerpt {
+    margin: 0 0 1rem 0;
+    line-height: 1.6;
+    color: var(--text-color);
+    font-size: 0.95rem;
+    flex: 1;
+  }
+
+  .read-more {
+    color: var(--link-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-block;
+    align-self: flex-start;
+  }
+
+  .read-more:hover {
+    color: var(--accent-color);
+    transform: translateX(4px);
+  }
+</style>

@@ -2,22 +2,22 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 const allPosts = Object.values(import.meta.glob('../posts/*.md', { eager: true }));
-const tags = [...new Set(allPosts.map((post: any) => post.frontmatter.tags).flat())].sort();
-const pageTitle = "Tags";
+const categories = [...new Set(allPosts.map((post: any) => post.frontmatter.category).filter(Boolean))].sort();
+const pageTitle = "Categories";
 ---
 
 <BaseLayout pageTitle={pageTitle}>
-  <div class="tags-container">
-    <p class="tags-intro">Browse posts by tag</p>
-    <div class="tags-grid">
-      {tags.map((tag) => {
+  <div class="categories-container">
+    <p class="categories-intro">Browse posts by category</p>
+    <div class="categories-grid">
+      {categories.map((category) => {
         const postCount = allPosts.filter((post: any) => 
-          post.frontmatter.tags.includes(tag)
+          post.frontmatter.category === category
         ).length;
         return (
-          <a href={`/tags/${tag}`} class="tag-card">
-            <span class="tag-name">{tag}</span>
-            <span class="tag-count">{postCount} {postCount === 1 ? 'post' : 'posts'}</span>
+          <a href={`/categories/${category}`} class="category-card">
+            <span class="category-name">{category}</span>
+            <span class="category-count">{postCount} {postCount === 1 ? 'post' : 'posts'}</span>
           </a>
         );
       })}
@@ -26,23 +26,23 @@ const pageTitle = "Tags";
 </BaseLayout>
 
 <style>
-  .tags-container {
+  .categories-container {
     max-width: 900px;
   }
 
-  .tags-intro {
+  .categories-intro {
     font-size: 1.1rem;
     color: var(--text-muted-color);
     margin-bottom: 2rem;
   }
 
-  .tags-grid {
+  .categories-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 1rem;
   }
 
-  .tag-card {
+  .category-card {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -56,31 +56,29 @@ const pageTitle = "Tags";
     min-height: 120px;
   }
 
-  .tag-card:hover {
-    background-color: var(--sidebar-active-color);
-    border-color: var(--link-color);
+  .category-card:hover {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
     transform: translateY(-2px);
   }
 
-  .tag-name {
+  .category-name {
     font-size: 1.2rem;
     font-weight: 600;
     color: var(--heading-color);
     margin-bottom: 0.5rem;
   }
 
-  .tag-card:hover .tag-name {
-    color: var(--text-color);
+  .category-card:hover .category-name {
+    color: var(--main-bg);
   }
 
-  .tag-count {
+  .category-count {
     font-size: 0.9rem;
     color: var(--text-muted-color);
   }
 
-  .tag-card:hover .tag-count {
-    color: var(--text-color);
+  .category-card:hover .category-count {
+    color: var(--main-bg);
   }
 </style>
-  </div>
-</BaseLayout>

@@ -1,37 +1,501 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
-const { frontmatter } = Astro.props;
+import TableOfContents from "../components/TableOfContents.astro";
+
+const { frontmatter, headings } = Astro.props;
+
+// Calculate reading time (avg 200 words per minute)
+const words = frontmatter.description?.split(/\s+/).length || 0;
+const readingTime = Math.ceil(words / 200) || 1;
+
+// Format dates
+const pubDate = new Date(frontmatter.pubDate);
+const formattedPubDate = pubDate.toLocaleDateString('en-US', { 
+  year: 'numeric', 
+  month: 'short', 
+  day: 'numeric' 
+});
+
+const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+const encodedUrl = encodeURIComponent(shareUrl);
+const encodedTitle = encodeURIComponent(frontmatter.title);
 ---
+
 <BaseLayout pageTitle={frontmatter.title}>
-  <article>
-    <p>Published on: {frontmatter.pubDate.toString().slice(0, 10)}</p>
-    <p><em>{frontmatter.description}</em></p>
-    <p>Written by: {frontmatter.author}</p>
-    <img src={frontmatter.image.url} width="300" alt={frontmatter.image.alt} />
-    <div class="tags">
-      {frontmatter.tags.map((tag: string) => (
-        <p class="tag"><a href={`/tags/${tag}`}>{tag}</a></p>
-      ))}
-  </div>
-    <slot />
+  <div class="post-layout">
+    <article class="post-article">
+    <!-- Post Header -->
+    <header class="post-header">
+      <div class="post-label">Post</div>
+      <h1 class="post-title">{frontmatter.title}</h1>
+      
+      <div class="post-meta">
+        <span class="meta-item">
+          <i class="fas fa-calendar"></i>
+          Posted {formattedPubDate}
+        </span>
+        <span class="meta-divider">•</span>
+        <span class="meta-item reading-time">
+          <i class="fas fa-book"></i>
+          {readingTime} min read
+        </span>
+      </div>
+
+      {frontmatter.image && (
+        <figure class="post-image">
+          <img src={frontmatter.image.url} alt={frontmatter.image.alt} />
+          {frontmatter.image.alt && <figcaption>{frontmatter.image.alt}</figcaption>}
+        </figure>
+      )}
+
+      <div class="post-byline">
+        By <strong>{frontmatter.author || 'Anonymous'}</strong>
+      </div>
+    </header>
+
+    <!-- Post Content -->
+    <div class="post-content">
+      <slot />
+    </div>
+
+    <!-- Post Footer -->
+    <footer class="post-footer">
+      {frontmatter.category && (
+        <div class="post-category">
+          <i class="fas fa-folder"></i>
+          Category: <a href={`/categories/${frontmatter.category}`}>{frontmatter.category}</a>
+        </div>
+      )}
+
+      {frontmatter.tags && frontmatter.tags.length > 0 && (
+        <div class="post-tags">
+          <i class="fas fa-tags"></i>
+          Tags: 
+          {frontmatter.tags.map((tag: string, index: number) => (
+            <>
+              <a href={`/tags/${tag}`} class="tag-link">{tag}</a>
+              {index < frontmatter.tags.length - 1 && <span class="tag-separator">,</span>}
+            </>
+          ))}
+        </div>
+      )}
+
+      <div class="post-license">
+        This post is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a> by the author.
+      </div>
+
+      <div class="post-share">
+        <strong>Share:</strong>
+        <a href={`https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`} class="share-btn twitter" target="_blank" rel="noopener noreferrer" title="Share on Twitter">
+          <i class="fab fa-twitter"></i> Twitter
+        </a>
+        <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`} class="share-btn facebook" target="_blank" rel="noopener noreferrer" title="Share on Facebook">
+          <i class="fab fa-facebook"></i> Facebook
+        </a>
+        <a href={`https://t.me/share/url?url=${encodedUrl}&text=${encodedTitle}`} class="share-btn telegram" target="_blank" rel="noopener noreferrer" title="Share on Telegram">
+          <i class="fab fa-telegram"></i> Telegram
+        </a>
+      </div>
+    </footer>
   </article>
+  <TableOfContents headings={headings} />
+  </div>
 </BaseLayout>
+
 <style>
-  a {
-    color: #00539F;
+  .post-layout {
+    display: grid;
+    grid-template-columns: 1fr 250px;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
   }
 
-  .tags {
+  .post-article {
+    max-width: 900px;
+  }
+
+  /* Post Header */
+  .post-header {
+    margin-bottom: 3rem;
+    border-bottom: 2px solid var(--main-border-color);
+    padding-bottom: 2rem;
+  }
+
+  .post-label {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background-color: var(--sidebar-hover-bg);
+    border-radius: 0.25rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted-color);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+  }
+
+  .post-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--heading-color);
+    margin: 0 0 1rem 0;
+  }
+
+  .post-meta {
     display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    color: var(--text-muted-color);
+    margin-bottom: 1.5rem;
     flex-wrap: wrap;
   }
 
-  .tag {
-    margin: 0.25em;
-    border: dotted 1px #a1a1a1;
-    border-radius: .5em;
-    padding: .5em 1em;
-    font-size: 1.15em;
-    background-color: #F8FCFD;
+  .meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .meta-item i {
+    color: var(--link-color);
+  }
+
+  .meta-divider {
+    opacity: 0.5;
+  }
+
+  .reading-time {
+    color: var(--text-color);
+    font-weight: 500;
+  }
+
+  /* Post Image */
+  .post-image {
+    margin: 1.5rem 0;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background-color: var(--sidebar-hover-bg);
+  }
+
+  .post-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+    max-height: 600px;
+    object-fit: cover;
+  }
+
+  .post-image figcaption {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    color: var(--text-muted-color);
+    text-align: center;
+    font-style: italic;
+  }
+
+  .post-byline {
+    font-size: 0.95rem;
+    color: var(--text-muted-color);
+    margin-top: 1rem;
+  }
+
+  .post-byline strong {
+    color: var(--heading-color);
+  }
+
+  /* Post Content */
+  .post-content {
+    line-height: 1.8;
+    font-size: 1.01rem;
+    color: var(--text-color);
+    margin-bottom: 3rem;
+  }
+
+  .post-content :global(h2) {
+    font-size: 1.8rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    color: var(--heading-color);
+    border-bottom: 1px solid var(--main-border-color);
+    padding-bottom: 0.5rem;
+  }
+
+  .post-content :global(h3) {
+    font-size: 1.4rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--heading-color);
+  }
+
+  .post-content :global(p) {
+    margin-bottom: 1rem;
+  }
+
+  .post-content :global(ul), 
+  .post-content :global(ol) {
+    margin-bottom: 1rem;
+    padding-left: 2rem;
+  }
+
+  .post-content :global(li) {
+    margin-bottom: 0.5rem;
+  }
+
+  .post-content :global(a) {
+    color: var(--link-color);
+    text-decoration: none;
+    border-bottom: 1px solid var(--link-underline-color);
+    transition: color 0.3s ease;
+  }
+
+  .post-content :global(a:hover) {
+    color: var(--accent-color);
+  }
+
+  .post-content :global(code) {
+    background-color: var(--highlight-bg-color);
+    color: var(--text-color);
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+  }
+
+  .post-content :global(pre) {
+    background-color: var(--highlight-bg-color);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+  }
+
+  .post-content :global(pre code) {
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
+  }
+
+  .post-content :global(blockquote) {
+    border-left: 4px solid var(--accent-color);
+    padding-left: 1rem;
+    margin-left: 0;
+    color: var(--text-muted-color);
+    font-style: italic;
+  }
+
+  /* Post Footer */
+  .post-footer {
+    border-top: 2px solid var(--main-border-color);
+    padding-top: 2rem;
+    margin-top: 3rem;
+  }
+
+  .post-category,
+  .post-tags {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    color: var(--text-muted-color);
+    margin-bottom: 1rem;
+  }
+
+  .post-category i,
+  .post-tags i {
+    color: var(--accent-color);
+  }
+
+  .post-category a {
+    color: var(--link-color);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .post-category a:hover {
+    color: var(--accent-color);
+  }
+
+  .tag-link {
+    color: var(--link-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .tag-link:hover {
+    color: var(--accent-color);
+  }
+
+  .tag-separator {
+    margin: 0 0.25rem;
+    opacity: 0.5;
+  }
+
+  .post-license {
+    font-size: 0.9rem;
+    color: var(--text-muted-color);
+    margin-bottom: 1rem;
+  }
+
+  .post-license a {
+    color: var(--link-color);
+    text-decoration: none;
+  }
+
+  .post-license a:hover {
+    text-decoration: underline;
+  }
+
+  /* Social Share */
+  .post-share {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--sidebar-border-color);
+  }
+
+  .post-share strong {
+    color: var(--heading-color);
+  }
+
+  .share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.8rem;
+    background-color: var(--sidebar-hover-bg);
+    color: var(--text-color);
+    text-decoration: none;
+    border-radius: 0.25rem;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+  }
+
+  .share-btn:hover {
+    background-color: var(--link-color);
+    color: var(--main-bg);
+  }
+
+  .share-btn.twitter:hover {
+    background-color: #1da1f2;
+  }
+
+  .share-btn.facebook:hover {
+    background-color: #1877f2;
+  }
+
+  .share-btn.telegram:hover {
+    background-color: #0088cc;
+  }
+
+  .share-btn i {
+    font-size: 1rem;
+  }
+
+  /* Responsive */
+  @media (max-width: 1200px) {
+    .post-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .post-title {
+      font-size: 1.8rem;
+    }
+
+    .post-content :global(h2) {
+      font-size: 1.5rem;
+    }
+
+    .post-meta {
+      font-size: 0.9rem;
+    }
+
+    .post-share {
+      justify-content: flex-start;
+    }
   }
 </style>
+
+<script>
+  // Image Lightbox functionality
+  function initializeLightbox() {
+    const postContent = document.querySelector('.post-content');
+    if (!postContent) return;
+
+    const images = postContent.querySelectorAll('img');
+
+    images.forEach((img) => {
+      // Skip if already wrapped
+      if (img.parentElement?.classList.contains('image-lightbox-wrapper')) {
+        return;
+      }
+
+      // Create wrapper
+      const wrapper = document.createElement('span');
+      wrapper.className = 'image-lightbox-wrapper';
+      img.parentNode.insertBefore(wrapper, img);
+      wrapper.appendChild(img);
+
+      // Click handler
+      wrapper.addEventListener('click', () => {
+        // Create modal
+        const modal = document.createElement('div');
+        modal.className = 'image-lightbox-modal active';
+
+        const content = document.createElement('div');
+        content.className = 'image-lightbox-content';
+
+        const imgClone = document.createElement('img');
+        imgClone.src = img.src;
+        imgClone.alt = img.alt;
+
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'image-lightbox-close';
+        closeBtn.innerHTML = '&times;';
+        closeBtn.setAttribute('aria-label', 'Close image');
+
+        content.appendChild(imgClone);
+        modal.appendChild(content);
+        modal.appendChild(closeBtn);
+        document.body.appendChild(modal);
+
+        // Close handlers
+        const closeModal = () => {
+          modal.classList.remove('active');
+          setTimeout(() => modal.remove(), 300);
+        };
+
+        closeBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          closeModal();
+        });
+
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) closeModal();
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') closeModal();
+        }, { once: true });
+      });
+    });
+  }
+
+  // Initialize on page load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeLightbox);
+  } else {
+    initializeLightbox();
+  }
+
+  // Reinitialize on navigation (for Astro View Transitions)
+  document.addEventListener('astro:after-swap', initializeLightbox);
+</script>
