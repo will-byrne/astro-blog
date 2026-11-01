@@ -1,59 +1,12 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import PostCard from '../../components/PostCard.astro';
+import TermPage from '../../components/TermPage.astro';
+import { getPosts, getTags } from '../../lib/posts';
 
 export async function getStaticPaths() {
-  const allPosts = Object.values(import.meta.glob('../posts/*.md', { eager: true }));
-
-  const uniqueTags = [...new Set(allPosts.map((post: any) => post.frontmatter.tags).flat())];
-  
-  return uniqueTags.map((tag) => {
-    const filteredPosts = allPosts
-      .filter((post: any) => post.frontmatter.tags.includes(tag))
-      .sort((a: any, b: any) => new Date(b.frontmatter.pubDate).getTime() - new Date(a.frontmatter.pubDate).getTime());
-    return {
-      params: { tag },
-      props: { posts: filteredPosts },
-    };
-  });
+  const tags = getTags(await getPosts());
+  return tags.map((term) => ({ params: { tag: term.slug }, props: { term } }));
 }
 
-const { tag } = Astro.params;
-const { posts } = Astro.props;
+const { term } = Astro.props;
 ---
-
-<BaseLayout pageTitle={`Tag: ${tag}`}>
-  <div class="tag-page">
-    <p class="tag-description">Showing {posts.length} {posts.length === 1 ? 'post' : 'posts'} tagged with <strong>"{tag}"</strong></p>
-    <div class="posts">
-      {posts.map((post: any) => (
-        <PostCard post={post} />
-      ))}
-    </div>
-  </div>
-</BaseLayout>
-
-<style>
-  .tag-page {
-    max-width: 900px;
-  }
-
-  .tag-description {
-    font-size: 1.1rem;
-    color: var(--text-muted-color);
-    margin-bottom: 2rem;
-    padding: 1rem;
-    background-color: var(--sidebar-hover-bg);
-    border-left: 3px solid var(--link-color);
-    border-radius: 0.25rem;
-  }
-
-  .tag-description strong {
-    color: var(--heading-color);
-  }
-
-  .posts {
-    display: flex;
-    flex-direction: column;
-  }
-</style>
+<TermPage term={term} kind="tag" />

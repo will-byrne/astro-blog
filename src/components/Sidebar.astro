@@ -1,0 +1,45 @@
+---
+import { SITE_TAGLINE, SITE_TITLE } from '../lib/posts';
+
+const links = [
+  { href: '/', icon: 'fa-home', label: 'HOME' },
+  { href: '/categories/', icon: 'fa-stream', label: 'CATEGORIES' },
+  { href: '/tags/', icon: 'fa-tag', label: 'TAGS' },
+  { href: '/gallery/', icon: 'fa-images', label: 'GALLERY' },
+  { href: '/resume/', icon: 'fa-file-pdf', label: 'RESUME' },
+  { href: '/archives/', icon: 'fa-archive', label: 'ARCHIVES' },
+  { href: '/about/', icon: 'fa-info-circle', label: 'ABOUT' },
+];
+const path = Astro.url.pathname.replace(/\/?$/, '/');
+const isActive = (href: string) => path === href || (href === '/' && /^\/page\d+\/$/.test(path));
+---
+<aside aria-label="Sidebar" id="sidebar" class="d-flex flex-column align-items-end">
+  <header class="profile-wrapper">
+    <a href="/" id="avatar" class="rounded-circle"><img src="/assets/avatar.jpg" width="112" height="112" alt="avatar" /></a>
+    <h1 class="site-title"><a href="/">{SITE_TITLE}</a></h1>
+    <p class="site-subtitle fst-italic mb-0">{SITE_TAGLINE}</p>
+  </header>
+  <nav class="flex-column flex-grow-1 w-100 ps-0">
+    <ul class="nav">
+      {links.map(({ href, icon, label }) => (
+        <li class:list={['nav-item', { active: isActive(href) }]}>
+          <a href={href} class="nav-link">
+            <i class={`fa-fw fas ${icon}`}></i>
+            <span>{label}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+  <div class="sidebar-bottom d-flex flex-wrap align-items-center w-100">
+    <a href="https://github.com/will-byrne" aria-label="github" target="_blank" rel="noopener noreferrer">
+      <i class="fab fa-github"></i>
+    </a>
+    <a href="javascript:location.href = 'mailto:' + ['blog+will.alex.byrne','gmail.com'].join('@')" aria-label="email">
+      <i class="fas fa-envelope"></i>
+    </a>
+    <a href="/feed.xml" aria-label="rss">
+      <i class="fas fa-rss"></i>
+    </a>
+  </div>
+</aside>

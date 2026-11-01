@@ -1,59 +1,12 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import PostCard from '../../components/PostCard.astro';
+import TermPage from '../../components/TermPage.astro';
+import { getCategories, getPosts } from '../../lib/posts';
 
 export async function getStaticPaths() {
-  const allPosts = Object.values(import.meta.glob('../posts/*.md', { eager: true }));
-
-  const uniqueCategories = [...new Set(allPosts.map((post: any) => post.frontmatter.category).filter(Boolean))];
-  
-  return uniqueCategories.map((category) => {
-    const filteredPosts = allPosts
-      .filter((post: any) => post.frontmatter.category === category)
-      .sort((a: any, b: any) => new Date(b.frontmatter.pubDate).getTime() - new Date(a.frontmatter.pubDate).getTime());
-    return {
-      params: { category },
-      props: { posts: filteredPosts },
-    };
-  });
+  const categories = getCategories(await getPosts());
+  return categories.map((term) => ({ params: { category: term.slug }, props: { term } }));
 }
 
-const { category } = Astro.params;
-const { posts } = Astro.props;
+const { term } = Astro.props;
 ---
-
-<BaseLayout pageTitle={`Category: ${category}`}>
-  <div class="category-page">
-    <p class="category-description">Showing {posts.length} {posts.length === 1 ? 'post' : 'posts'} in the <strong>"{category}"</strong> category</p>
-    <div class="posts">
-      {posts.map((post: any) => (
-        <PostCard post={post} />
-      ))}
-    </div>
-  </div>
-</BaseLayout>
-
-<style>
-  .category-page {
-    max-width: 900px;
-  }
-
-  .category-description {
-    font-size: 1.1rem;
-    color: var(--text-muted-color);
-    margin-bottom: 2rem;
-    padding: 1rem;
-    background-color: var(--sidebar-hover-bg);
-    border-left: 3px solid var(--accent-color);
-    border-radius: 0.25rem;
-  }
-
-  .category-description strong {
-    color: var(--heading-color);
-  }
-
-  .posts {
-    display: flex;
-    flex-direction: column;
-  }
-</style>
+<TermPage term={term} kind="category" />

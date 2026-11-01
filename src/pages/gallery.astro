@@ -1,0 +1,43 @@
+---
+import { readdirSync } from 'node:fs';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const images = readdirSync('public/assets/ai')
+  .filter((file) => /\.jpe?g$/i.test(file))
+  .sort();
+---
+
+<BaseLayout pageTitle="Gallery" ogType="article">
+  <article class="px-1">
+    <h1 class="dynamic-title">Gallery</h1>
+    <div class="content">
+      <p>This is a collection of some of my AI art, mostly generated on my iPad.</p>
+      <div class="image-gallery">
+        {images.map((file) => (
+          <a href={`/assets/ai/${file}`} class="popup img-link"><img src={`/assets/ai/${file}`} alt={file.replace(/\.[^.]+$/, '')} loading="lazy" /></a>
+        ))}
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<style is:global>
+  .image-gallery {
+    overflow: auto;
+    margin-left: -1% !important;
+  }
+
+  .image-gallery a {
+    float: left;
+    display: block;
+    margin: 0 0 1% 1%;
+    text-align: center;
+    text-decoration: none !important;
+  }
+
+  .image-gallery a img {
+    width: auto;
+    display: block;
+    max-height: 300px;
+  }
+</style>

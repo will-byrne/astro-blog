@@ -1,84 +1,28 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCategories, getPosts } from '../../lib/posts';
 
-const allPosts = Object.values(import.meta.glob('../posts/*.md', { eager: true }));
-const categories = [...new Set(allPosts.map((post: any) => post.frontmatter.category).filter(Boolean))].sort();
-const pageTitle = "Categories";
+const categories = getCategories(await getPosts());
 ---
 
-<BaseLayout pageTitle={pageTitle}>
-  <div class="categories-container">
-    <p class="categories-intro">Browse posts by category</p>
-    <div class="categories-grid">
-      {categories.map((category) => {
-        const postCount = allPosts.filter((post: any) => 
-          post.frontmatter.category === category
-        ).length;
-        return (
-          <a href={`/categories/${category}`} class="category-card">
-            <span class="category-name">{category}</span>
-            <span class="category-count">{postCount} {postCount === 1 ? 'post' : 'posts'}</span>
-          </a>
-        );
-      })}
+<BaseLayout pageTitle="Categories" ogType="article">
+  <article class="px-1">
+    <h1 class="dynamic-title">Categories</h1>
+    <div class="content">
+      {categories.map(({ slug, label, posts }) => (
+        <div class="card categories">
+          <div class="card-header d-flex justify-content-between hide-border-bottom">
+            <span class="ms-2">
+              <i class="far fa-folder fa-fw"></i>
+              <a href={`/categories/${slug}/`} class="mx-2">{label}</a>
+              <span class="text-muted small font-weight-light">{posts.length} {posts.length === 1 ? 'post' : 'posts'}</span>
+            </span>
+            <span class="category-trigger hide-border-bottom disabled">
+              <i class="fas fa-fw fa-angle-right"></i>
+            </span>
+          </div>
+        </div>
+      ))}
     </div>
-  </div>
+  </article>
 </BaseLayout>
-
-<style>
-  .categories-container {
-    max-width: 900px;
-  }
-
-  .categories-intro {
-    font-size: 1.1rem;
-    color: var(--text-muted-color);
-    margin-bottom: 2rem;
-  }
-
-  .categories-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1rem;
-  }
-
-  .category-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 1.5rem;
-    background-color: var(--sidebar-hover-bg);
-    border: 1px solid var(--sidebar-border-color);
-    border-radius: 0.5rem;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    min-height: 120px;
-  }
-
-  .category-card:hover {
-    background-color: var(--accent-color);
-    border-color: var(--accent-color);
-    transform: translateY(-2px);
-  }
-
-  .category-name {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--heading-color);
-    margin-bottom: 0.5rem;
-  }
-
-  .category-card:hover .category-name {
-    color: var(--main-bg);
-  }
-
-  .category-count {
-    font-size: 0.9rem;
-    color: var(--text-muted-color);
-  }
-
-  .category-card:hover .category-count {
-    color: var(--main-bg);
-  }
-</style>

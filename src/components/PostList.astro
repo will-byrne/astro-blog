@@ -1,0 +1,39 @@
+---
+import PostCard from './PostCard.astro';
+import type { Post } from '../lib/posts';
+
+interface Props {
+  posts: Post[];
+  page: number;
+  totalPages: number;
+}
+
+const { posts, page, totalPages } = Astro.props;
+const hrefFor = (n: number) => (n === 1 ? '/' : `/page${n}/`);
+const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+---
+<div id="post-list" class="flex-grow-1 px-xl-1">
+  {posts.map((post) => <PostCard post={post} />)}
+</div>
+
+{totalPages > 1 && (
+  <nav aria-label="Page Navigation">
+    <ul class="pagination align-items-center mt-4 mb-0">
+      <li class:list={['page-item', { disabled: page === 1 }]}>
+        <a class="page-link" href={page === 1 ? '#' : hrefFor(page - 1)} aria-label="previous-page"><i class="fas fa-angle-left"></i></a>
+      </li>
+      {pages.map((n) => (
+        <li class:list={['page-item', { active: n === page }]}>
+          <a class="page-link" href={hrefFor(n)}>{n}</a>
+        </li>
+      ))}
+      <li class="page-index align-middle">
+        <span>{page}</span>
+        <span class="text-muted">/ {totalPages}</span>
+      </li>
+      <li class:list={['page-item', { disabled: page === totalPages }]}>
+        <a class="page-link" href={page === totalPages ? '#' : hrefFor(page + 1)} aria-label="next-page"><i class="fas fa-angle-right"></i></a>
+      </li>
+    </ul>
+  </nav>
+)}

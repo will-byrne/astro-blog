@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://willbyrne.dev/sitemap-index.xml
