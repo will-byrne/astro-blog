@@ -1,0 +1,50 @@
+---
+import Icon from './Icon.astro';
+
+const links = [
+  { href: '/categories/', label: 'Categories' },
+  { href: '/tags/', label: 'Tags' },
+  { href: '/resume/', label: 'Resume' },
+];
+---
+<footer class="site-footer">
+  <nav aria-label="More">
+    {links.map(({ href, label }) => <a href={href}>{label}</a>)}
+  </nav>
+  <div class="social cycle">
+    <a class="icon-button" href="https://github.com/will-byrne" aria-label="GitHub" rel="me noopener noreferrer"><Icon name="github" /></a>
+    <a class="icon-button" href="javascript:location.href = 'mailto:' + ['blog+will.alex.byrne','gmail.com'].join('@')" aria-label="Email"><Icon name="mail" /></a>
+    <a class="icon-button" href="/feed.xml" aria-label="RSS feed"><Icon name="rss" /></a>
+  </div>
+  <p class="meta">© {new Date().getFullYear()} Will Byrne. Posts are licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Built with <a href="https://astro.build">Astro</a> in <a href="https://catppuccin.com">Catppuccin Macchiato</a>.</p>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: 4rem;
+    padding-block: 1.5rem;
+    border-top: 2px solid var(--surface0);
+  }
+
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 1.25rem;
+  }
+
+  nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+  }
+
+  .social {
+    display: flex;
+    gap: 0.25rem;
+    margin: 0.25rem 0 0.5rem -0.6rem;
+  }
+
+  p {
+    margin: 0;
+  }
+</style>

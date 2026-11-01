@@ -1,0 +1,120 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import avatar from '../assets/images/avatar.jpg';
+import { SITE_TITLE } from '../lib/posts';
+
+const links = [
+  { href: '/', label: 'Journal' },
+  { href: '/archives/', label: 'Archive' },
+  { href: '/gallery/', label: 'Gallery' },
+  { href: '/about/', label: 'About' },
+];
+const path = Astro.url.pathname.replace(/\/?$/, '/');
+const isCurrent = (href: string) =>
+  href === '/' ? path === '/' || /^\/(page\d+|posts)\//.test(path) : path.startsWith(href);
+---
+<header class="site-header">
+  <div class="top">
+    <a href="/" class="brand">
+      <Image src={avatar} width={40} height={40} densities={[1, 2]} alt="" loading="eager" />
+      <span>{SITE_TITLE}</span>
+    </a>
+    <button type="button" class="icon-button" data-search-open aria-label="Search">
+      <Icon name="search" />
+    </button>
+  </div>
+  <nav aria-label="Main" class="cycle">
+    {links.map(({ href, label }) => (
+      <a href={href} aria-current={isCurrent(href) ? 'page' : undefined}>{label}</a>
+    ))}
+  </nav>
+</header>
+
+<style>
+  .site-header {
+    padding-top: 1rem;
+    border-bottom: 2px solid var(--surface0);
+  }
+
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: var(--tap);
+    color: var(--text);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .brand:hover {
+    color: var(--mauve);
+  }
+
+  .top button {
+    color: var(--yellow);
+  }
+
+  .brand img {
+    border-radius: 50%;
+  }
+
+  nav {
+    display: flex;
+    gap: 0.25rem clamp(0.75rem, 4vw, 1.25rem);
+    flex-wrap: wrap;
+  }
+
+  nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    margin-bottom: -2px;
+    border-bottom: 2px solid transparent;
+    color: var(--subtext1);
+    text-decoration: none;
+  }
+
+  nav a:hover {
+    color: var(--accent);
+  }
+
+  nav a[aria-current='page'] {
+    border-bottom-color: var(--accent);
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* One row once there is room: brand on the left, links and search on the right */
+  @media (min-width: 48rem) {
+    .site-header {
+      display: flex;
+      align-items: flex-end;
+      padding-block: 0.75rem 0;
+    }
+
+    .top {
+      display: contents;
+    }
+
+    .brand {
+      margin-right: auto;
+    }
+
+    nav {
+      order: 1;
+    }
+
+    .top button {
+      order: 2;
+      margin-left: 0.75rem;
+    }
+  }
+</style>

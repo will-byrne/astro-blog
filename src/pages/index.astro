@@ -6,6 +6,8 @@ import { getPosts, POSTS_PER_PAGE, SITE_TITLE } from '../lib/posts';
 const allPosts = await getPosts();
 const totalPages = Math.ceil(allPosts.length / POSTS_PER_PAGE);
 ---
-<BaseLayout pageTitle={SITE_TITLE} crumbs={[{ label: 'Home' }]}>
+<BaseLayout pageTitle={SITE_TITLE}>
+  <h1 class="page-title">Tech, music and life.</h1>
+  <p class="page-intro">A journal of what I'm building, playing and learning along the way.</p>
   <PostList posts={allPosts.slice(0, POSTS_PER_PAGE)} page={1} totalPages={totalPages} />
 </BaseLayout>

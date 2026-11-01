@@ -8,7 +8,7 @@ tags:
   - teamwork
   - collaboration
 image:
-  url: /assets/ai/developers.jpeg
+  url: ../../assets/images/ai/developers.jpeg
   alt: A group of developers having a meeting
 ---
 

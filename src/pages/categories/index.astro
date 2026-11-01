@@ -1,28 +1,55 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import TopicNav from '../../components/TopicNav.astro';
 import { getCategories, getPosts } from '../../lib/posts';
 
 const categories = getCategories(await getPosts());
 ---
 
 <BaseLayout pageTitle="Categories" ogType="article">
-  <article class="px-1">
-    <h1 class="dynamic-title">Categories</h1>
-    <div class="content">
-      {categories.map(({ slug, label, posts }) => (
-        <div class="card categories">
-          <div class="card-header d-flex justify-content-between hide-border-bottom">
-            <span class="ms-2">
-              <i class="far fa-folder fa-fw"></i>
-              <a href={`/categories/${slug}/`} class="mx-2">{label}</a>
-              <span class="text-muted small font-weight-light">{posts.length} {posts.length === 1 ? 'post' : 'posts'}</span>
-            </span>
-            <span class="category-trigger hide-border-bottom disabled">
-              <i class="fas fa-fw fa-angle-right"></i>
-            </span>
-          </div>
-        </div>
-      ))}
-    </div>
-  </article>
+  <h1 class="page-title">Categories</h1>
+  <TopicNav />
+  <ul class="cycle">
+    {categories.map(({ slug, label, posts }) => (
+      <li>
+        <a href={`/categories/${slug}/`}>
+          <span>{label}</span>
+          <span class="count">{posts.length} {posts.length === 1 ? 'post' : 'posts'}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
 </BaseLayout>
+
+<style>
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 3.25rem;
+    border-top: 1px solid var(--surface0);
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  @media (min-width: 48rem) {
+    ul {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 3rem;
+    }
+  }
+
+  .count {
+    flex: none;
+    color: var(--subtext1);
+    font-size: 1rem;
+  }
+</style>

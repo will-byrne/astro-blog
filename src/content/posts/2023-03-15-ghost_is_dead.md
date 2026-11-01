@@ -8,7 +8,7 @@ tags:
   - Infrastructure
   - Jekyll
 image:
-  url: /assets/gothic_london.jpeg
+  url: ../../assets/images/gothic_london.jpeg
   alt: 'Generated with Estilovintedois: estilovintedois, masterpiece, best quality, gothic, night, london, victorian, dr jekyll'
 ---
 As it turns out trying to upgrade your `Ghost` server when suffering badly from insomnia is not a great idea.

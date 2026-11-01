@@ -1,37 +1,65 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getPosts, postUrl, type Post } from '../lib/posts';
+import { getPosts, groupByYear, postUrl } from '../lib/posts';
 
-const years = new Map<number, Post[]>();
-for (const post of await getPosts()) {
-  const year = post.data.pubDate.getUTCFullYear();
-  years.set(year, [...(years.get(year) ?? []), post]);
-}
-
-const day = (date: Date) => String(date.getUTCDate()).padStart(2, '0');
-const month = (date: Date) => date.toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' });
+const posts = await getPosts();
+const shortDate = (date: Date) => date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
 ---
 
-<BaseLayout pageTitle="Archives" ogType="article">
-  <article class="px-1">
-    <h1 class="dynamic-title">Archives</h1>
-    <div class="content">
-      <div id="archives" class="pl-xl-3">
-        {[...years].map(([year, posts]) => (
-          <>
-            <time class="year lead d-block">{year}</time>
-            <ul class="list-unstyled">
-              {posts.map((post) => (
-                <li>
-                  <span class="date day">{day(post.data.pubDate)}</span>
-                  <span class="date month small text-muted ms-1">{month(post.data.pubDate)}</span>
-                  <a href={postUrl(post)}>{post.data.title}</a>
-                </li>
-              ))}
-            </ul>
-          </>
+<BaseLayout pageTitle="Archive" ogType="article">
+  <h1 class="page-title">Archive</h1>
+  <p class="page-intro">All {posts.length} posts, newest first.</p>
+  {groupByYear(posts).map(([year, yearPosts]) => (
+    <section class="year">
+      <h2>{year}</h2>
+      <ul>
+        {yearPosts.map((post) => (
+          <li>
+            <time datetime={post.data.pubDate.toISOString()}>{shortDate(post.data.pubDate)}</time>
+            <a href={postUrl(post)}>{post.data.title}</a>
+          </li>
         ))}
-      </div>
-    </div>
-  </article>
+      </ul>
+    </section>
+  ))}
 </BaseLayout>
+
+<style>
+  section + section {
+    margin-top: 2rem;
+  }
+
+  h2 {
+    margin-bottom: 0.5rem;
+    color: var(--accent);
+    font-size: 1.25rem;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    gap: 0.75rem;
+    padding-block: 0.5rem;
+    border-top: 1px solid var(--surface0);
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  time {
+    color: var(--sapphire);
+    font-size: 1rem;
+    line-height: 1.9;
+  }
+</style>

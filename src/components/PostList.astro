@@ -1,6 +1,7 @@
 ---
-import PostCard from './PostCard.astro';
-import type { Post } from '../lib/posts';
+import { Image } from 'astro:assets';
+import PostEntry from './PostEntry.astro';
+import { formatDate, getExcerpt, groupByYear, postUrl, type Post } from '../lib/posts';
 
 interface Props {
   posts: Post[];
@@ -10,30 +11,130 @@ interface Props {
 
 const { posts, page, totalPages } = Astro.props;
 const hrefFor = (n: number) => (n === 1 ? '/' : `/page${n}/`);
-const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+
+// The first page leads with the latest post
+const featured = page === 1 ? posts[0] : undefined;
+const rest = featured ? posts.slice(1) : posts;
 ---
-<div id="post-list" class="flex-grow-1 px-xl-1">
-  {posts.map((post) => <PostCard post={post} />)}
-</div>
+{featured && (
+  <article class="featured">
+    {featured.data.image && <Image src={featured.data.image.url} alt="" widths={[640, 960, 1280]} sizes="(min-width: 64rem) 38rem, calc(100vw - 2.5rem)" loading="eager" fetchpriority="high" />}
+    <p class="meta">Latest · <time datetime={featured.data.pubDate.toISOString()}>{formatDate(featured.data.pubDate)}</time> · {featured.data.category}</p>
+    <h2><a href={postUrl(featured)}>{featured.data.title}</a></h2>
+    <p class="excerpt">{getExcerpt(featured)}</p>
+  </article>
+)}
+
+{groupByYear(rest).map(([year, yearPosts]) => (
+  <section class="year">
+    <h2>{year}</h2>
+    <ol class="timeline cycle">
+      {yearPosts.map((post) => <PostEntry post={post} />)}
+    </ol>
+  </section>
+))}
 
 {totalPages > 1 && (
-  <nav aria-label="Page Navigation">
-    <ul class="pagination align-items-center mt-4 mb-0">
-      <li class:list={['page-item', { disabled: page === 1 }]}>
-        <a class="page-link" href={page === 1 ? '#' : hrefFor(page - 1)} aria-label="previous-page"><i class="fas fa-angle-left"></i></a>
-      </li>
-      {pages.map((n) => (
-        <li class:list={['page-item', { active: n === page }]}>
-          <a class="page-link" href={hrefFor(n)}>{n}</a>
-        </li>
-      ))}
-      <li class="page-index align-middle">
-        <span>{page}</span>
-        <span class="text-muted">/ {totalPages}</span>
-      </li>
-      <li class:list={['page-item', { disabled: page === totalPages }]}>
-        <a class="page-link" href={page === totalPages ? '#' : hrefFor(page + 1)} aria-label="next-page"><i class="fas fa-angle-right"></i></a>
-      </li>
-    </ul>
+  <nav class="pagination" aria-label="Pages">
+    {page > 1 ? <a href={hrefFor(page - 1)} rel="prev">← Newer</a> : <span></span>}
+    <span class="meta">Page {page} of {totalPages}</span>
+    {page < totalPages ? <a href={hrefFor(page + 1)} rel="next">Older →</a> : <span></span>}
   </nav>
 )}
+
+<style>
+  .featured {
+    position: relative;
+    margin-bottom: 3rem;
+  }
+
+  .featured img {
+    width: 100%;
+    aspect-ratio: 2 / 1;
+    margin-bottom: 1rem;
+    border-radius: 0.75rem;
+    object-fit: cover;
+  }
+
+  .featured .meta {
+    margin: 0 0 0.25rem;
+  }
+
+  .featured h2 {
+    font-size: clamp(1.6rem, 5vw, 2rem);
+  }
+
+  .featured h2 a {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .featured h2 a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .featured:hover h2 a {
+    color: var(--pink);
+  }
+
+  .excerpt {
+    margin: 0.5rem 0 0;
+    color: var(--subtext1);
+  }
+
+  /* Image beside the text on wide screens */
+  @media (min-width: 64rem) {
+    .featured:has(img) {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+      grid-template-rows: 1fr auto auto auto 1fr;
+      align-items: start;
+      column-gap: 2.5rem;
+    }
+
+    .featured:has(img) img {
+      grid-row: 1 / -1;
+      aspect-ratio: 16 / 10;
+      margin-bottom: 0;
+    }
+
+    .featured:has(img) .meta {
+      grid-area: 2 / 2;
+    }
+
+    .featured:has(img) h2 {
+      grid-area: 3 / 2;
+    }
+
+    .featured:has(img) .excerpt {
+      grid-area: 4 / 2;
+    }
+  }
+
+  .year + .year {
+    margin-top: 2.5rem;
+  }
+
+  .year h2 {
+    margin-bottom: 0.5rem;
+    color: var(--accent);
+    font-size: 1.1rem;
+  }
+
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 2.5rem;
+  }
+
+  .pagination a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    font-weight: 700;
+  }
+</style>

@@ -1,42 +1,33 @@
 ---
-import '@fontsource/lato/400.css';
-import '@fontsource/source-sans-pro/400.css';
-import '@fontsource/source-sans-pro/600.css';
-import '@fontsource/source-sans-pro/700.css';
-import '@fontsource/source-sans-pro/900.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import '@fortawesome/fontawesome-free/css/all.min.css';
-import '../styles/chirpy.css';
+import { getImage } from 'astro:assets';
+import '@fontsource-variable/atkinson-hyperlegible-next/wght.css';
+import '@fontsource-variable/atkinson-hyperlegible-next/wght-italic.css';
+import '@fontsource-variable/atkinson-hyperlegible-mono/wght.css';
 import '../styles/global.css';
-import Sidebar from '../components/Sidebar.astro';
-import Topbar, { type Crumb } from '../components/Topbar.astro';
-import Panel from '../components/Panel.astro';
-import TrendingTags from '../components/TrendingTags.astro';
-import { AUTHOR_URL, SITE_DESCRIPTION, SITE_TITLE } from '../lib/posts';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Icon from '../components/Icon.astro';
+import SearchDialog from '../components/SearchDialog.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../lib/posts';
 
 interface Props {
   pageTitle: string;
   description?: string;
-  image?: string;
+  image?: ImageMetadata;
   ogType?: 'website' | 'article';
-  crumbs?: Crumb[];
-  topbarTitle?: string;
 }
 
-const {
-  pageTitle,
-  description = SITE_DESCRIPTION,
-  image,
-  ogType = 'website',
-  crumbs = [{ label: 'Home', href: '/' }, { label: pageTitle }],
-  topbarTitle = pageTitle,
-} = Astro.props;
+const { pageTitle, description = SITE_DESCRIPTION, image, ogType = 'website' } = Astro.props;
 const title = pageTitle === SITE_TITLE ? SITE_TITLE : `${pageTitle} | ${SITE_TITLE}`;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
+const socialImage = image && (await getImage({ src: image, width: 1200, format: 'jpeg' }));
 ---
-<html lang="en" data-mode="dark">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#24273a" />
+    <meta name="generator" content={Astro.generator} />
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicons/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicons/favicon-16x16.png" />
@@ -44,8 +35,6 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
     <link rel="canonical" href={canonicalUrl} />
     <link rel="alternate" type="application/rss+xml" title={SITE_TITLE} href="/feed.xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />
-    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, shrink-to-fit=no" />
-    <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta property="og:title" content={title} />
@@ -53,53 +42,40 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:site_name" content={SITE_TITLE} />
     <meta property="og:type" content={ogType} />
-    {image && <meta property="og:image" content={new URL(image, Astro.site)} />}
+    {socialImage && <meta property="og:image" content={new URL(socialImage.src, Astro.site)} />}
   </head>
   <body>
-    <Sidebar />
-    <div id="main-wrapper" class="d-flex justify-content-center">
-      <div class="container d-flex flex-column px-xxl-5">
-        <Topbar crumbs={crumbs} title={topbarTitle} />
-        <div class="row flex-grow-1">
-          <main aria-label="Main Content" class="col-12 col-lg-11 col-xl-9 px-md-4">
-            <slot />
-          </main>
-          <Panel>
-            <slot name="panel" />
-          </Panel>
-        </div>
-        <div class="row">
-          <div id="tail-wrapper" class="col-12 col-lg-11 col-xl-9 px-md-4">
-            <slot name="tail" />
-            <footer aria-label="Site Info" class="d-flex flex-column justify-content-center text-muted flex-lg-row justify-content-lg-between align-items-lg-center pb-lg-3">
-              <p>
-                © <time>{new Date().getFullYear()}</time> <a href={AUTHOR_URL}>Will Byrne</a>.
-                <span title="Except where otherwise noted, the blog posts on this site are licensed under the Creative Commons Attribution 4.0 International (CC BY 4.0) License by the author.">Some rights reserved.</span>
-              </p>
-              <p>
-                Using the <a href="https://github.com/cotes2020/jekyll-theme-chirpy" target="_blank" rel="noopener">Chirpy</a> theme with <a href="https://astro.build" target="_blank" rel="noopener">Astro</a>.
-              </p>
-            </footer>
-          </div>
-        </div>
-        <div id="search-result-wrapper" class="d-flex justify-content-center unloaded">
-          <div class="col-11 content">
-            <div id="search-hints">
-              <TrendingTags />
-            </div>
-            <div id="search-results" class="d-flex flex-wrap justify-content-center text-muted mt-3"></div>
-          </div>
-        </div>
-      </div>
-      <aside aria-label="Scroll to Top">
-        <button id="back-to-top" type="button" class="btn btn-lg btn-box-shadow" aria-label="Back to top">
-          <i class="fas fa-angle-up"></i>
-        </button>
-      </aside>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <div class="page-box">
+      <Header />
+      <main id="content">
+        <slot />
+      </main>
+      <Footer />
     </div>
-    <div id="mask"></div>
+    <button type="button" id="back-to-top" class="icon-button" aria-label="Back to top" hidden><Icon name="up" /></button>
+    <SearchDialog />
+    <dialog id="lightbox" aria-label="Enlarged image">
+      <img alt="" />
+      <button type="button" class="icon-button" aria-label="Close image"><Icon name="close" /></button>
+    </dialog>
     <script>
-      import '../scripts/chirpy.js';
+      import '../scripts/site.js';
     </script>
+    <style>
+      #back-to-top {
+        position: fixed;
+        right: 1rem;
+        bottom: 1rem;
+        z-index: 5;
+        background: var(--surface0);
+        border-radius: 50%;
+        color: var(--mauve);
+      }
+
+      #back-to-top[hidden] {
+        display: none;
+      }
+    </style>
   </body>
 </html>

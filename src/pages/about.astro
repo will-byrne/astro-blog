@@ -4,21 +4,33 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 const goals = ['Finish sorting Irish FBR', 'Lose weight', 'Blog Improvements'];
 ---
 <BaseLayout pageTitle="About" ogType="article">
-  <article class="px-1">
-    <h1 class="dynamic-title">About</h1>
-    <div class="content">
-      <h2 id="blog"><span class="me-2">Blog</span><a href="#blog" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2>
-      <p>This is my blog about tech and music and whatever else crosses my mind. It was written to be a personal log of my thoughts, a journal for my hobbies, a place to place notes on research and tech I study while working, and a place to put down ideas on self improvement.</p>
+  <h1 class="page-title">About</h1>
+  <div class="about">
+  <div class="prose">
+    <h2 id="blog">Blog</h2>
+    <p>This is my blog about tech and music and whatever else crosses my mind. It was written to be a personal log of my thoughts, a journal for my hobbies, a place to place notes on research and tech I study while working, and a place to put down ideas on self improvement.</p>
 
-      <p>There are no rules about what I post, the above was the intent when I started this project but I have decided that I will not allow that to stop me writing a post if I think that it will help me or others.</p>
+    <p>There are no rules about what I post, the above was the intent when I started this project but I have decided that I will not allow that to stop me writing a post if I think that it will help me or others.</p>
 
-      <h2 id="me"><span class="me-2">Me</span><a href="#me" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2>
-      <p>Hi, I am me. I am a human in my late 30s. I enjoy many hobbies including astrophotography, archery, bbqs, calligraphy, drawing, listening to music, playing music, board games, video games, reading, table top role playing games, and many others. I live by myself in a small village in the eastern UK, I like the quiet and the lack of light pollution for my stargazing.</p>
-
-      <h2 id="current-goals"><span class="me-2">Current Goals</span><a href="#current-goals" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2>
-      <ul class="task-list">
-        {goals.map((goal) => <li class="task-list-item"><i class="far fa-circle fa-fw"></i>{goal}</li>)}
-      </ul>
-    </div>
-  </article>
+    <h2 id="me">Me</h2>
+    <p>Hi, I am me. I am a human in my late 30s. I enjoy many hobbies including astrophotography, archery, bbqs, calligraphy, drawing, listening to music, playing music, board games, video games, reading, table top role playing games, and many others. I live by myself in a small village in the eastern UK, I like the quiet and the lack of light pollution for my stargazing.</p>
+  </div>
+  <div class="prose">
+    <h2 id="current-goals">Current Goals</h2>
+    <ul class="goals">
+      {goals.map((goal) => <li>{goal}</li>)}
+    </ul>
+  </div>
+  </div>
 </BaseLayout>
+
+<style>
+  /* Goals sit beside the text once there is room */
+  @media (min-width: 75rem) {
+    .about {
+      display: grid;
+      grid-template-columns: minmax(0, var(--reading)) minmax(0, 1fr);
+      column-gap: 4rem;
+    }
+  }
+</style>

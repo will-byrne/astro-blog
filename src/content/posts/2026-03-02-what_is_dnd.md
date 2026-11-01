@@ -8,7 +8,7 @@ tags:
   - D&D
   - ttrpg
 image:
-  url: /assets/dice.jpeg
+  url: ../../assets/images/dice.jpeg
   alt: Big pile of polyhedral dice
 ---
 

@@ -11,7 +11,7 @@ tags:
   - Rasberry-pi
 ---
 
-![Unicorn Ghost](/assets/unicorn-ghost.jpg)
+![Unicorn Ghost](../../assets/images/unicorn-ghost.jpg)
 
 Having decided to start this project I encountered a few problems, surprises and more than a little frustration. Compared to when I last did this however it was a lot simpler.
 
@@ -67,4 +67,4 @@ It was at this point that I thought maybe I had missed a setting in my router...
 
 Despite frustrations and self recriminations setting this up was fun, it's not often I get the chance or have the time to play with this sort of thing and I learned a bit about Docker along the way and a day you learn something new is a day well spent. Next time I set something like this up should be a lot simpler because I am going to image the sd card this is running on while its in a relatively base state and I have this document to prevent me making the same mistakes again. So in conclusion, check your port forwarding, beware angry goat ghosts, stay hydrated and FHTAGN!
 
-![Cthulhu Fthagn](/assets/cthulhu.jpeg)
+![Cthulhu Fthagn](../../assets/images/cthulhu.jpeg)

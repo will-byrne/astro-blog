@@ -3,9 +3,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 export type Post = CollectionEntry<'posts'>;
 
 export const SITE_TITLE = "Will's Tech Blog";
-export const SITE_TAGLINE = 'Tech, Music and Life';
-export const SITE_DESCRIPTION = 'A collection of my musings on tech, music and photography.';
-export const AUTHOR_URL = 'https://github.com/will-byrne';
+export const SITE_DESCRIPTION = 'A journal of tech, music and life.';
 export const POSTS_PER_PAGE = 10;
 
 // Drafts are visible in `astro dev` but never built for production
@@ -16,7 +14,7 @@ export async function getPosts(): Promise<Post[]> {
 
 export const postUrl = (post: Post) => `/posts/${post.id}/`;
 
-// Matches the tag and category URLs Jekyll generated, e.g. "D&D" -> "d-d"
+// Keeps the tag and category URLs from the old Jekyll site, e.g. "D&D" -> "d-d"
 export function slugify(label: string): string {
   return label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 }
@@ -38,27 +36,19 @@ function groupPosts(posts: Post[], labelsOf: (post: Post) => string[]): Term[] {
       terms.set(slug, term);
     }
   }
-  return [...terms.values()];
+  return [...terms.values()].sort((a, b) => a.label.localeCompare(b.label));
 }
 
-export function getTags(posts: Post[]): Term[] {
-  return groupPosts(posts, (post) => post.data.tags).sort((a, b) => a.label.localeCompare(b.label));
-}
+export const getTags = (posts: Post[]) => groupPosts(posts, (post) => post.data.tags);
+export const getCategories = (posts: Post[]) => groupPosts(posts, (post) => [post.data.category]);
 
-// Chirpy sorts categories case-sensitively, so "iPad" comes last
-export function getCategories(posts: Post[]): Term[] {
-  return groupPosts(posts, (post) => [post.data.category]).sort((a, b) => (a.label < b.label ? -1 : 1));
-}
-
-export function getTrendingTags(posts: Post[], limit = 10): Term[] {
-  return getTags(posts)
-    .sort((a, b) => b.posts.length - a.posts.length || a.label.localeCompare(b.label))
-    .slice(0, limit);
-}
-
-export function getRecentlyUpdated(posts: Post[], limit = 5): Post[] {
-  const lastChange = (post: Post) => (post.data.updated ?? post.data.pubDate).getTime();
-  return [...posts].sort((a, b) => lastChange(b) - lastChange(a)).slice(0, limit);
+export function groupByYear(posts: Post[]): [number, Post[]][] {
+  const years = new Map<number, Post[]>();
+  for (const post of posts) {
+    const year = post.data.pubDate.getUTCFullYear();
+    years.set(year, [...(years.get(year) ?? []), post]);
+  }
+  return [...years];
 }
 
 // Posts sharing the most tags and category, newest first on a tie
@@ -85,17 +75,19 @@ export function plainText(markdown: string): string {
 
 export function getExcerpt(post: Post, maxLength = 200): string {
   if (post.data.description) return post.data.description;
-  const text = plainText(post.body ?? '');
+  const prose = (post.body ?? '').replace(/```[\s\S]*?```/g, ' ').replace(/^#+\s.*$/gm, ' ').replace(/^\s*[-*+]\s+/gm, '');
+  const text = plainText(prose);
   if (text.length <= maxLength) return text;
-  return `${text.slice(0, maxLength).replace(/\s+\S*$/, '')}...`;
+  return `${text.slice(0, maxLength).replace(/\s+\S*$/, '')}…`;
 }
 
-export const getWordCount = (post: Post) => plainText(post.body ?? '').split(/\s+/).filter(Boolean).length;
-
-// Chirpy's formula: 180 words per minute, rounded down, at least 1
-export const getReadingTime = (post: Post) => Math.floor(getWordCount(post) / 180) || 1;
+// 200 words per minute
+export function getReadingTime(post: Post): number {
+  const words = plainText(post.body ?? '').split(/\s+/).filter(Boolean).length;
+  return Math.ceil(words / 200) || 1;
+}
 
 // Dates are stored in UTC, so format them that way or they shift with the build machine's timezone
 export function formatDate(date: Date): string {
-  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' });
+  return date.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
 }

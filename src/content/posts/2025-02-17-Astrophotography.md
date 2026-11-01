@@ -8,7 +8,7 @@ tags:
   - Photography
   - Space
 image:
-  url: /assets/andromeda.jpeg
+  url: ../../assets/images/andromeda.jpeg
   alt: Andromeda galaxy
 ---
 
@@ -61,7 +61,7 @@ I don’t actually have much experience with using telescopes for astrophotograp
 Refractors like the [Williams Optics Redcat 51](https://williamoptics.com/products/cat-51) are currently my preferred lenses. This was actually the first lens I bought specifically for astrophotography in the SpaceCat variant and I used it to take a great (at least I think so) picture of the Andromeda galaxy (see the cover image for this post). It is a triplet APO refractor and all I understand about that is that it uses three lenses, it is very fast and is actually recommended for nature and sport photography as well. It is a very well put together lens and the inclusion of the Bahtinov cap makes focusing very easy when you first set up for a night. Other lenses are of course available, Vixen and Sharpstar both make great ones also. If looking to get into the hobby these lenses might seem expensive but they are a great place to start and unless you drop them are pretty bullet proof, mine sits in a backpack in a padded enclosure and isn’t even scratched after a few years of use. It is also very important to pick one that can capture the targets you are looking at, while I love my SpaceCat it struggles with most galaxies that are not Andromeda and it can only barely handle Triangulum. Ideally I would love a Redcat 91 but currently it is out of my budget but a Redcat 71 may be in my future depending on whether I can find the time to do more shooting this year.
 
 # My setup
-![Astrophotography Kit](/assets/astro_kit.jpeg)
+![Astrophotography Kit](../../assets/images/astro_kit.jpeg)
 
 This is the setup that I used to take the picture of the Andromeda galaxy. It is a relatively cheap setup (for the hobby).
 

@@ -10,7 +10,7 @@ tags:
   - Jekyll
   - Catppuccin
 image:
-  url: /assets/img/catppuccin_rainbow.jpeg
+  url: ../../assets/images/img/catppuccin_rainbow.jpeg
   alt: Minimalist Catppuccin Rainbow
 ---
 
@@ -39,7 +39,7 @@ The main change that I wanted to make was to chang the colours, there were some 
 
 ### Catppuccin
 [Catppuccin](https://catppuccin-website.vercel.app/) ([GitHub](https://github.com/catppuccin/catppuccin)) is a wonderful coffee / cat inspired theme that I find very easy to read. Being colour blind these dark themes often give me issues but this one has been made very well and I don't struggle as much with low contrast (to me) colour differences. I use this scheme on my PC for almost everything and on their [GitHub repo](https://github.com/catppuccin/catppuccin) they have ports from everything from terminal emulators, to games, to IDEs, and many more.
-<a href="/assets/img/macchiato_squircle.jpeg" class="popup img-link"><img src="/assets/img/macchiato_squircle.jpeg" alt="Catppuccin logo" width="25%" loading="lazy"></a>
+<img src="/assets/img/macchiato_squircle.jpeg" alt="Catppuccin logo" width="25%" loading="lazy">
 
 #### Variants
 There are four main variants of the theme: Latte (the light theme), Frappe, Macchiato, and Mocha. I use the Mocha variant on my arch system and plan to eventually incorporate a switcher into my site to allow switching between the four variants (possibly with the appropriate coffee cups as icons).

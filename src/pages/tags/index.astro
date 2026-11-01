@@ -1,21 +1,49 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import TopicNav from '../../components/TopicNav.astro';
 import { getPosts, getTags } from '../../lib/posts';
 
 const tags = getTags(await getPosts());
 ---
 
 <BaseLayout pageTitle="Tags" ogType="article">
-  <article class="px-1">
-    <h1 class="dynamic-title">Tags</h1>
-    <div class="content">
-      <div id="tags" class="d-flex flex-wrap mx-xl-2">
-        {tags.map(({ slug, label, posts }) => (
-          <div>
-            <a class="tag" href={`/tags/${slug}/`}>{label}<span class="text-muted">{posts.length}</span></a>
-          </div>
-        ))}
-      </div>
-    </div>
-  </article>
+  <h1 class="page-title">Tags</h1>
+  <TopicNav />
+  <ul class="cycle">
+    {tags.map(({ slug, label, posts }) => (
+      <li><a href={`/tags/${slug}/`}>{label} <span>{posts.length}</span></a></li>
+    ))}
+  </ul>
 </BaseLayout>
+
+<style>
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: var(--tap);
+    padding-inline: 0.9rem;
+    background: var(--mantle);
+    border-radius: 0.5rem;
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  a:hover {
+    background: var(--surface0);
+  }
+
+  span {
+    color: var(--subtext1);
+    font-size: 1rem;
+  }
+</style>

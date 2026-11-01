@@ -8,7 +8,7 @@ const posts = defineCollection({
     // Keep the filename's case and underscores, as they are part of the published URLs
     generateId: ({ entry }) => entry.replace(/\.md$/, '').replace(/^\d{4}-\d{2}-\d{2}-/, ''),
   }),
-  schema: z.object({
+  schema: ({ image }) => z.object({
     title: z.string(),
     pubDate: z.coerce.date(),
     updated: z.coerce.date().optional(),
@@ -16,7 +16,7 @@ const posts = defineCollection({
     author: z.string().default('Will Byrne'),
     category: z.string(),
     tags: z.array(z.string()).default([]),
-    image: z.object({ url: z.string(), alt: z.string().default('') }).optional(),
+    image: z.object({ url: image(), alt: z.string().default('') }).optional(),
     draft: z.boolean().default(false),
   }),
 });

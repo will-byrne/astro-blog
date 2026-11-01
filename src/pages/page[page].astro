@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PostList from '../components/PostList.astro';
-import { getPosts, POSTS_PER_PAGE, SITE_TITLE } from '../lib/posts';
+import { getPosts, POSTS_PER_PAGE } from '../lib/posts';
 
 export async function getStaticPaths() {
   const allPosts = await getPosts();
@@ -22,6 +22,8 @@ export async function getStaticPaths() {
 
 const { posts, page, totalPages } = Astro.props;
 ---
-<BaseLayout pageTitle={SITE_TITLE} crumbs={[{ label: 'Home' }]}>
+<BaseLayout pageTitle={`Journal, page ${page}`}>
+  <h1 class="page-title">Journal</h1>
+  <p class="page-intro">Older entries.</p>
   <PostList posts={posts} page={page} totalPages={totalPages} />
 </BaseLayout>

@@ -8,7 +8,7 @@ tags:
   - Coding
   - AI
 image:
-  url: /assets/cyberpark.jpeg
+  url: ../../assets/images/cyberpark.jpeg
   alt: Cyberpark childrens playground
 ---
 

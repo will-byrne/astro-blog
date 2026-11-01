@@ -1,0 +1,31 @@
+---
+const links = [
+  { href: '/categories/', label: 'Categories' },
+  { href: '/tags/', label: 'Tags' },
+];
+const path = Astro.url.pathname.replace(/\/?$/, '/');
+---
+<nav aria-label="Topics">
+  {links.map(({ href, label }) => <a href={href} aria-current={path === href ? 'page' : undefined}>{label}</a>)}
+</nav>
+
+<style>
+  nav {
+    display: flex;
+    gap: 1.25rem;
+    margin: 1rem 0 1.5rem;
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+  }
+
+  a[aria-current='page'] {
+    color: var(--peach);
+    font-weight: 700;
+    text-decoration-color: var(--peach);
+    text-decoration-thickness: 2px;
+  }
+</style>

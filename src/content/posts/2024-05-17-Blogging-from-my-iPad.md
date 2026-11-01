@@ -9,7 +9,7 @@ tags:
   - iPad
   - Infrastructure
 image:
-  url: /assets/iPad.jpg
+  url: ../../assets/images/iPad.jpg
   alt: iPad Pro M4
 ---
 
@@ -56,7 +56,7 @@ Setting it up was easy, all I had to do was log into my GitHub account and selec
 This is something that will probably chop and change as I play with different apps but currently I am using [MWeb](https://www.mweb.im/) but I don’t love it or hate it so ill try others probably until I find one that supports my favourite catppuccin theme.
 
 ### Images
-![Andromeda](/assets/andromeda.jpeg)
+![Andromeda](../../assets/images/andromeda.jpeg)
 If that image is visible then it all worked… guess I’ll have to wait till it’s pushed to see.
 
 ### Keyboard

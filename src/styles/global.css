@@ -1,147 +1,508 @@
-/* Image Lightbox Styles */
-.image-lightbox-wrapper {
-  cursor: pointer;
-  position: relative;
-  display: inline-block;
-  max-width: 100%;
-  transition: transform 0.2s ease;
+/* Catppuccin Macchiato */
+:root {
+  --base: #24273a;
+  --mantle: #1e2030;
+  --crust: #181926;
+  --surface0: #363a4f;
+  --surface1: #494d64;
+  --surface2: #5b6078;
+  --subtext1: #b8c0e0;
+  --text: #cad3f5;
+  --lavender: #b7bdf8;
+  --mauve: #c6a0f6;
+  --pink: #f5bde6;
+  --peach: #f5a97f;
+  --yellow: #eed49f;
+  --green: #a6da95;
+  --teal: #8bd5ca;
+  --sapphire: #7dc4e4;
+  --blue: #8aadf4;
+  --stripes: linear-gradient(
+    to right,
+    var(--mauve) 0 12.5%,
+    var(--pink) 0 25%,
+    var(--peach) 0 37.5%,
+    var(--yellow) 0 50%,
+    var(--green) 0 62.5%,
+    var(--teal) 0 75%,
+    var(--sapphire) 0 87.5%,
+    var(--blue) 0
+  );
+
+  --font-sans: 'Atkinson Hyperlegible Next Variable', system-ui, sans-serif;
+  --font-mono: 'Atkinson Hyperlegible Mono Variable', ui-monospace, monospace;
+
+  --reading: 44rem;
+  --box: 76rem;
+  --gutter: 1.25rem;
+  --tap: 2.75rem;
+
+  color-scheme: dark;
 }
 
-.image-lightbox-wrapper:hover {
-  transform: scale(1.02);
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-.image-lightbox-wrapper img {
+html {
+  background: var(--mantle);
+  scroll-padding-top: 1.5rem;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 1.125rem;
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+  word-spacing: 0.05em;
+  hyphens: none;
+  text-align: left;
+}
+
+main {
+  flex: 1;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+
+img {
+  display: block;
   max-width: 100%;
   height: auto;
-  display: block;
 }
 
-.image-lightbox-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
+a {
+  color: var(--lavender);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+a:hover {
+  color: var(--pink);
+}
+
+button {
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--mauve);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+::selection {
+  background: var(--surface2);
+  color: var(--text);
+}
+
+/* Larger type uses the extra width without making lines any longer to read */
+@media (min-width: 64rem) {
+  :root {
+    --reading: 47rem;
+  }
+
+  body {
+    font-size: 1.1875rem;
+  }
+}
+
+/* Layout */
+.page-box {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.9);
-  display: none;
+  padding-inline: var(--gutter);
+  background: var(--base);
+}
+
+/* The palette as a band across the top of the page */
+.page-box::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 0.3rem;
+  background: var(--stripes);
+}
+
+/* On phones the box fills the screen; from tablets up it floats on the darker page */
+@media (min-width: 48rem) {
+  .page-box {
+    width: min(100% - 3rem, var(--box));
+    margin: 1.5rem auto;
+    padding-inline: 3rem;
+    border-radius: 1rem;
+    overflow: clip;
+  }
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  z-index: 10;
+  padding: 0.5rem 1rem;
+  background: var(--mauve);
+  color: var(--crust);
+  border-radius: 0.5rem;
+}
+
+.skip-link:focus {
+  top: 1rem;
+  color: var(--crust);
+}
+
+/* Accent colours follow position in a list, never what an item is, so new items need no styling */
+.cycle > :nth-child(8n + 1),
+.year:nth-of-type(8n + 1) {
+  --accent: var(--mauve);
+}
+
+.cycle > :nth-child(8n + 2),
+.year:nth-of-type(8n + 2) {
+  --accent: var(--pink);
+}
+
+.cycle > :nth-child(8n + 3),
+.year:nth-of-type(8n + 3) {
+  --accent: var(--peach);
+}
+
+.cycle > :nth-child(8n + 4),
+.year:nth-of-type(8n + 4) {
+  --accent: var(--yellow);
+}
+
+.cycle > :nth-child(8n + 5),
+.year:nth-of-type(8n + 5) {
+  --accent: var(--green);
+}
+
+.cycle > :nth-child(8n + 6),
+.year:nth-of-type(8n + 6) {
+  --accent: var(--teal);
+}
+
+.cycle > :nth-child(8n + 7),
+.year:nth-of-type(8n + 7) {
+  --accent: var(--sapphire);
+}
+
+.cycle > :nth-child(8n + 8),
+.year:nth-of-type(8n + 8) {
+  --accent: var(--blue);
+}
+
+/* Shared text */
+.page-title {
+  margin-top: 2.5rem;
+  color: var(--mauve);
+  font-size: clamp(2rem, 7vw, 2.75rem);
+}
+
+.page-intro {
+  margin: 0.75rem 0 2.5rem;
+  color: var(--subtext1);
+}
+
+.meta {
+  color: var(--subtext1);
+  font-size: 1rem;
+}
+
+.meta time {
+  color: var(--sapphire);
+}
+
+.icon-button {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  z-index: 10000;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  flex: none;
+  width: var(--tap);
+  height: var(--tap);
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 0.5rem;
+  color: var(--accent, var(--text));
+  cursor: pointer;
 }
 
-.image-lightbox-modal.active {
-  display: flex;
+.icon-button:hover {
+  background: var(--surface0);
+  color: var(--pink);
+}
+
+/* The thread running through lists of posts */
+.timeline {
+  margin: 0;
+  padding: 0 0 0 1.25rem;
+  list-style: none;
+  border-left: 2px solid var(--surface0);
+}
+
+/* Markdown */
+.prose {
+  max-width: var(--reading);
+  overflow-wrap: break-word;
+}
+
+.prose > * {
+  margin-block: 0 1.25em;
+}
+
+.prose :is(h1, h2, h3, h4) {
+  margin-block: 2em 0.6em;
+  scroll-margin-top: 1.5rem;
+}
+
+.prose h1 {
+  color: var(--mauve);
+  font-size: 1.75rem;
+}
+
+.prose h2 {
+  color: var(--sapphire);
+  font-size: 1.5rem;
+}
+
+.prose h3 {
+  color: var(--green);
+  font-size: 1.25rem;
+}
+
+.prose h4 {
+  color: var(--peach);
+  font-size: 1.1rem;
+}
+
+.prose .anchor {
+  margin-left: 0.4em;
+  color: var(--subtext1);
+  font-weight: 400;
+  text-decoration: none;
+  opacity: 0;
+}
+
+.prose .anchor::before {
+  content: '#';
+}
+
+.prose :is(h1, h2, h3, h4):hover .anchor,
+.prose .anchor:focus-visible {
   opacity: 1;
 }
 
-.image-lightbox-content {
-  position: relative;
-  max-width: 90%;
-  max-height: 90vh;
-  animation: lightboxZoomIn 0.3s ease;
+@media (hover: none) {
+  .prose .anchor {
+    display: none;
+  }
 }
 
-.image-lightbox-content img {
-  max-width: 100%;
-  max-height: 90vh;
-  object-fit: contain;
+.prose :is(ul, ol) {
+  padding-left: 1.5em;
 }
 
-.image-lightbox-close {
-  position: absolute;
-  top: 20px;
-  right: 30px;
-  color: #f1f5f9;
-  font-size: 28px;
-  font-weight: bold;
-  cursor: pointer;
+.prose li::marker {
+  color: var(--teal);
+}
+
+.prose li + li {
+  margin-top: 0.4em;
+}
+
+.prose li > :is(ul, ol) {
+  margin-top: 0.4em;
+}
+
+.prose hr {
+  height: 0.2rem;
+  margin-block: 2.5em;
+  background: var(--stripes);
+  border: 0;
+  border-radius: 0.1rem;
+}
+
+.prose blockquote {
+  margin-inline: 0;
+  padding: 0.25em 0 0.25em 1.25em;
+  border-left: 3px solid var(--pink);
+  color: var(--subtext1);
+}
+
+.prose blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.prose blockquote.prompt-warning {
+  padding: 1em 1.25em;
+  background: var(--mantle);
+  border-left-color: var(--yellow);
+  border-radius: 0 0.5rem 0.5rem 0;
+  color: var(--text);
+}
+
+.prose img {
+  border-radius: 0.5rem;
+}
+
+[data-zoomable] {
+  cursor: zoom-in;
+}
+
+.prose :not(pre) > code {
+  padding: 0.1em 0.35em;
+  background: var(--mantle);
+  border-radius: 0.3rem;
+  color: var(--peach);
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  overflow-wrap: anywhere;
+}
+
+.code-block {
+  margin-inline: 0;
+  background: var(--mantle);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.code-block figcaption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 1rem;
+  background: var(--crust);
+  color: var(--sapphire);
+  font-size: 0.9rem;
+}
+
+.copy-button {
+  min-width: 4.5rem;
+  min-height: var(--tap);
   background: none;
-  border: none;
-  padding: 0;
-  width: 30px;
-  height: 30px;
+  border: 0;
+  border-radius: 0.5rem;
+  color: var(--lavender);
+  cursor: pointer;
+}
+
+.copy-button:hover {
+  color: var(--mauve);
+}
+
+.code-block pre {
+  margin: 0;
+  padding: 1rem;
+  overflow-x: auto;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.code-block code {
+  font-family: var(--font-mono);
+  letter-spacing: 0;
+  word-spacing: 0;
+}
+
+/* The Catppuccin code theme italicises some tokens, which are harder to read */
+.code-block code span {
+  font-style: normal !important;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1rem;
+}
+
+.prose :is(th, td) {
+  padding: 0.6em 0.8em;
+  border-bottom: 1px solid var(--surface1);
+  text-align: left;
+}
+
+.goals {
+  padding-left: 0 !important;
+  list-style: none;
+}
+
+.goals li::before {
+  content: '';
+  display: inline-block;
+  width: 0.8em;
+  height: 0.8em;
+  margin-right: 0.6em;
+  border: 2px solid var(--accent, var(--mauve));
+  border-radius: 50%;
+}
+
+/* Dialogs */
+#lightbox {
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  max-height: 100%;
+  margin: 0;
+  padding: 1rem;
+  background: rgb(24 25 38 / 0.95);
+  border: 0;
+  cursor: zoom-out;
+}
+
+#lightbox[open] {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.2s ease;
-  z-index: 10001;
 }
 
-.image-lightbox-close:hover,
-.image-lightbox-close:focus {
-  color: var(--link-color);
+#lightbox img {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 0.5rem;
+  object-fit: contain;
 }
 
-@keyframes lightboxZoomIn {
-  from {
-    transform: scale(0.8);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+#lightbox button {
+  position: fixed;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: var(--surface0);
 }
 
-/* Responsive image lightbox */
-@media (max-width: 768px) {
-  .image-lightbox-content {
-    max-width: 95%;
-    max-height: 85vh;
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
   }
 
-  .image-lightbox-content img {
-    max-height: 85vh;
+  a,
+  button {
+    transition: color 0.15s ease, background-color 0.15s ease;
   }
-
-  .image-lightbox-close {
-    top: 10px;
-    right: 15px;
-    font-size: 24px;
-    width: 24px;
-    height: 24px;
-  }
-}
-
-/* tocbot 4.25.0 base styles, which the Chirpy stylesheet builds on (tocbot is MIT licensed) */
-.toc-list {
-  margin: 0;
-  padding-left: 10px;
-}
-
-a.toc-link {
-  color: currentColor;
-  height: 100%;
-}
-
-.is-collapsible {
-  max-height: 1000px;
-  overflow: hidden;
-  transition: all 300ms ease-in-out;
-}
-
-.is-collapsed {
-  max-height: 0;
-}
-
-.is-active-link {
-  font-weight: 700;
-}
-
-.toc-link::before {
-  background-color: #eee;
-  content: ' ';
-  display: inline-block;
-  height: inherit;
-  left: 0;
-  margin-top: -1px;
-  position: absolute;
-  width: 2px;
-}
-
-.is-active-link::before {
-  background-color: #54bc4b;
 }

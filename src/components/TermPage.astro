@@ -1,37 +1,21 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { formatDate, postUrl, type Term } from '../lib/posts';
+import PostEntry from './PostEntry.astro';
+import type { Term } from '../lib/posts';
 
 interface Props {
   term: Term;
-  kind: 'tag' | 'category';
+  kind: 'Tag' | 'Category';
 }
 
 const { term, kind } = Astro.props;
-const isTag = kind === 'tag';
-const crumbs = [
-  { label: 'Home', href: '/' },
-  isTag ? { label: 'Tags', href: '/tags/' } : { label: 'Categories', href: '/categories/' },
-  { label: term.label },
-];
+const count = `${term.posts.length} ${term.posts.length === 1 ? 'post' : 'posts'}`;
+const parent = kind === 'Tag' ? { href: '/tags/', label: 'All tags' } : { href: '/categories/', label: 'All categories' };
 ---
-<BaseLayout pageTitle={term.label} crumbs={crumbs} topbarTitle={isTag ? 'Tag' : 'Category'}>
-  <article class="px-1">
-    <div id={isTag ? 'page-tag' : 'page-category'}>
-      <h1 class="ps-lg-2">
-        <i class={`${isTag ? 'fa fa-tag' : 'far fa-folder-open'} fa-fw text-muted`}></i>
-        {term.label}
-        <span class="lead text-muted ps-2">{term.posts.length}</span>
-      </h1>
-      <ul class="content ps-0">
-        {term.posts.map((post) => (
-          <li class="d-flex justify-content-between px-md-3">
-            <a href={postUrl(post)}>{post.data.title}</a>
-            <span class="dash flex-grow-1"></span>
-            <time class="text-muted small text-nowrap" datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
-          </li>
-        ))}
-      </ul>
-    </div>
-  </article>
+<BaseLayout pageTitle={term.label} description={`${count} filed under ${term.label}.`}>
+  <h1 class="page-title">{term.label}</h1>
+  <p class="page-intro">{kind} · {count} · <a href={parent.href}>{parent.label}</a></p>
+  <ol class="timeline cycle">
+    {term.posts.map((post) => <PostEntry post={post} headingLevel="h2" />)}
+  </ol>
 </BaseLayout>

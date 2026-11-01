@@ -12,14 +12,9 @@
     "@astrojs/markdown-remark": "6.3.10",
     "@astrojs/rss": "^4.0.15",
     "@astrojs/sitemap": "^3.7.4",
-    "@catppuccin/palette": "^1.7.1",
-    "@fontsource/lato": "^5.3.0",
-    "@fontsource/source-sans-pro": "^5.2.5",
-    "@fortawesome/fontawesome-free": "6.5.1",
-    "@fortawesome/fontawesome-svg-core": "^7.1.0",
-    "@fortawesome/free-solid-svg-icons": "^7.1.0",
-    "astro": "^5.16.15",
-    "bootstrap": "5.3.2"
+    "@fontsource-variable/atkinson-hyperlegible-mono": "^5.3.0",
+    "@fontsource-variable/atkinson-hyperlegible-next": "^5.3.0",
+    "astro": "^5.16.15"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",

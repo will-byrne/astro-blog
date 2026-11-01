@@ -10,7 +10,7 @@ tags:
   - Shortcuts
   - Infrastructure
 image:
-  url: /assets/shortcuts_screenshot.jpeg
+  url: ../../assets/images/shortcuts_screenshot.jpeg
   alt: Apple Shortcuts screenshot
 ---
 

@@ -1,6 +1,4 @@
 ---
-import TocList, { type TocNode } from './TocList.astro';
-
 interface Props {
   headings: Array<{
     depth: number;
@@ -11,57 +9,137 @@ interface Props {
 
 const { headings } = Astro.props;
 
-// Nest each heading under the nearest shallower one above it
-const roots: TocNode[] = [];
-const stack: TocNode[] = [];
-for (const heading of headings.filter((h) => h.depth <= 4)) {
-  const node = { ...heading, children: [] };
-  while (stack.length > 0 && stack[stack.length - 1].depth >= node.depth) stack.pop();
-  (stack[stack.length - 1]?.children ?? roots).push(node);
-  stack.push(node);
-}
+// Posts start at either h1 or h2, so indent relative to the shallowest heading
+const filteredHeadings = headings.filter((h) => h.depth <= 3);
+const topDepth = Math.min(...filteredHeadings.map((h) => h.depth));
 ---
 
-{roots.length > 0 && (
-  <section id="toc-wrapper" class="ps-0 pe-4">
-    <h2 class="panel-heading ps-3 pt-2 mb-2">Contents</h2>
-    <nav id="toc">
-      <TocList nodes={roots} />
-    </nav>
-  </section>
+{filteredHeadings.length > 1 && (
+  <details class="toc" data-toc>
+    <summary>On this page</summary>
+    <ol>
+      {filteredHeadings.map((heading) => (
+        <li style={`--level: ${heading.depth - topDepth}`}>
+          <a href={`#${heading.slug}`}>{heading.text}</a>
+        </li>
+      ))}
+    </ol>
+  </details>
 )}
 
-<script>
-  const tocLinks = document.querySelectorAll('.toc-link');
-  const headings = document.querySelectorAll('article .content :is(h1, h2, h3, h4)[id]');
-
-  // Shows only the active entry, its ancestors and its direct children
-  function setActive(link: Element) {
-    tocLinks.forEach((other) => {
-      other.classList.remove('is-active-link');
-      other.parentElement?.classList.remove('is-active-li');
-    });
-    document.querySelectorAll('#toc .is-collapsible').forEach((list) => list.classList.add('is-collapsed'));
-
-    link.classList.add('is-active-link');
-    link.parentElement?.classList.add('is-active-li');
-    link.parentElement?.querySelector(':scope > ul')?.classList.remove('is-collapsed');
-    for (let list = link.closest('ul'); list; list = list.parentElement?.closest('ul') ?? null) {
-      list.classList.remove('is-collapsed');
-    }
+<style>
+  .toc {
+    grid-area: toc;
+    margin-block: 1.5rem;
+    background: var(--mantle);
+    border-radius: 0.75rem;
   }
 
-  if (tocLinks.length > 0 && headings.length > 0) {
-    setActive(tocLinks[0]);
+  summary {
+    display: flex;
+    color: var(--peach);
+    align-items: center;
+    min-height: var(--tap);
+    padding-inline: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  ol {
+    margin: 0;
+    padding: 0 1rem 0.75rem;
+    list-style: none;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  li {
+    padding-left: calc(var(--level) * 0.9rem);
+  }
+
+  a {
+    display: flex;
+    align-items: center;
+    min-height: var(--tap);
+    color: var(--subtext1);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--text);
+  }
+
+  a[aria-current='true'] {
+    color: var(--green);
+    font-weight: 700;
+  }
+
+  /* A permanent side list once there is room for it */
+  @media (min-width: 75rem) {
+    .toc {
+      position: sticky;
+      top: 1.5rem;
+      align-self: start;
+      max-height: calc(100dvh - 3rem);
+      margin-block: 2.5rem 0;
+      overflow-y: auto;
+      background: none;
+    }
+
+    summary {
+      padding-inline: 0;
+      list-style: none;
+      cursor: default;
+      pointer-events: none;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    ol {
+      padding: 0;
+      font-size: 0.95rem;
+    }
+
+    a {
+      min-height: 0;
+      padding-block: 0.3rem;
+    }
+  }
+</style>
+
+<script>
+  const toc = document.querySelector<HTMLDetailsElement>('[data-toc]');
+
+  if (toc) {
+    const links = toc.querySelectorAll('a');
+    const wide = window.matchMedia('(min-width: 75rem)');
+    const syncOpen = () => {
+      toc.open = wide.matches;
+    };
+    syncOpen();
+    wide.addEventListener('change', syncOpen);
+
+    links.forEach((link) => {
+      link.addEventListener('click', () => {
+        if (!wide.matches) toc.open = false;
+      });
+    });
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
-        const link = document.querySelector(`.toc-link[href="#${CSS.escape(entry.target.id)}"]`);
-        if (link) setActive(link);
+        links.forEach((link) => {
+          if (link.getAttribute('href') === `#${entry.target.id}`) link.setAttribute('aria-current', 'true');
+          else link.removeAttribute('aria-current');
+        });
       });
-    }, { rootMargin: '-80px 0px -80% 0px', threshold: 0 });
+    }, { rootMargin: '0px 0px -80% 0px' });
 
-    headings.forEach((heading) => observer.observe(heading));
+    links.forEach((link) => {
+      const heading = document.getElementById(link.getAttribute('href')!.slice(1));
+      if (heading) observer.observe(heading);
+    });
   }
 </script>

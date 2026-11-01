@@ -1,43 +1,49 @@
 ---
-import { readdirSync } from 'node:fs';
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
-const images = readdirSync('public/assets/ai')
-  .filter((file) => /\.jpe?g$/i.test(file))
-  .sort();
+const files = import.meta.glob<{ default: ImageMetadata }>('../assets/images/ai/*.{jpg,jpeg,JPG,JPEG}', { eager: true });
+const images = Object.entries(files)
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([file, module]) => ({
+    src: module.default,
+    alt: file.split('/').pop()!.replace(/\.[^.]+$/, '').replace(/_/g, ' '),
+  }));
 ---
 
 <BaseLayout pageTitle="Gallery" ogType="article">
-  <article class="px-1">
-    <h1 class="dynamic-title">Gallery</h1>
-    <div class="content">
-      <p>This is a collection of some of my AI art, mostly generated on my iPad.</p>
-      <div class="image-gallery">
-        {images.map((file) => (
-          <a href={`/assets/ai/${file}`} class="popup img-link"><img src={`/assets/ai/${file}`} alt={file.replace(/\.[^.]+$/, '')} loading="lazy" /></a>
-        ))}
-      </div>
-    </div>
-  </article>
+  <h1 class="page-title">Gallery</h1>
+  <p class="page-intro">A collection of some of my AI art, mostly generated on my iPad.</p>
+  <div class="gallery">
+    {images.map(({ src, alt }) => (
+      <Image src={src} alt={alt} widths={[320, 640, 960, 1600]} sizes="(min-width: 75rem) 18rem, (min-width: 48rem) 33vw, 50vw" data-zoomable />
+    ))}
+  </div>
 </BaseLayout>
 
-<style is:global>
-  .image-gallery {
-    overflow: auto;
-    margin-left: -1% !important;
+<style>
+  .gallery {
+    columns: 2;
+    column-gap: 0.75rem;
   }
 
-  .image-gallery a {
-    float: left;
-    display: block;
-    margin: 0 0 1% 1%;
-    text-align: center;
-    text-decoration: none !important;
+  img {
+    width: 100%;
+    margin-bottom: 0.75rem;
+    border-radius: 0.5rem;
+    break-inside: avoid;
   }
 
-  .image-gallery a img {
-    width: auto;
-    display: block;
-    max-height: 300px;
+  @media (min-width: 48rem) {
+    .gallery {
+      columns: 3;
+    }
+  }
+
+  @media (min-width: 75rem) {
+    .gallery {
+      columns: 4;
+    }
   }
 </style>

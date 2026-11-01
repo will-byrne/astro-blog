@@ -1,108 +1,251 @@
 ---
+import { Image } from "astro:assets";
 import BaseLayout from "./BaseLayout.astro";
+import Icon from "../components/Icon.astro";
 import TableOfContents from "../components/TableOfContents.astro";
-import { AUTHOR_URL, SITE_TITLE, formatDate, getExcerpt, getPosts, getReadingTime, getRelatedPosts, getWordCount, postUrl, slugify, type Post } from "../lib/posts";
+import { formatDate, getExcerpt, getPosts, getReadingTime, getRelatedPosts, postUrl, slugify, type Post } from "../lib/posts";
 
 const { post, headings } = Astro.props as { post: Post; headings: { depth: number; slug: string; text: string }[] };
-const { title, pubDate, updated, image, author, category, tags } = post.data;
+const { title, pubDate, updated, image, category, tags } = post.data;
 
 const posts = await getPosts();
 const index = posts.findIndex((other) => other.id === post.id);
 const newer = posts[index - 1];
 const older = posts[index + 1];
 const related = getRelatedPosts(post, posts);
-
-const encodedUrl = encodeURIComponent(new URL(Astro.url.pathname, Astro.site).href);
-const encodedTitle = encodeURIComponent(`${title} - ${SITE_TITLE}`);
-const shareLinks = [
-  { label: 'Twitter', icon: 'fa-twitter', href: `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}` },
-  { label: 'Facebook', icon: 'fa-facebook-square', href: `https://www.facebook.com/sharer/sharer.php?title=${encodedTitle}&u=${encodedUrl}` },
-  { label: 'Telegram', icon: 'fa-telegram', href: `https://t.me/share/url?url=${encodedUrl}&text=${encodedTitle}` },
-];
 ---
 
-<BaseLayout pageTitle={title} description={getExcerpt(post)} image={image?.url} ogType="article" topbarTitle="Post">
-  <article class="px-1">
+<BaseLayout pageTitle={title} description={getExcerpt(post)} image={image?.url} ogType="article">
+  <article class="post">
     <header>
-      <h1 data-toc-skip>{title}</h1>
-      <div class="post-meta text-muted">
-        <span>Posted <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time></span>
-        {updated && <span> Updated <time datetime={updated.toISOString()}>{formatDate(updated)}</time></span>}
-        {image && (
-          <div class="mt-3 mb-3">
-            <a href={image.url} class="popup img-link preview-img"><img src={image.url} alt={image.alt} width="1200" height="630" loading="lazy" /></a>
-            {image.alt && <figcaption class="text-center pt-2 pb-2">{image.alt}</figcaption>}
-          </div>
-        )}
-        <div class="d-flex justify-content-between">
-          <span>By <em><a href={AUTHOR_URL}>{author}</a></em></span>
-          <span class="readtime" title={`${getWordCount(post)} words`}><em>{getReadingTime(post)} min</em> read</span>
-        </div>
-      </div>
+      <p class="meta"><a href={`/categories/${slugify(category)}/`}>{category}</a></p>
+      <h1>{title}</h1>
+      <p class="meta">
+        <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
+        · {getReadingTime(post)} min read
+        {updated && <><br />Updated <time datetime={updated.toISOString()}>{formatDate(updated)}</time></>}
+      </p>
+      {image && (
+        <figure>
+          <Image src={image.url} alt={image.alt} widths={[640, 960, 1280, 1600]} sizes="min(47rem, calc(100vw - 2.5rem))" loading="eager" fetchpriority="high" data-zoomable />
+          {image.alt && <figcaption class="meta">{image.alt}</figcaption>}
+        </figure>
+      )}
     </header>
 
-    <div class="content">
-      <slot />
-    </div>
+    <TableOfContents headings={headings} />
 
-    <div class="post-tail-wrapper text-muted">
-      <div class="post-meta mb-3">
-        <i class="far fa-folder-open fa-fw me-1"></i>
-        <a href={`/categories/${slugify(category)}/`}>{category}</a>
+    <div class="body">
+      <div class="prose">
+        <slot />
       </div>
-      {tags.length > 0 && (
-        <div class="post-tags">
-          <i class="fa fa-tags fa-fw me-1"></i>
-          {tags.map((tag) => <a href={`/tags/${slugify(tag)}/`} class="post-tag no-text-decoration">{tag}</a>)}
-        </div>
-      )}
-      <div class="post-tail-bottom d-flex justify-content-between align-items-center mt-5 pb-2">
-        <div class="license-wrapper">
-          This post is licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> by the author.
-        </div>
-        <div class="share-wrapper d-flex align-items-center">
-          <span class="share-label text-muted">Share</span>
-          <span class="share-icons">
-            {shareLinks.map(({ label, icon, href }) => (
-              <a href={href} target="_blank" rel="noopener" title={label} aria-label={label}><i class={`fa-fw fab ${icon}`}></i></a>
-            ))}
-            <button id="copy-link" aria-label="Copy link" class="btn small" title="Copy link">
-              <i class="fa-fw fas fa-link pe-none fs-6"></i>
-            </button>
-          </span>
-        </div>
-      </div>
+
+      <footer>
+        {tags.length > 0 && (
+          <ul class="tags cycle" aria-label="Tags">
+            {tags.map((tag) => <li><a href={`/tags/${slugify(tag)}/`}>{tag}</a></li>)}
+          </ul>
+        )}
+        <button type="button" id="share" class="share"><Icon name="share" /><span>Share</span></button>
+
+        <nav class="post-nav" aria-label="More posts">
+          {older && <a href={postUrl(older)} rel="prev"><span class="meta">Older</span>{older.data.title}</a>}
+          {newer && <a href={postUrl(newer)} rel="next" class="next"><span class="meta">Newer</span>{newer.data.title}</a>}
+        </nav>
+
+        {related.length > 0 && (
+          <section class="related">
+            <h2>Related posts</h2>
+            <ul>
+              {related.map((other) => (
+                <li>
+                  <a href={postUrl(other)}>{other.data.title}</a>
+                  <p class="meta"><time datetime={other.data.pubDate.toISOString()}>{formatDate(other.data.pubDate)}</time></p>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </footer>
     </div>
   </article>
-
-  <TableOfContents slot="panel" headings={headings} />
-
-  <Fragment slot="tail">
-    {related.length > 0 && (
-      <aside id="related-posts" aria-labelledby="related-label">
-        <h3 class="mb-4" id="related-label">Further Reading</h3>
-        <nav class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4 mb-4">
-          {related.map((other) => (
-            <article class="col">
-              <a href={postUrl(other)} class="post-preview card h-100">
-                <div class="card-body">
-                  <time datetime={other.data.pubDate.toISOString()}>{formatDate(other.data.pubDate)}</time>
-                  <h4 class="pt-0 my-2">{other.data.title}</h4>
-                  <div class="text-muted"><p>{getExcerpt(other)}</p></div>
-                </div>
-              </a>
-            </article>
-          ))}
-        </nav>
-      </aside>
-    )}
-    <nav class="post-navigation d-flex justify-content-between" aria-label="Post Navigation">
-      {older
-        ? <a href={postUrl(older)} class="btn btn-outline-primary" aria-label="Older"><p>{older.data.title}</p></a>
-        : <div class="btn btn-outline-primary disabled" aria-label="Older"><p>-</p></div>}
-      {newer
-        ? <a href={postUrl(newer)} class="btn btn-outline-primary" aria-label="Newer"><p>{newer.data.title}</p></a>
-        : <div class="btn btn-outline-primary disabled" aria-label="Newer"><p>-</p></div>}
-    </nav>
-  </Fragment>
 </BaseLayout>
+
+<style>
+  .post {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'head' 'toc' 'body';
+    max-width: var(--reading);
+    margin-inline: auto;
+  }
+
+  header {
+    grid-area: head;
+    padding-top: 2.5rem;
+  }
+
+  header p {
+    margin: 0;
+  }
+
+  header .meta a {
+    color: var(--pink);
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+  }
+
+  h1 {
+    color: var(--mauve);
+    margin-block: 0.25rem 0.75rem;
+    font-size: clamp(2rem, 7vw, 2.75rem);
+  }
+
+  figure {
+    margin: 1.5rem 0 0;
+  }
+
+  figure img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 0.75rem;
+    object-fit: cover;
+  }
+
+  figcaption {
+    margin-top: 0.5rem;
+    overflow-wrap: break-word;
+  }
+
+  .body {
+    grid-area: body;
+    min-width: 0;
+    padding-top: 1.5rem;
+  }
+
+  /* Headings in posts should not push the first line of text down */
+  .prose > :global(:first-child) {
+    margin-top: 0;
+  }
+
+  footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--surface0);
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0 0 1rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tags a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    padding-inline: 0.9rem;
+    background: var(--mantle);
+    border-radius: 0.5rem;
+    color: var(--accent);
+    font-size: 1rem;
+    text-decoration: none;
+  }
+
+  .tags a:hover {
+    background: var(--surface0);
+  }
+
+  .share {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: var(--tap);
+    padding-inline: 0.9rem;
+    background: var(--surface0);
+    border: 0;
+    border-radius: 0.5rem;
+    color: var(--teal);
+    cursor: pointer;
+  }
+
+  .share:hover {
+    background: var(--surface1);
+  }
+
+  .post-nav {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+
+  .post-nav a {
+    display: block;
+    padding: 0.75rem 1rem;
+    background: var(--mantle);
+    border-radius: 0.75rem;
+    color: var(--text);
+    font-weight: 700;
+    line-height: 1.35;
+    text-decoration: none;
+  }
+
+  .post-nav a:hover {
+    color: var(--pink);
+  }
+
+  .post-nav .meta {
+    display: block;
+    font-weight: 400;
+  }
+
+  .related {
+    margin-top: 2.5rem;
+  }
+
+  .related h2 {
+    color: var(--peach);
+    margin-bottom: 0.75rem;
+    font-size: 1.25rem;
+  }
+
+  .related ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .related li {
+    padding-block: 0.5rem;
+  }
+
+  .related p {
+    margin: 0;
+  }
+
+  @media (min-width: 40rem) {
+    .post-nav {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .post-nav .next {
+      grid-column: 2;
+    }
+  }
+
+  /* The reading column, with the contents list beside it */
+  @media (min-width: 75rem) {
+    .post {
+      grid-template-columns: minmax(0, var(--reading)) minmax(0, 1fr);
+      grid-template-areas:
+        'head toc'
+        'body toc';
+      column-gap: 4rem;
+      max-width: none;
+    }
+  }
+</style>
