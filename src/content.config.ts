@@ -21,4 +21,55 @@ const posts = defineCollection({
   }),
 });
 
-export const collections = { posts };
+// The resume repo copies resume.json to this public gist on every push
+const RESUME_URL = 'https://gist.githubusercontent.com/will-byrne/b6c82ed9d60d9e11dda925d9bc924628/raw/resume.json';
+
+const resume = defineCollection({
+  loader: async () => {
+    const response = await fetch(RESUME_URL);
+    if (!response.ok) throw new Error(`Could not fetch resume: ${response.status} ${response.statusText}`);
+    return [{ id: 'resume', ...(await response.json()) }];
+  },
+  schema: z.object({
+    basics: z.object({
+      name: z.string(),
+      label: z.string(),
+      summary: z.string(),
+      location: z.object({ address: z.string().optional(), countryCode: z.string().optional() }).optional(),
+      profiles: z.array(z.object({ network: z.string(), url: z.string() })).default([]),
+    }),
+    work: z.array(z.object({
+      name: z.string(),
+      position: z.string(),
+      url: z.string().optional(),
+      image: z.string().optional(),
+      location: z.string().optional(),
+      startDate: z.string(),
+      endDate: z.string().optional(),
+      summary: z.string().optional(),
+      highlights: z.array(z.string()).default([]),
+      keywords: z.array(z.string()).default([]),
+    })),
+    volunteer: z.array(z.object({
+      organization: z.string(),
+      position: z.string(),
+      url: z.string().optional(),
+      startDate: z.string(),
+      endDate: z.string().optional(),
+      summary: z.string().optional(),
+    })).default([]),
+    education: z.array(z.object({
+      institution: z.string(),
+      area: z.string(),
+      studyType: z.string(),
+      score: z.string().optional(),
+      startDate: z.string(),
+      endDate: z.string().optional(),
+    })).default([]),
+    skills: z.array(z.object({ name: z.string(), level: z.string(), keywords: z.array(z.string()) })).default([]),
+    languages: z.array(z.object({ language: z.string(), fluency: z.string() })).default([]),
+    interests: z.array(z.object({ name: z.string() })).default([]),
+  }),
+});
+
+export const collections = { posts, resume };

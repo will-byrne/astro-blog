@@ -14,7 +14,7 @@ interface Props {
   pageTitle: string;
   description?: string;
   image?: ImageMetadata;
-  ogType?: 'website' | 'article';
+  ogType?: 'website' | 'article' | 'profile';
 }
 
 const { pageTitle, description = SITE_DESCRIPTION, image, ogType = 'website' } = Astro.props;

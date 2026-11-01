@@ -1,5 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Chips from '../components/Chips.astro';
+import { getResume } from '../lib/resume';
+
+const { basics, interests } = await getResume();
 
 const goals = ['Finish sorting Irish FBR', 'Lose weight', 'Blog Improvements'];
 ---
@@ -14,12 +18,21 @@ const goals = ['Finish sorting Irish FBR', 'Lose weight', 'Blog Improvements'];
 
     <h2 id="me">Me</h2>
     <p>Hi, I am me. I am a human in my late 30s. I enjoy many hobbies including astrophotography, archery, bbqs, calligraphy, drawing, listening to music, playing music, board games, video games, reading, table top role playing games, and many others. I live by myself in a small village in the eastern UK, I like the quiet and the lack of light pollution for my stargazing.</p>
+
+    <h2 id="work">Work</h2>
+    <p>{basics.summary}</p>
+    <p>You can read more on my <a href="/resume/">resume</a>.</p>
   </div>
-  <div class="prose">
+  <div>
+    <div class="prose">
     <h2 id="current-goals">Current Goals</h2>
     <ul class="goals">
       {goals.map((goal) => <li>{goal}</li>)}
     </ul>
+
+    <h2 id="interests">Interests</h2>
+    </div>
+    <Chips items={interests.map((interest) => interest.name)} />
   </div>
   </div>
 </BaseLayout>

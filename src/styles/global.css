@@ -368,6 +368,11 @@ button {
   border-radius: 0.5rem;
 }
 
+/* For small images in posts: wrap the Markdown image in <div class="image-small"> */
+.prose .image-small img {
+  width: 25%;
+}
+
 [data-zoomable] {
   cursor: zoom-in;
 }

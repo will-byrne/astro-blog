@@ -1,8 +1,294 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Chips from '../components/Chips.astro';
+import Icon from '../components/Icon.astro';
+import { formatDuration, formatRange, getResume, groupByCompany } from '../lib/resume';
+
+const { basics, work, volunteer, education, skills, languages } = await getResume();
+const location = [basics.location?.address, basics.location?.countryCode].filter(Boolean).join(', ');
+const profileIcons = { github: 'github', linkedin: 'linkedin' } as const;
 ---
 
-<BaseLayout pageTitle="Resume" ogType="article">
-  <h1 class="page-title">Resume</h1>
-  <p class="page-intro">Here is my CV in <a href="/assets/will_byrne.pdf">PDF format</a>.</p>
+<BaseLayout pageTitle="Resume" description={`${basics.name}, ${basics.label}.`} ogType="profile">
+  <header class="intro">
+    <div>
+      <h1 class="page-title">{basics.name}</h1>
+      <p class="label">{basics.label}</p>
+    </div>
+    <ul class="contact cycle">
+      <li><a href="javascript:location.href = 'mailto:' + ['will.alex.byrne','gmail.com'].join('@')"><Icon name="mail" />Email</a></li>
+      {basics.profiles.map((profile) => {
+        const icon = profileIcons[profile.network.toLowerCase() as keyof typeof profileIcons];
+        return <li><a href={profile.url} rel="me noopener noreferrer">{icon && <Icon name={icon} />}{profile.network}</a></li>;
+      })}
+      {location && <li><span><Icon name="pin" />{location}</span></li>}
+      <li><a href="/assets/will_byrne.pdf"><Icon name="download" />Download PDF</a></li>
+    </ul>
+  </header>
+
+  <div class="sections cycle">
+    <section>
+      <h2><Icon name="wrench" />Skills</h2>
+      {skills.map((skill) => (
+        <div class="skill">
+          <p><strong>{skill.name}</strong><br /><span class="meta">{skill.level}</span></p>
+          <Chips items={skill.keywords} />
+        </div>
+      ))}
+    </section>
+
+    <section>
+      <h2><Icon name="briefcase" />Work experience</h2>
+      {groupByCompany(work).map((company) => (
+        <article class="item">
+          <div class="item-head">
+            {company.image && <img src={`/${company.image}`} alt="" width="64" height="64" loading="lazy" />}
+            <div class="item-title">
+              <h3>{company.url ? <a href={company.url}>{company.name}</a> : company.name}</h3>
+              <Chips items={company.keywords} />
+            </div>
+            <p class="meta item-dates">
+              {formatRange(company.startDate, company.endDate)}<br />
+              {formatDuration(company.startDate, company.endDate)}
+              {company.location && <><br />{company.location}</>}
+            </p>
+          </div>
+          {company.roles.map((role) => (
+            <div class="role">
+              <h4>{role.position}</h4>
+              {company.roles.length > 1 && <p class="meta">{formatRange(role.startDate, role.endDate)}, {formatDuration(role.startDate, role.endDate)}</p>}
+              <div class="prose">
+                {role.summary && <p>{role.summary}</p>}
+                {role.highlights.length > 0 && <ul>{role.highlights.map((highlight) => <li>{highlight}</li>)}</ul>}
+              </div>
+            </div>
+          ))}
+        </article>
+      ))}
+    </section>
+
+    <section>
+      <h2><Icon name="heart" />Volunteer experience</h2>
+      {volunteer.map((item) => (
+        <article class="item">
+          <div class="item-head">
+            <div class="item-title">
+              <h3>{item.url ? <a href={item.url}>{item.organization}</a> : item.organization}</h3>
+            </div>
+            <p class="meta item-dates">
+              {formatRange(item.startDate, item.endDate)}<br />
+              {formatDuration(item.startDate, item.endDate)}
+            </p>
+          </div>
+          <div class="role">
+            <h4>{item.position}</h4>
+            <div class="prose"><p>{item.summary}</p></div>
+          </div>
+        </article>
+      ))}
+    </section>
+
+    <section>
+      <h2><Icon name="cap" />Education</h2>
+      {education.map((item) => (
+        <article class="item">
+          <div class="item-head">
+            <div class="item-title">
+              <h3>{item.institution}</h3>
+              <p>{item.studyType} {item.area}{item.score && ` (${item.score})`}</p>
+            </div>
+            <p class="meta item-dates">{formatRange(item.startDate, item.endDate)}</p>
+          </div>
+        </article>
+      ))}
+    </section>
+
+    <section>
+      <h2><Icon name="globe" />Languages</h2>
+      <Chips items={languages.map((item) => `${item.language} (${item.fluency})`)} />
+    </section>
+  </div>
 </BaseLayout>
+
+<style>
+  .intro {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .label {
+    margin: 0.5rem 0 0;
+    color: var(--subtext1);
+    font-size: 1.25rem;
+  }
+
+  .contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .contact :is(a, span) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: var(--tap);
+  }
+
+  .contact svg {
+    flex: none;
+    color: var(--accent);
+  }
+
+  section {
+    margin-top: 2.5rem;
+  }
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--accent);
+    color: var(--accent);
+    font-size: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+  }
+
+  h3 a {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  h3 a:hover {
+    color: var(--pink);
+    text-decoration: underline;
+  }
+
+  h4 {
+    font-size: 1.1rem;
+  }
+
+  .skill {
+    display: grid;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .skill p {
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .item + .item {
+    margin-top: 2rem;
+  }
+
+  .item-head {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.75rem 1rem;
+    align-items: start;
+  }
+
+  .item-head img {
+    width: 4rem;
+    height: 4rem;
+    background: var(--text);
+    border-radius: 50%;
+    object-fit: contain;
+  }
+
+  .item-title {
+    grid-column: 2;
+  }
+
+  .item-title:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .item-title p {
+    margin: 0.25rem 0 0;
+  }
+
+  .item-title :global(.chips) {
+    margin-top: 0.5rem;
+  }
+
+  .item-dates {
+    grid-column: 1 / -1;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* Each role hangs off the same thread as the journal timeline */
+  .role {
+    position: relative;
+    margin-top: 1.25rem;
+    padding-left: 1.25rem;
+    border-left: 2px solid var(--surface1);
+  }
+
+  .role::before {
+    content: '';
+    position: absolute;
+    top: 0.45rem;
+    left: -6px;
+    width: 10px;
+    height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+
+  .role .meta {
+    margin: 0;
+  }
+
+  .role .prose {
+    margin-top: 0.5rem;
+  }
+
+  .role .prose > :last-child {
+    margin-bottom: 0;
+  }
+
+  /* Skill names, company details and dates line up in columns, as on the PDF */
+  @media (min-width: 64rem) {
+    .intro {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+    }
+
+    .contact {
+      display: grid;
+      grid-template-columns: repeat(2, auto);
+    }
+
+    .skill {
+      grid-template-columns: 8rem minmax(0, 1fr);
+      gap: 1rem;
+    }
+
+    .item-head {
+      grid-template-columns: 4rem minmax(0, 1fr) 15rem;
+      column-gap: 1rem;
+    }
+
+    .item-title:first-child {
+      grid-column: 1 / 3;
+    }
+
+    .item-dates {
+      grid-column: 3;
+      grid-row: 1;
+    }
+  }
+</style>

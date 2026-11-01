@@ -8,6 +8,7 @@ const links = [
   { href: '/', label: 'Journal' },
   { href: '/archives/', label: 'Archive' },
   { href: '/gallery/', label: 'Gallery' },
+  { href: '/resume/', label: 'Resume' },
   { href: '/about/', label: 'About' },
 ];
 const path = Astro.url.pathname.replace(/\/?$/, '/');
@@ -90,6 +91,16 @@ const isCurrent = (href: string) =>
     border-bottom-color: var(--accent);
     color: var(--accent);
     font-weight: 700;
+  }
+
+  /* Keep all the links on one line on phones */
+  @media (max-width: 30rem) {
+    nav {
+      flex-wrap: nowrap;
+      justify-content: space-between;
+      gap: 0.25rem;
+      font-size: 1rem;
+    }
   }
 
   /* One row once there is room: brand on the left, links and search on the right */

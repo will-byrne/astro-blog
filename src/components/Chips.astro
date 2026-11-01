@@ -1,0 +1,29 @@
+---
+interface Props {
+  items: string[];
+}
+
+const { items } = Astro.props;
+---
+<ul class="chips cycle">
+  {items.map((item) => <li>{item}</li>)}
+</ul>
+
+<style>
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    padding: 0.1rem 0.6rem;
+    background: var(--mantle);
+    border-radius: 0.4rem;
+    color: var(--accent);
+    font-size: 1rem;
+  }
+</style>
