@@ -40,11 +40,28 @@ const { title, pubDate, category, image } = post.data;
     box-shadow: 0 0 0 4px var(--base);
   }
 
+  /* The padding is cancelled by the negative margin, so the text stays put and the box grows outwards */
   article {
     position: relative;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 0.75rem;
+    margin: -0.75rem;
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    transition: background-color 150ms ease;
+  }
+
+  /* Hover box: the darker panel colour with a hint of the entry's timeline colour, so it suits every theme */
+  article:focus-within,
+  article:hover {
+    background: color-mix(in srgb, var(--accent) 8%, var(--mantle));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    article {
+      transition: none;
+    }
   }
 
   .meta {

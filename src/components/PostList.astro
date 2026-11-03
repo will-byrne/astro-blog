@@ -45,7 +45,21 @@ const rest = featured ? posts.slice(1) : posts;
 <style>
   .featured {
     position: relative;
-    margin-bottom: 3rem;
+    margin: -0.75rem -0.75rem 2.25rem;
+    padding: 0.75rem;
+    border-radius: 1rem;
+    transition: background-color 150ms ease;
+  }
+
+  .featured:focus-within,
+  .featured:hover {
+    background: color-mix(in srgb, var(--pink) 8%, var(--mantle));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .featured {
+      transition: none;
+    }
   }
 
   .featured img {
