@@ -15,7 +15,14 @@ export default defineConfig({
   },
   markdown: {
     shikiConfig: {
-      theme: 'catppuccin-macchiato',
+      // All four flavours are written as CSS variables; the stylesheet picks the one in use
+      themes: {
+        latte: 'catppuccin-latte',
+        frappe: 'catppuccin-frappe',
+        macchiato: 'catppuccin-macchiato',
+        mocha: 'catppuccin-mocha',
+      },
+      defaultColor: false,
     },
     rehypePlugins: [rehypeHeadingIds, rehypeProse],
   },

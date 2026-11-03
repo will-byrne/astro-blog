@@ -27,6 +27,13 @@ const socialImage = image && (await getImage({ src: image, width: 1200, format: 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#24273a" />
+    <script is:inline>
+      // Apply the saved flavour before the page paints
+      try {
+        const theme = localStorage.getItem('theme');
+        if (['latte', 'frappe', 'macchiato', 'mocha'].includes(theme)) document.documentElement.dataset.theme = theme;
+      } catch {}
+    </script>
     <meta name="generator" content={Astro.generator} />
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicons/favicon-32x32.png" />

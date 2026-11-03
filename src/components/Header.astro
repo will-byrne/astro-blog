@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
+import ThemePicker from './ThemePicker.astro';
 import avatar from '../assets/images/avatar.jpg';
 import { SITE_TITLE } from '../lib/posts';
 
@@ -21,9 +22,12 @@ const isCurrent = (href: string) =>
       <Image src={avatar} width={40} height={40} densities={[1, 2]} alt="" loading="eager" />
       <span>{SITE_TITLE}</span>
     </a>
-    <button type="button" class="icon-button" data-search-open aria-label="Search">
-      <Icon name="search" />
-    </button>
+    <div class="actions">
+      <button type="button" class="icon-button" data-search-open aria-label="Search">
+        <Icon name="search" />
+      </button>
+      <ThemePicker />
+    </div>
   </div>
   <nav aria-label="Main" class="cycle">
     {links.map(({ href, label }) => (
@@ -59,7 +63,12 @@ const isCurrent = (href: string) =>
     color: var(--mauve);
   }
 
-  .top button {
+  .actions {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .actions > button {
     color: var(--yellow);
   }
 
@@ -123,7 +132,7 @@ const isCurrent = (href: string) =>
       order: 1;
     }
 
-    .top button {
+    .actions {
       order: 2;
       margin-left: 0.75rem;
     }

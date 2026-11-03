@@ -1,0 +1,156 @@
+---
+import Icon from './Icon.astro';
+
+// Lightest to darkest. Each swatch previews the flavour with its own base and mauve
+const themes = [
+  { id: 'latte', label: 'Latte', icon: 'sun', base: '#eff1f5', ink: '#8839ef' },
+  { id: 'frappe', label: 'Frappé', icon: 'sunset', base: '#303446', ink: '#ca9ee6' },
+  { id: 'macchiato', label: 'Macchiato', icon: 'moon', base: '#24273a', ink: '#c6a0f6' },
+  { id: 'mocha', label: 'Mocha', icon: 'moon-star', base: '#1e1e2e', ink: '#cba6f7' },
+] as const;
+---
+<div class="theme-picker" data-theme-picker>
+  <button type="button" class="icon-button" aria-label="Change theme" aria-expanded="false" aria-controls="theme-menu" data-theme-toggle>
+    <Icon name="palette" />
+  </button>
+  <ul id="theme-menu" class="menu" hidden>
+    {themes.map(({ id, label, icon, base, ink }) => (
+      <li>
+        <button type="button" data-theme-option={id} data-base={base} aria-pressed="false">
+          <span class="swatch" style={`background:${base};color:${ink}`}><Icon name={icon} /></span>
+          {label}
+        </button>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<script>
+  const STORAGE_KEY = 'theme';
+  const DEFAULT_THEME = 'macchiato';
+  const root = document.documentElement;
+  const picker = document.querySelector<HTMLElement>('[data-theme-picker]')!;
+  const toggle = picker.querySelector<HTMLButtonElement>('[data-theme-toggle]')!;
+  const menu = picker.querySelector<HTMLUListElement>('.menu')!;
+  const options = [...picker.querySelectorAll<HTMLButtonElement>('[data-theme-option]')];
+  const themeColor = document.querySelector('meta[name="theme-color"]');
+
+  function applyTheme(id: string) {
+    root.dataset.theme = id;
+    for (const option of options) {
+      const current = option.dataset.themeOption === id;
+      option.setAttribute('aria-pressed', String(current));
+      if (current) themeColor?.setAttribute('content', option.dataset.base!);
+    }
+  }
+
+  function setOpen(open: boolean) {
+    menu.hidden = !open;
+    toggle.setAttribute('aria-expanded', String(open));
+    if (open) (options.find((o) => o.getAttribute('aria-pressed') === 'true') ?? options[0]).focus();
+  }
+
+  applyTheme(root.dataset.theme || DEFAULT_THEME);
+
+  toggle.addEventListener('click', () => setOpen(menu.hidden));
+
+  for (const option of options) {
+    option.addEventListener('click', () => {
+      const id = option.dataset.themeOption!;
+      applyTheme(id);
+      try {
+        localStorage.setItem(STORAGE_KEY, id);
+      } catch {
+        // Without storage the choice lasts for this page only
+      }
+      setOpen(false);
+      toggle.focus();
+    });
+  }
+
+  // Close on Escape or a click elsewhere; arrow keys move through the flavours
+  picker.addEventListener('keydown', (event) => {
+    if (menu.hidden) return;
+    if (event.key === 'Escape') {
+      setOpen(false);
+      toggle.focus();
+    } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      const step = event.key === 'ArrowDown' ? 1 : -1;
+      const index = options.indexOf(document.activeElement as HTMLButtonElement);
+      options[(index + step + options.length) % options.length].focus();
+    }
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!menu.hidden && !picker.contains(event.target as Node)) setOpen(false);
+  });
+</script>
+
+<style>
+  .theme-picker {
+    position: relative;
+  }
+
+  [data-theme-toggle] {
+    color: var(--mauve);
+  }
+
+  .menu {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    z-index: 20;
+    min-width: 12rem;
+    margin: 0;
+    padding: 0.4rem;
+    list-style: none;
+    background: var(--mantle);
+    border: 2px solid var(--surface1);
+    border-radius: 0.75rem;
+  }
+
+  .menu[hidden] {
+    display: none;
+  }
+
+  .menu button {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    min-height: var(--tap);
+    padding: 0.25rem 0.6rem 0.25rem 0.25rem;
+    background: none;
+    border: 0;
+    border-radius: 0.5rem;
+    color: var(--text);
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .menu button:hover {
+    background: var(--surface0);
+  }
+
+  .menu button[aria-pressed='true'] {
+    background: var(--surface0);
+    font-weight: 700;
+  }
+
+  .swatch {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 2px solid var(--surface1);
+    border-radius: 50%;
+  }
+
+  .swatch :global(svg) {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+</style>

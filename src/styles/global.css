@@ -1,5 +1,6 @@
-/* Catppuccin Macchiato */
-:root {
+/* Catppuccin, in all four flavours. Macchiato is the default; the theme picker sets data-theme on <html> */
+:root,
+:root[data-theme='macchiato'] {
   --base: #24273a;
   --mantle: #1e2030;
   --crust: #181926;
@@ -17,6 +18,73 @@
   --teal: #8bd5ca;
   --sapphire: #7dc4e4;
   --blue: #8aadf4;
+  color-scheme: dark;
+}
+
+:root[data-theme='latte'] {
+  --base: #eff1f5;
+  --mantle: #e6e9ef;
+  --crust: #dce0e8;
+  --surface0: #ccd0da;
+  --surface1: #bcc0cc;
+  --surface2: #acb0be;
+  --subtext1: #5c5f77;
+  --text: #4c4f69;
+  --lavender: #7287fd;
+  --mauve: #8839ef;
+  --pink: #ea76cb;
+  --peach: #fe640b;
+  --yellow: #df8e1d;
+  --green: #40a02b;
+  --teal: #179299;
+  --sapphire: #209fb5;
+  --blue: #1e66f5;
+  color-scheme: light;
+}
+
+:root[data-theme='frappe'] {
+  --base: #303446;
+  --mantle: #292c3c;
+  --crust: #232634;
+  --surface0: #414559;
+  --surface1: #51576d;
+  --surface2: #626880;
+  --subtext1: #b5bfe2;
+  --text: #c6d0f5;
+  --lavender: #babbf1;
+  --mauve: #ca9ee6;
+  --pink: #f4b8e4;
+  --peach: #ef9f76;
+  --yellow: #e5c890;
+  --green: #a6d189;
+  --teal: #81c8be;
+  --sapphire: #85c1dc;
+  --blue: #8caaee;
+  color-scheme: dark;
+}
+
+:root[data-theme='mocha'] {
+  --base: #1e1e2e;
+  --mantle: #181825;
+  --crust: #11111b;
+  --surface0: #313244;
+  --surface1: #45475a;
+  --surface2: #585b70;
+  --subtext1: #bac2de;
+  --text: #cdd6f4;
+  --lavender: #b4befe;
+  --mauve: #cba6f7;
+  --pink: #f5c2e7;
+  --peach: #fab387;
+  --yellow: #f9e2af;
+  --green: #a6e3a1;
+  --teal: #94e2d5;
+  --sapphire: #74c7ec;
+  --blue: #89b4fa;
+  color-scheme: dark;
+}
+
+:root {
   --stripes: linear-gradient(
     to right,
     var(--mauve) 0 12.5%,
@@ -36,8 +104,6 @@
   --box: 76rem;
   --gutter: 1.25rem;
   --tap: 2.75rem;
-
-  color-scheme: dark;
 }
 
 *,
@@ -432,6 +498,23 @@ button {
   word-spacing: 0;
 }
 
+/* Code is highlighted in all four flavours at build time; show the one matching the page */
+.code-block code span {
+  color: var(--shiki-macchiato);
+}
+
+:root[data-theme='latte'] .code-block code span {
+  color: var(--shiki-latte);
+}
+
+:root[data-theme='frappe'] .code-block code span {
+  color: var(--shiki-frappe);
+}
+
+:root[data-theme='mocha'] .code-block code span {
+  color: var(--shiki-mocha);
+}
+
 /* The Catppuccin code theme italicises some tokens, which are harder to read */
 .code-block code span {
   font-style: normal !important;
@@ -476,7 +559,7 @@ button {
   max-height: 100%;
   margin: 0;
   padding: 1rem;
-  background: rgb(24 25 38 / 0.95);
+  background: color-mix(in srgb, var(--crust) 95%, transparent);
   border: 0;
   cursor: zoom-out;
 }
