@@ -1,0 +1,41 @@
+name: "Test"
+on:
+  pull_request:
+  push:
+    # Pushes to main are tested by the deploy workflow, which calls this one
+    branches-ignore:
+      - main
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      # Use the stored resume so the tests do not depend on the gist being reachable
+      RESUME_FILE: tests/fixtures/resume.json
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Type check
+        run: yarn typecheck
+
+      - name: Unit and content tests
+        run: yarn test:unit
+
+      - name: Build and test the built site
+        run: yarn test:build

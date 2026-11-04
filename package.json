@@ -6,7 +6,12 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "typecheck": "astro check",
+    "test": "vitest run",
+    "test:unit": "vitest run --project unit",
+    "test:build": "vitest run --project build",
+    "test:watch": "vitest --project unit"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "6.3.10",
@@ -20,6 +25,14 @@
     "@astrojs/check": "^0.9.12",
     "@emnapi/core": "^1.11.3",
     "@emnapi/runtime": "^1.11.3",
-    "typescript": "^5"
+    "fast-xml-parser": "^5.12.0",
+    "node-html-parser": "^9.0.6",
+    "rehype-stringify": "^10",
+    "remark-parse": "^11",
+    "remark-rehype": "^11",
+    "typescript": "^5",
+    "unified": "^11",
+    "vitest": "^5.1.0",
+    "yaml": "^2.9.1"
   }
 }

@@ -1,0 +1,211 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json",
+  "basics": {
+    "name": "Will Byrne",
+    "label": "Senior Full Stack Software Developer",
+    "image": "",
+    "email": "will.alex.byrne@gmail.com",
+    "phone": "+447429700455",
+    "url": "https://willbyrne.dev",
+    "summary": "I am a senior fullstack software developer with over a decade of experience in designing, developing and maintaining web applications. I am proficient in many frontend and backend technologies, including: React, Node.js, TypeScript, CSS, HTML, ...etc. I am passionate about testing and normally take a role in developing testing strategies and frameworks. I am adept at working in fast lean environments with a great emphasis on teamwork and I enjoy pair and mob programming. I strongly believe in continuous improvement and personal development and encouraging others to do the same.",
+    "location": {
+      "countryCode": "UK",
+      "address": "Cambridgeshire"
+    },
+    "profiles": [
+      {
+        "network": "LinkedIn",
+        "username": "will-byrne-34418853",
+        "url": "https://www.linkedin.com/in/will-byrne-34418853/"
+      },
+      {
+        "network": "GitHub",
+        "username": "will-byrne",
+        "url": "https://github.com/will-byrne"
+      }
+    ]
+  },
+  "work": [
+    {
+      "name": "Acurable",
+      "position": "Software Developer",
+      "startDate": "2026-10-12",
+      "image": "acurable.jpg",
+      "keywords": ["JavaScript", "TypeScript", "Sinon", "React", "HTML", "CSS", "Storybook", "CI/CD", "Docker", "Postgres"],
+      "highlights": [
+        "Just started"
+      ],
+      "url": "https://www.linkedin.com/company/acurable/",
+      "location": "London, United Kingdom",
+      "summary": "Joined the company as a full stack software developer recently"
+    },
+    {
+      "name": "eLife Sciences Publications Ltd",
+      "position": "Senior Software Developer",
+      "startDate": "2019-03-31",
+      "endDate": "2025-02-28",
+      "image": "elife.jpg",
+      "keywords": ["JavaScript", "TypeScript", "Kubernetes", "Jest", "React", "HTML", "CSS", "Storybook", "Temporal", "CI/CD", "GitHub actions", "Chromatic", "Docker", "MongoDB"],
+      "highlights": [
+        "Created and maintained the Storybook interaction tests and the Chromatic visual regression tests",
+        "As a team we took ownership of the version of Stencila Encoda we needed to alter when the owners were unable to spend time to make the changes",
+        "Earned a promotion to Senior Software Developer",
+        "Developed the Enhanced Preprint platform form prototype to released product and spearheaded the automated testing frameworks",
+        "Worked on the Reviewer application and led the introduction of Storybook"
+      ],
+      "url": "https://www.linkedin.com/company/2541446",
+      "location": "Cambridge, United Kingdom",
+      "summary": "Joined the company as a full stack developer on a team using Node.js, GraphQL, and React. We re-wrote our teams main project in TypeScript, keeping the Node.js, GraphQL, and React stack but adding validation and testing tools like Joi and Storybook. After that project was completed I was moved onto a new team where we developed an application named Sciety which used TypeScript, Node.js, and Fp-Ts. I was then tasked with creating the new Enhanced Preprint platform which has a larger stack including TypeScript, Node.js, Next.js, Temporal, MongoDB ...etc."
+    },
+    {
+      "name": "Orbitil",
+      "position": "UI Engineer",
+      "startDate": "2017-11-30",
+      "endDate": "2019-02-28",
+      "image": "orbitil.jpeg",
+      "keywords": ["JavaScript", "HTML", "CSS", "Bootstrap"],
+      "highlights": [],
+      "summary": "I was hired as a Frontend Developer to aid the backend developer in creating a richer front end experience for a python web application. My main duties included designing and implementing new UX elements alongside making sure there was adequate test coverage. This role had a lot of challenges with flexible work hours between myself and the other developer which necessitated self improvement in the way I documented my work and code.",
+      "url": "https://www.linkedin.com/company/orbitil/",
+      "location": "Cambridge, United Kingdom"
+    },
+    {
+      "name": "Autonomy",
+      "position": "Software Developer",
+      "startDate": "2011-10-31",
+      "endDate": "2017-07-31",
+      "image": "hp.jpeg",
+      "highlights": [
+        "Profiled and rewrote the Selenium tests and reduced the run time from 9 hours to 20 minutes",
+        "Co-developed a rapid prototype of the UX for Idol / Haven on demand called BiFi",
+        "Volunteered as a member of the sports and social council",
+        "Volunteered as the lead fire warden on site in charge of training, drills, and managing the other fire marshals"
+      ],
+      "keywords": ["Java", "JavaScript", "JUnit", "Selenium", "Backbone.js", "HTML", "CSS"],
+      "url": "https://www.linkedin.com/company/4014",
+      "location": "Cambridge, United Kingdom",
+      "summary": "Started as a Graduate Software Developer working on a legacy Java application using WebLogic and JBoss, when that project wound down I was moved onto a team that made the frontend for HP Idol / Haven on demand platform. This UX was developed with a Java backend using Spring Boot and the frontend was written in Backbone.js and JQuery. I was a constant voice for more testing in both applications I worked on here and managed to do some great improvements to the browser tests."
+    }
+  ],
+  "volunteer": [
+    {
+      "organization": "Fauna and Flora International",
+      "position": "Volunteer",
+      "url": "https://www.fauna-flora.org/",
+      "startDate": "2016",
+      "endDate": "2017",
+      "summary": "Worked as a volunteer with a group of colleagues for the charity upgrading one of their campaign websites. This was done through the HP charity program where we were able to use some limited work time to volunteer for charities / good causes."
+    },
+    {
+      "organization": "Peacock Archers",
+      "position": "Volunteer Coach",
+      "startDate": "2016",
+      "endDate": "2021",
+      "summary": "Helped coach the club archers as a level 2 archery coach, this was usually two or three sessions a week where I would spend some time shooting and some time coaching other archers."
+    }
+  ],
+  "education": [
+    {
+      "institution": "Edinburgh University",
+      "area": "Computer Science",
+      "studyType": "Master of Science (M.Sc.)",
+      "startDate": "2010-12-31",
+      "endDate": "2011-12-31",
+      "score": "",
+      "courses": []
+    },
+    {
+      "institution": "Aberdeen University",
+      "area": "Computer Science",
+      "studyType": "Bachelor of Science (BSc)",
+      "startDate": "2006-12-31",
+      "endDate": "2010-12-31",
+      "score": "BSc 2.1",
+      "courses": []
+    }
+  ],
+  "awards": [],
+  "certificates": [],
+  "publications": [],
+  "skills": [
+    {
+      "name": "Frontend",
+      "level": "Senior",
+      "keywords": ["TypeScript", "JavaScript", "HTML", "CSS", "React"]
+    },
+    {
+      "name": "Backend",
+      "level": "Senior",
+      "keywords": ["TypeScript", "JavaScript", "Java", "Node.js", "Temporal", "MongoDB"]
+    },
+    {
+      "name": "Testing",
+      "level": "Senior",
+      "keywords": ["Jest", "Playwright", "Backstop.js", "Storybook", "Chromatic", "Testing-library", "Supertest", "JUnit"]
+    },
+    {
+      "name": "DevOps",
+      "level": "Adept",
+      "keywords": ["Kubernetes", "Flux", "Docker", "GitHub actions", "CI/CD"]
+    },
+    {
+      "name": "Soft Skills",
+      "level": "Senior",
+      "keywords": [ "Analytical thinking", "Thorough attention to detail", "Problem solving", "Communication" ]
+    }
+  ],
+  "languages": [
+    {
+      "language": "English",
+      "fluency": "Native Speaker"
+    }
+  ],
+  "interests": [
+    {
+      "name": "Ice / Roller skating"
+    },
+    {
+      "name": "Astrophotography"
+    },
+    {
+      "name": "Archery"
+    },
+    {
+      "name": "Juggling"
+    },
+    {
+      "name": "Video Games"
+    },
+    { 
+      "name": "Role Playing Games"
+    },
+    { 
+      "name": "Baking"
+    },
+    {
+      "name": "Cello, Guitar, Clarinet"
+    },
+    {
+      "name": "Drawing"
+    },
+    {
+      "name": "Cross Stitch / Crochet"
+    }
+  ],
+  "references": [
+    {
+      "name": "Ashlea Shaw",
+      "reference": "I have had the pleasure of working closely with Will Byrne, a dedicated professional whose commitment to effective testing ensures exceptional user experiences and minimal bugs. His meticulous attention to detail and proactive approach to quality assurance have consistently elevated our projects, leading to seamless and reliable outcomes.\n\nBeyond his technical expertise, Will enriches our team with his diverse hobbies and talents. He has introduced us to the art of juggling, leading engaging sessions that have enhanced our coordination and team dynamics. His passion for storytelling shines through in the memorable Dungeons & Dragons sessions he organizes, fostering creativity and camaraderie among team members. Additionally, Will's cello performances have provided us with moments of musical inspiration, showcasing his artistic versatility.\n\nIn summary, Will Byrne is a multifaceted professional whose dedication to quality and diverse interests make him an invaluable asset to any team."
+    },
+    {
+      "name": "Peter Hooper",
+      "reference": "Will is an amazing software developer, with great attention to detail. We've benefited from his in-depth knowledge in testing and good all round coding skill. I've enjoyed pairing together, mostly on debugging knotty problems - he's a great guy and an asset to any team!"
+    }
+  ],
+  "projects": [],
+  "meta": {
+    "version": "v1.0.0",
+    "canonical": "https://github.com/jsonresume/resume-schema/blob/v1.0.0/schema.json",
+    "theme": "macchiato"
+  }
+}
