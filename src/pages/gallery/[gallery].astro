@@ -22,7 +22,7 @@ const { gallery, others } = Astro.props;
 const count = (n: number) => `${n} ${n === 1 ? 'image' : 'images'}`;
 ---
 
-<BaseLayout pageTitle={`${gallery.title} gallery`} description={gallery.description} image={gallery.cover.src}>
+<BaseLayout pageTitle={`${gallery.title} gallery`} description={gallery.description} image={gallery.cover.src} imageAlt={gallery.cover.alt}>
   <p class="back"><a href="/gallery/">← All galleries</a></p>
   <h1 class="page-title">{gallery.title}</h1>
   {gallery.description && <p class="description">{gallery.description}</p>}

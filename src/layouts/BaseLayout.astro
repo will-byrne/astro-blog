@@ -9,18 +9,28 @@ import Footer from '../components/Footer.astro';
 import Icon from '../components/Icon.astro';
 import SearchDialog from '../components/SearchDialog.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../lib/posts';
+// Made from scripts/og-default.html; used for link previews when a page has no image of its own
+import defaultSocialImage from '../assets/images/og-default.png';
 
 interface Props {
   pageTitle: string;
   description?: string;
   image?: ImageMetadata;
+  /** Describes the image for people who cannot see it in a link preview */
+  imageAlt?: string;
   ogType?: 'website' | 'article' | 'profile';
 }
 
-const { pageTitle, description = SITE_DESCRIPTION, image, ogType = 'website' } = Astro.props;
+const { pageTitle, description = SITE_DESCRIPTION, image, imageAlt, ogType = 'website' } = Astro.props;
 const title = pageTitle === SITE_TITLE ? SITE_TITLE : `${pageTitle} | ${SITE_TITLE}`;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
-const socialImage = image && (await getImage({ src: image, width: 1200, format: 'jpeg' }));
+// Cropped to the 1.91:1 shape link previews use, up to 1200x630. Images are never enlarged, so a small
+// image gets the largest crop of that shape it can fill, and the tags below always give the real size.
+const socialSource = image ?? defaultSocialImage;
+const socialWidth = Math.floor(Math.min(1200, socialSource.width, (socialSource.height * 1200) / 630));
+const socialHeight = Math.round((socialWidth * 630) / 1200);
+const socialImage = await getImage({ src: socialSource, width: socialWidth, height: socialHeight, fit: 'cover', format: 'jpeg' });
+const socialImageAlt = image ? (imageAlt ?? '') : `${SITE_TITLE}: ${SITE_DESCRIPTION}`;
 ---
 <html lang="en">
   <head>
@@ -49,7 +59,13 @@ const socialImage = image && (await getImage({ src: image, width: 1200, format: 
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:site_name" content={SITE_TITLE} />
     <meta property="og:type" content={ogType} />
-    {socialImage && <meta property="og:image" content={new URL(socialImage.src, Astro.site)} />}
+    <meta property="og:image" content={new URL(socialImage.src, Astro.site)} />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content={String(socialWidth)} />
+    <meta property="og:image:height" content={String(socialHeight)} />
+    {socialImageAlt && <meta property="og:image:alt" content={socialImageAlt} />}
+    <meta property="og:locale" content="en_GB" />
+    <meta name="twitter:card" content="summary_large_image" />
   </head>
   <body>
     <a class="skip-link" href="#content">Skip to content</a>

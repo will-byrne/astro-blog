@@ -1,0 +1,115 @@
+<!doctype html>
+<!--
+  The default link preview image, used when a page has no image of its own.
+  To change it, edit this file, then save a 1200x630 screenshot to src/assets/images/og-default.png:
+    chromium --headless --screenshot=src/assets/images/og-default.png --window-size=1200,630 --hide-scrollbars scripts/og-default.html
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      @font-face {
+        font-family: 'Atkinson Hyperlegible Next';
+        src: url('../node_modules/@fontsource-variable/atkinson-hyperlegible-next/files/atkinson-hyperlegible-next-latin-wght-normal.woff2') format('woff2');
+        font-weight: 200 800;
+      }
+
+      /* Catppuccin Macchiato, the site's default flavour */
+      :root {
+        --base: #24273a;
+        --mantle: #1e2030;
+        --surface0: #363a4f;
+        --text: #cad3f5;
+        --subtext1: #b8c0e0;
+        --mauve: #c6a0f6;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+
+      body {
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        background: var(--mantle);
+        color: var(--text);
+        font-family: 'Atkinson Hyperlegible Next', sans-serif;
+      }
+
+      .card {
+        position: absolute;
+        inset: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 80px;
+        background: var(--base);
+        border-radius: 32px;
+        overflow: hidden;
+      }
+
+      /* The palette stripe across the top of every page */
+      .card::before {
+        content: '';
+        position: absolute;
+        inset: 0 0 auto;
+        height: 14px;
+        background: linear-gradient(
+          to right,
+          #c6a0f6 0 12.5%, #f5bde6 0 25%, #f5a97f 0 37.5%, #eed49f 0 50%,
+          #a6da95 0 62.5%, #8bd5ca 0 75%, #7dc4e4 0 87.5%, #8aadf4 0
+        );
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 40px;
+      }
+
+      img {
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        box-shadow: 0 0 0 6px var(--surface0);
+      }
+
+      h1 {
+        color: var(--mauve);
+        font-size: 92px;
+        font-weight: 800;
+        line-height: 1.05;
+        letter-spacing: -0.01em;
+      }
+
+      p {
+        margin-top: 16px;
+        color: var(--subtext1);
+        font-size: 40px;
+      }
+
+      .url {
+        position: absolute;
+        bottom: 52px;
+        left: 80px;
+        color: var(--text);
+        font-size: 34px;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="brand">
+        <img src="../src/assets/images/avatar.jpg" alt="" />
+        <div>
+          <h1>Will's Tech Blog</h1>
+          <p>A journal of tech, music and life.</p>
+        </div>
+      </div>
+      <div class="url">willbyrne.dev</div>
+    </div>
+  </body>
+</html>

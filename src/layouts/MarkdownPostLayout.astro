@@ -15,7 +15,7 @@ const older = posts[index + 1];
 const related = getRelatedPosts(post, posts);
 ---
 
-<BaseLayout pageTitle={title} description={getExcerpt(post)} image={image?.url} ogType="article">
+<BaseLayout pageTitle={title} description={getExcerpt(post)} image={image?.url} imageAlt={image?.alt} ogType="article">
   <article class="post">
     <header>
       <p class="meta"><a href={`/categories/${slugify(category)}/`}>{category}</a></p>
