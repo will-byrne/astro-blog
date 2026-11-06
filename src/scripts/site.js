@@ -51,6 +51,12 @@ const openSearch = () => {
 };
 
 searchInput.addEventListener('input', () => runSearch(searchInput.value));
+// In a search box, Escape would only clear the text, so it would take two presses to close
+searchInput.addEventListener('keydown', (event) => {
+  if (event.key !== 'Escape') return;
+  event.preventDefault();
+  searchDialog.close();
+});
 document.querySelectorAll('[data-search-open]').forEach((button) => button.addEventListener('click', openSearch));
 document.querySelector('[data-search-close]').addEventListener('click', () => searchDialog.close());
 searchDialog.addEventListener('click', (event) => {

@@ -30,15 +30,32 @@
   --surface2: #acb0be;
   --subtext1: #5c5f77;
   --text: #4c4f69;
-  --lavender: #7287fd;
-  --mauve: #8839ef;
-  --pink: #ea76cb;
-  --peach: #fe640b;
-  --yellow: #df8e1d;
-  --green: #40a02b;
-  --teal: #179299;
-  --sapphire: #209fb5;
-  --blue: #1e66f5;
+  /*
+    Latte's own accents are too pale to read as text on its light background (as low as 2.2:1).
+    These are the same hues made darker in OKLCH until they reach 4.5:1 on --base and --mantle,
+    so links and headings stay readable. Catppuccin's originals are in the comments.
+  */
+  --lavender: #4c5bcd; /* #7287fd */
+  --mauve: #8535eb; /* #8839ef */
+  --pink: #a93a8f; /* #ea76cb */
+  --peach: #c52a00; /* #fe640b */
+  --yellow: #9f5200; /* #df8e1d */
+  --green: #087800; /* #40a02b */
+  --teal: #007279; /* #179299 */
+  --sapphire: #007186; /* #209fb5 */
+  --blue: #135cea; /* #1e66f5 */
+  /* The palette stripe is decoration, not text, so it keeps Latte's original bright colours */
+  --stripes: linear-gradient(
+    to right,
+    #8839ef 0 12.5%,
+    #ea76cb 0 25%,
+    #fe640b 0 37.5%,
+    #df8e1d 0 50%,
+    #40a02b 0 62.5%,
+    #179299 0 75%,
+    #209fb5 0 87.5%,
+    #1e66f5 0
+  );
   color-scheme: light;
 }
 

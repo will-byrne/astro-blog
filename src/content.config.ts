@@ -1,6 +1,6 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
-import { readFile } from 'node:fs/promises';
+import { loadResume } from './lib/resume-source';
 
 const posts = defineCollection({
   loader: glob({
@@ -21,17 +21,6 @@ const posts = defineCollection({
     draft: z.boolean().default(false),
   }),
 });
-
-// The resume repo copies resume.json to this public gist on every push
-const RESUME_URL = 'https://gist.githubusercontent.com/will-byrne/b6c82ed9d60d9e11dda925d9bc924628/raw/resume.json';
-
-// RESUME_FILE points at a local copy instead, so tests and CI do not depend on the network
-async function loadResume() {
-  if (process.env.RESUME_FILE) return JSON.parse(await readFile(process.env.RESUME_FILE, 'utf8'));
-  const response = await fetch(RESUME_URL);
-  if (!response.ok) throw new Error(`Could not fetch resume: ${response.status} ${response.statusText}`);
-  return response.json();
-}
 
 const resume = defineCollection({
   loader: async () => [{ id: 'resume', ...(await loadResume()) }],

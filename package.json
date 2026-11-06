@@ -12,7 +12,10 @@
     "test:unit": "vitest run --project unit",
     "test:build": "vitest run --project build",
     "test:watch": "vitest --project unit",
-    "new-post": "node scripts/new-post.ts"
+    "new-post": "node scripts/new-post.ts",
+    "update-resume": "node scripts/update-resume.ts",
+    "test:e2e": "playwright test",
+    "test:all": "yarn typecheck && yarn test && yarn test:e2e"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "6.3.10",
@@ -24,8 +27,10 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
+    "@axe-core/playwright": "^4.14.0",
     "@emnapi/core": "^1.11.3",
     "@emnapi/runtime": "^1.11.3",
+    "@playwright/test": "1.58.0",
     "fast-xml-parser": "^5.12.0",
     "node-html-parser": "^9.0.6",
     "rehype-stringify": "^10",

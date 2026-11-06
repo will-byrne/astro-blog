@@ -12,6 +12,6 @@ export default function setup() {
   execFileSync('npx', ['astro', 'build', '--silent'], {
     stdio: 'inherit',
     // Vitest sets NODE_ENV=test, which would make Astro build drafts as if in dev
-    env: { ...process.env, NODE_ENV: 'production', RESUME_FILE: process.env.RESUME_FILE ?? resolve('tests/fixtures/resume.json') },
+    env: { ...process.env, NODE_ENV: 'production', RESUME_FILE: process.env.RESUME_FILE ?? resolve('src/data/resume.json') },
   });
 }
