@@ -8,7 +8,7 @@ tags:
   - teamwork
   - collaboration
 image:
-  url: ../../assets/images/ai/cat_and_fox_supporting.jpeg
+  url: ../../assets/gallery/ai/cat_and_fox_supporting.jpeg
   alt: Cat and Fox Supporting Each Other
 ---
 
