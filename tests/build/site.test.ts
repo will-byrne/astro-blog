@@ -12,21 +12,6 @@ const urls = pageUrls();
 const xml = new XMLParser({ ignoreAttributes: false });
 const asArray = <T>(value: T | T[]) => (Array.isArray(value) ? value : [value]);
 
-// These posts use `#` headings in their Markdown, adding more h1s below the title.
-// Change them to `##` and remove them from this list; the test below fails if one is fixed but still listed.
-const KNOWN_EXTRA_H1 = [
-  '/posts/Astrophotography/',
-  '/posts/collaborative_meetings/',
-  '/posts/comfyui/',
-  '/posts/ipad_ai/',
-  '/posts/supporting_development/',
-];
-
-it('only lists pages that still have extra main headings', () => {
-  const fixed = KNOWN_EXTRA_H1.filter((url) => !exists(url) || page(url).querySelectorAll('h1').length === 1);
-  expect(fixed).toEqual([]);
-});
-
 describe('every page', () => {
   describe.each(urls)('%s', (url) => {
     const doc = page(url);
@@ -43,7 +28,7 @@ describe('every page', () => {
       expect(doc.querySelector('meta[name="description"]')?.getAttribute('content')?.trim()).toBeTruthy();
     });
 
-    it.skipIf(KNOWN_EXTRA_H1.includes(url))('has exactly one main heading', () => {
+    it('has exactly one main heading', () => {
       expect(doc.querySelectorAll('h1')).toHaveLength(1);
     });
 

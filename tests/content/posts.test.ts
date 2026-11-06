@@ -74,6 +74,11 @@ describe.each(posts)('$file', (post) => {
     expect(missing).toEqual([]);
   });
 
+  it('starts its headings at ## because the page title is the only main heading', () => {
+    const topLevel = post.headings.filter((h) => h.level === 1).map((h) => `line ${h.line}: # ${h.text}`);
+    expect(topLevel, 'change # to ## and move the headings under it down a level too').toEqual([]);
+  });
+
   it('only links to posts that exist', () => {
     const links = [...post.prose.matchAll(/\]\(\/posts\/([^/)#?\s]+)/g)].map((m) => m[1]);
     expect(links.filter((slug) => !slugs.has(slug))).toEqual([]);
