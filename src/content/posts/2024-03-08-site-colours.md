@@ -10,7 +10,7 @@ tags:
   - Jekyll
   - Catppuccin
 image:
-  url: ../../assets/images/img/catppuccin_rainbow.jpeg
+  url: ../../assets/images/catppuccin_rainbow.jpeg
   alt: Minimalist Catppuccin Rainbow
 ---
 
@@ -43,7 +43,7 @@ The main change that I wanted to make was to chang the colours, there were some 
 
 <div class="image-small">
 
-![Catppuccin logo](../../assets/images/img/macchiato_squircle.jpeg)
+![Catppuccin logo](../../assets/images/macchiato_squircle.jpeg)
 
 </div>
 
