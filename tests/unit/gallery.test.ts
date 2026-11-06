@@ -127,6 +127,40 @@ describe('buildSections', () => {
   });
 });
 
+describe('image details from section.json', () => {
+  it('uses the alt text and caption given for a file', () => {
+    const [section] = buildSections(
+      glob('ai/sith_cat.jpeg', 'ai/fox.jpeg'),
+      config('ai', { images: { 'sith_cat.jpeg': { alt: 'A cat with a red lightsaber', caption: 'Made on my iPad' } } }),
+    );
+    expect(section.images.find((i) => i.file === 'sith_cat.jpeg')).toMatchObject({ alt: 'A cat with a red lightsaber', caption: 'Made on my iPad' });
+  });
+
+  it('falls back to the file name for alt text, with no caption', () => {
+    const [section] = buildSections(glob('ai/fox.jpeg', 'ai/sith_cat.jpeg'), config('ai', { images: { 'sith_cat.jpeg': { caption: 'Only a caption' } } }));
+    const fox = section.images.find((i) => i.file === 'fox.jpeg')!;
+    expect(fox.alt).toBe('Fox');
+    expect(fox.caption).toBeUndefined();
+    expect(section.images.find((i) => i.file === 'sith_cat.jpeg')).toMatchObject({ alt: 'Sith cat', caption: 'Only a caption' });
+  });
+
+  it('keeps the date from the file name alongside a caption', () => {
+    const [section] = buildSections(glob('d/2026-11-06-hands.jpg'), config('d', { images: { '2026-11-06-hands.jpg': { caption: 'Week one' } } }));
+    expect(section.images[0]).toMatchObject({ caption: 'Week one', date: new Date('2026-11-06T00:00:00Z') });
+  });
+
+  it('fails clearly on an entry for a file that is not there, such as after a rename', () => {
+    expect(() => buildSections(glob('ai/a.jpg'), config('ai', { images: { 'old-name.jpg': { alt: 'x' } } }))).toThrow(
+      /ai\/section\.json: images: no file called old-name\.jpg/,
+    );
+  });
+
+  it('rejects empty alt text and misspelt fields', () => {
+    expect(() => buildSections(glob('ai/a.jpg'), config('ai', { images: { 'a.jpg': { alt: '   ' } } }))).toThrow(/ai\/section\.json/);
+    expect(() => buildSections(glob('ai/a.jpg'), config('ai', { images: { 'a.jpg': { capton: 'x' } } }))).toThrow(/ai\/section\.json/);
+  });
+});
+
 describe('previewImages', () => {
   it('shows the newest images other than the cover', () => {
     const [section] = buildSections(

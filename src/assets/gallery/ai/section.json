@@ -1,4 +1,62 @@
 {
   "title": "AI art",
-  "description": "Some of my AI art, mostly generated on my iPad."
+  "description": "Some of my AI art, mostly generated on my iPad.",
+  "images": {
+    "ai_castle.jpeg": {
+      "alt": "A castle lit up on a misty clifftop under a full moon, with riders on horseback on the path below and ravens circling"
+    },
+    "andromeda_astronaut.jpeg": {
+      "alt": "A cartoon astronaut with purple hair and big blue eyes, with planets and a spiral galaxy behind her"
+    },
+    "cat_and_fox_supporting.jpeg": {
+      "alt": "A cartoon grey kitten and an orange fox smiling and nuzzling each other"
+    },
+    "developers.jpeg": {
+      "alt": "Four developers chatting around a table with laptops, in an office full of screens and plants"
+    },
+    "dragon.jpeg": {
+      "alt": "A black and orange dragon with glowing eyes and spread wings, surrounded by fire"
+    },
+    "dragon_2.jpeg": {
+      "alt": "A roaring dark blue dragon with red spines and fire around it, in front of smoking mountains"
+    },
+    "dragon_blessing.jpeg": {
+      "alt": "A huge serpent-like dragon coiled in a ring above a small figure standing on a rock"
+    },
+    "dragon_mecha.jpeg": {
+      "alt": "A white and blue armoured mecha holding a large rifle and a shield with a dragon emblem"
+    },
+    "fairy_reading.jpeg": {
+      "alt": "A fairy with butterfly wings in a night-time garden, holding a glowing butterfly as others fly around her"
+    },
+    "fluffy_fox.jpeg": {
+      "alt": "A fluffy cream-coloured fox with blue eyes and several tails, sitting in a forest"
+    },
+    "glass_nebula_fox.jpeg": {
+      "alt": "A sitting fox made of glass, filled with stars and nebula colours, on a windowsill"
+    },
+    "glitterwings.jpeg": {
+      "alt": "A fairy with blue-green wings surrounded by a rainbow of flowers and feathers in an ornate, symmetrical design",
+      "caption": "Glitterwings, my character in a Dungeons and Dragons game"
+    },
+    "glitterwings_ritual.jpeg": {
+      "alt": "A fairy in golden armour with rainbow wings and a crown, kneeling on a glowing magic circle in the snow"
+    },
+    "ice_mecha.jpeg": {
+      "alt": "A white and blue mecha with ice crystal wings and a glowing blue sword, standing in snowy mountains"
+    },
+    "sith_cat.jpeg": {
+      "alt": "A black cat with yellow eyes in a dark hooded robe, holding a red lightsaber"
+    },
+    "synthwave_aurora.jpeg": {
+      "alt": "A green aurora over neon pink palm trees reflected in still water"
+    },
+    "white_mecha.jpeg": {
+      "alt": "A white armoured mecha with a glowing chest, walking through a sunny forest valley",
+      "caption": "Made in Draw Things on my iPad with DreamShaper XL"
+    },
+    "wolf_samurai.jpeg": {
+      "alt": "A wolf warrior with red eyes in ornate black and gold samurai armour"
+    }
+  }
 }

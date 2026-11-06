@@ -1,4 +1,4 @@
-import { readdirSync, statSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { slugify } from '../../src/lib/slugify';
@@ -56,5 +56,21 @@ describe.each(folders)('the $name gallery', ({ url, count }) => {
     expect(doc.querySelector('main a[href="/gallery/"]')).toBeTruthy();
     const others = doc.querySelectorAll('nav[aria-label="Other galleries"] a').map((a) => a.getAttribute('href'));
     expect(others.sort()).toEqual(folders.filter((f) => f.url !== url).map((f) => f.url).sort());
+  });
+});
+
+describe.each(folders)('the $name gallery details', ({ name, url }) => {
+  const configPath = join(GALLERY_DIR, name, 'section.json');
+  const images: Record<string, { alt?: string; caption?: string }> = existsSync(configPath) ? (JSON.parse(readFileSync(configPath, 'utf8')).images ?? {}) : {};
+  const alts = () => page(url).querySelectorAll('main .grid img').map((img) => img.getAttribute('alt'));
+  const captions = () => page(url).querySelectorAll('main .grid .caption').map((el) => el.text);
+
+  it('uses the alt text from section.json', () => {
+    for (const { alt } of Object.values(images)) if (alt) expect(alts()).toContain(alt);
+  });
+
+  it('shows the captions from section.json', () => {
+    const expected = Object.values(images).flatMap(({ caption }) => (caption ? [caption] : []));
+    expect(captions().sort()).toEqual(expected.sort());
   });
 });

@@ -29,10 +29,15 @@ const count = (n: number) => `${n} ${n === 1 ? 'image' : 'images'}`;
   <p class="meta count">{count(gallery.images.length)}</p>
 
   <div class="grid">
-    {gallery.images.map(({ src, alt, date }) => (
+    {gallery.images.map(({ src, alt, date, caption }) => (
       <figure>
         <Image src={src} alt={alt} widths={[320, 640, 960, 1600]} sizes="(min-width: 75rem) 18rem, (min-width: 48rem) 33vw, 50vw" data-zoomable />
-        {date && <figcaption class="meta"><time datetime={date.toISOString().slice(0, 10)}>{formatDate(date)}</time></figcaption>}
+        {(caption || date) && (
+          <figcaption>
+            {caption && <span class="caption">{caption}</span>}
+            {date && <time class="meta" datetime={date.toISOString().slice(0, 10)}>{formatDate(date)}</time>}
+          </figcaption>
+        )}
       </figure>
     ))}
   </div>
@@ -90,8 +95,15 @@ const count = (n: number) => `${n} ${n === 1 ? 'image' : 'images'}`;
   }
 
   figcaption {
-    margin-top: 0.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    margin-top: 0.375rem;
     font-size: 0.9rem;
+  }
+
+  .caption {
+    color: var(--subtext1);
   }
 
   .others {

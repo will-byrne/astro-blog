@@ -9,8 +9,12 @@
 //     "description": "Shown under the heading",
 //     "order": 2,                        // lower comes first; sections without one go last, by title
 //     "newestFirst": true,               // for dated files, e.g. 2026-11-06-first-sketch.jpg
-//     "cover": "2026-11-06-hands.jpg"    // the image on the /gallery/ card; defaults to the newest
+//     "cover": "2026-11-06-hands.jpg",   // the image on the /gallery/ card; defaults to the newest
+//     "images": {                        // alt text and captions, by file name
+//       "2026-11-06-hands.jpg": { "alt": "A pencil sketch of two hands", "caption": "Week one" }
+//     }
 //   }
+// Without an alt, the file name is used, e.g. "sith_cat.jpeg" -> "Sith cat".
 // A file named YYYY-MM-DD-name.ext shows its date and sorts by it.
 import { z } from 'astro/zod';
 import type { ImageMetadata } from 'astro';
@@ -23,6 +27,12 @@ export const sectionSchema = z
     order: z.number().optional(),
     newestFirst: z.boolean().default(false),
     cover: z.string().min(1).optional(),
+    images: z
+      .record(
+        z.string(),
+        z.object({ alt: z.string().trim().min(1).optional(), caption: z.string().trim().min(1).optional() }).strict(),
+      )
+      .default({}),
   })
   // A misspelt field fails the build instead of being ignored
   .strict();
@@ -34,6 +44,7 @@ export interface GalleryImage {
   alt: string;
   /** From a YYYY-MM-DD- prefix on the file name */
   date?: Date;
+  caption?: string;
   file: string;
 }
 
@@ -110,6 +121,14 @@ export function buildSections(
 
   const sections = [...folders].map(([folder, list]): GallerySection => {
     const config = settings.get(folder) ?? sectionSchema.parse({});
+    // Catch entries for files that were renamed or misspelt, which would otherwise be silently ignored
+    const unknown = Object.keys(config.images).filter((file) => !list.some((image) => image.file === file));
+    if (unknown.length) throw new Error(`${folder}/section.json: images: no file called ${unknown.join(', ')} in this folder`);
+    for (const image of list) {
+      const details = config.images[image.file];
+      if (details?.alt) image.alt = details.alt;
+      if (details?.caption) image.caption = details.caption;
+    }
     const direction = config.newestFirst ? -1 : 1;
     const sorted = [...list].sort((a, b) => {
       // Dated images go in date order, then anything undated by name
