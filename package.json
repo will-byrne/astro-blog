@@ -11,7 +11,8 @@
     "test": "vitest run",
     "test:unit": "vitest run --project unit",
     "test:build": "vitest run --project build",
-    "test:watch": "vitest --project unit"
+    "test:watch": "vitest --project unit",
+    "new-post": "node scripts/new-post.ts"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "6.3.10",

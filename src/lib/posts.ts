@@ -1,4 +1,5 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
+import { slugify } from './slugify';
 
 export type Post = CollectionEntry<'posts'>;
 
@@ -14,10 +15,7 @@ export async function getPosts(): Promise<Post[]> {
 
 export const postUrl = (post: Post) => `/posts/${post.id}/`;
 
-// Keeps the tag and category URLs from the old Jekyll site, e.g. "D&D" -> "d-d"
-export function slugify(label: string): string {
-  return label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-}
+export { slugify };
 
 export interface Term {
   slug: string;
