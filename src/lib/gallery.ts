@@ -1,6 +1,6 @@
-// Builds the gallery's sections from the folders in src/assets/gallery.
+// Builds the galleries from the folders in src/assets/gallery.
 //
-// Each folder is a section. Images used only in posts live in src/assets/images instead,
+// Each folder is a gallery with its own page at /gallery/<folder>/; /gallery/ lists them all. Images used only in posts live in src/assets/images instead,
 // so nothing appears in the gallery unless it is put here on purpose.
 //
 // A folder may hold a section.json, where every field is optional:
@@ -8,7 +8,8 @@
 //     "title": "Learning to draw",      // defaults to the folder name, e.g. "my_drawings" -> "My drawings"
 //     "description": "Shown under the heading",
 //     "order": 2,                        // lower comes first; sections without one go last, by title
-//     "newestFirst": true                // for dated files, e.g. 2026-11-06-first-sketch.jpg
+//     "newestFirst": true,               // for dated files, e.g. 2026-11-06-first-sketch.jpg
+//     "cover": "2026-11-06-hands.jpg"    // the image on the /gallery/ card; defaults to the newest
 //   }
 // A file named YYYY-MM-DD-name.ext shows its date and sorts by it.
 import { z } from 'astro/zod';
@@ -21,6 +22,7 @@ export const sectionSchema = z
     description: z.string().optional(),
     order: z.number().optional(),
     newestFirst: z.boolean().default(false),
+    cover: z.string().min(1).optional(),
   })
   // A misspelt field fails the build instead of being ignored
   .strict();
@@ -36,13 +38,27 @@ export interface GalleryImage {
 }
 
 export interface GallerySection {
-  /** From the folder name, used as the heading's id */
+  /** From the folder name; the gallery's URL is /gallery/<id>/ */
   id: string;
   title: string;
   description?: string;
   order?: number;
+  /** Shown on the /gallery/ card */
+  cover: GalleryImage;
   images: GalleryImage[];
 }
+
+/** Newest dated image first, otherwise the first in the gallery's own order */
+function newest(images: GalleryImage[]): GalleryImage[] {
+  const dated = images.filter((image) => image.date).sort((a, b) => b.date!.getTime() - a.date!.getTime());
+  return [...dated, ...images.filter((image) => !image.date)];
+}
+
+/** A few images other than the cover, newest first, for the thumbnails on a /gallery/ card */
+export const previewImages = (section: GallerySection, count = 4) =>
+  newest(section.images)
+    .filter((image) => image !== section.cover)
+    .slice(0, count);
 
 const DATE_PREFIX = /^(\d{4}-\d{2}-\d{2})[-_ ]?/;
 
@@ -102,7 +118,16 @@ export function buildSections(
       if (!a.date && b.date) return 1;
       return a.file.localeCompare(b.file) * direction;
     });
-    return { id: slugify(folder) || folder, title: config.title ?? humanise(folder), description: config.description, order: config.order, images: sorted };
+    const cover = config.cover ? sorted.find((image) => image.file === config.cover) : newest(sorted)[0];
+    if (!cover) throw new Error(`${folder}/section.json: cover: there is no image called ${config.cover} in this folder`);
+    return {
+      id: slugify(folder) || folder,
+      title: config.title ?? humanise(folder),
+      description: config.description,
+      order: config.order,
+      cover,
+      images: sorted,
+    };
   });
 
   return sections.sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity) || a.title.localeCompare(b.title));

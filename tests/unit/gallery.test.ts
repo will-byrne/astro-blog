@@ -1,6 +1,6 @@
 import type { ImageMetadata } from 'astro';
 import { describe, expect, it } from 'vitest';
-import { buildSections, describeFile, humanise } from '../../src/lib/gallery';
+import { buildSections, describeFile, humanise, previewImages } from '../../src/lib/gallery';
 
 const img = (name: string) => ({ src: name, width: 100, height: 100, format: 'jpg' }) as unknown as ImageMetadata;
 
@@ -105,5 +105,43 @@ describe('buildSections', () => {
 
   it('fails clearly on a field of the wrong type', () => {
     expect(() => buildSections(glob('ai/a.jpg'), config('ai', { order: 'first' }))).toThrow(/ai\/section\.json: order/);
+  });
+
+  it('uses the newest dated image as the cover, whatever the display order', () => {
+    const [section] = buildSections(glob('drawings/2026-01-15-a.jpg', 'drawings/2026-12-01-b.jpg', 'drawings/untitled.jpg'));
+    expect(section.cover.file).toBe('2026-12-01-b.jpg');
+  });
+
+  it('uses the first image as the cover when nothing is dated', () => {
+    const [section] = buildSections(glob('ai/b.jpg', 'ai/a.jpg'));
+    expect(section.cover.file).toBe('a.jpg');
+  });
+
+  it('uses the cover named in section.json', () => {
+    const [section] = buildSections(glob('ai/a.jpg', 'ai/b.jpg'), config('ai', { cover: 'b.jpg' }));
+    expect(section.cover.file).toBe('b.jpg');
+  });
+
+  it('fails clearly when the named cover is not in the folder', () => {
+    expect(() => buildSections(glob('ai/a.jpg'), config('ai', { cover: 'missing.jpg' }))).toThrow(/ai\/section\.json: cover: there is no image called missing\.jpg/);
+  });
+});
+
+describe('previewImages', () => {
+  it('shows the newest images other than the cover', () => {
+    const [section] = buildSections(
+      glob('d/2026-01-01-a.jpg', 'd/2026-02-01-b.jpg', 'd/2026-03-01-c.jpg', 'd/2026-04-01-d.jpg', 'd/2026-05-01-e.jpg', 'd/2026-06-01-f.jpg'),
+    );
+    expect(previewImages(section).map((image) => image.file)).toEqual(['2026-05-01-e.jpg', '2026-04-01-d.jpg', '2026-03-01-c.jpg', '2026-02-01-b.jpg']);
+  });
+
+  it('follows the gallery order when nothing is dated', () => {
+    const [section] = buildSections(glob('ai/a.jpg', 'ai/b.jpg', 'ai/c.jpg'), config('ai', { cover: 'b.jpg' }));
+    expect(previewImages(section, 2).map((image) => image.file)).toEqual(['a.jpg', 'c.jpg']);
+  });
+
+  it('is empty when the cover is the only image', () => {
+    const [section] = buildSections(glob('ai/a.jpg'));
+    expect(previewImages(section)).toEqual([]);
   });
 });
