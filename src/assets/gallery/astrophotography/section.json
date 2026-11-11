@@ -7,12 +7,20 @@
       "caption": "Andromeda Galaxy (M31), with its companion galaxies M32 and M110. Nikon D5600 on an iOptron Sky Guider Pro, processed in StarTools."
     },
     "na-nebula.jpg": {
-      "alt": "Red glowing gas filling the frame, with a dark lane of dust curving through the middle and thousands of stars",
+      "alt": "North America Nebula (NGC 7000) in Cygnus",
       "caption": "North America Nebula (NGC 7000) in Cygnus. Nikon D5600 on an iOptron Sky Guider Pro, processed in StarTools."
     },
     "NorthAmerica_processed_v3 - claude.jpg": {
-      "alt": "Red glowing gas filling the frame, with a dark lane of dust curving through the middle and thousands of stars",
+      "alt": "North America Nebula (NGC 7000) in Cygnus",
       "caption": "North America Nebula (NGC 7000) in Cygnus. Nikon D5600 on an iOptron Sky Guider Pro, processed by Claude."
+    },
+    "andromeda_astro-processor.jpg": {
+      "alt": "The Andromeda Galaxy, a large spiral of grey-blue light with a bright core, crossed by dark dust lanes and surrounded by stars",
+      "caption": "Andromeda Galaxy (M31), with its companion galaxies M32 and M110. Nikon D5600 on an iOptron Sky Guider Pro, processed in astro-processor."
+    },
+    "NA_astro-processor.jpg": {
+      "alt": "North America Nebula (NGC 7000) in Cygnus",
+      "caption": "North America Nebula (NGC 7000) in Cygnus. Nikon D5600 on an iOptron Sky Guider Pro, processed in astro-processor."
     }
   }
 }
