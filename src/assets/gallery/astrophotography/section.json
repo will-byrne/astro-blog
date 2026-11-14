@@ -1,6 +1,8 @@
 {
   "title": "Astrophotography",
   "description": "Photos I have taken of space stuff.",
+  "layout": "rows",
+  "cover": "andromeda.jpeg",
   "images": {
     "andromeda.jpeg": {
       "alt": "The Andromeda Galaxy, a large spiral of grey-blue light with a bright core, crossed by dark dust lanes and surrounded by stars",

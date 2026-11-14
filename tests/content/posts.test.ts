@@ -1,11 +1,13 @@
-import { existsSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { slugify } from '../../src/lib/slugify';
 import { POSTS_DIR, readPosts } from '../helpers/content';
 
 // Checks the real posts, so a mistake in a new post is caught before it is deployed
 const posts = readPosts();
 const slugs = new Set(posts.map((post) => post.slug));
+const galleries = readdirSync(resolve('src/assets/gallery'));
 
 it('finds the posts', () => {
   expect(posts.length).toBeGreaterThan(0);
@@ -62,6 +64,12 @@ describe.each(posts)('$file', (post) => {
     const url = post.data.image?.url;
     if (!url) return;
     expect(existsSync(resolve(POSTS_DIR, url)), url).toBe(true);
+  });
+
+  it('names a gallery that exists, if it has one', () => {
+    const gallery = post.data.gallery;
+    if (gallery === undefined) return;
+    expect(galleries.map((name) => slugify(name) || name), `gallery: ${gallery}`).toContain(slugify(String(gallery)) || gallery);
   });
 
   it('points to images that exist', () => {

@@ -2,23 +2,30 @@
 import { Image } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getGalleries } from '../../lib/gallery-content';
-import type { GallerySection } from '../../lib/gallery';
-import { formatDate } from '../../lib/posts';
+import { findGallery, type GallerySection } from '../../lib/gallery';
+import { formatDate, getPosts, postUrl, type Post } from '../../lib/posts';
 
-export function getStaticPaths() {
+export async function getStaticPaths() {
   const galleries = getGalleries();
+  const posts = await getPosts();
   return galleries.map((gallery) => ({
     params: { gallery: gallery.id },
-    props: { gallery, others: galleries.filter((other) => other.id !== gallery.id) },
+    props: {
+      gallery,
+      others: galleries.filter((other) => other.id !== gallery.id),
+      // Posts with `gallery:` naming this one in their frontmatter, newest first
+      posts: posts.filter((post) => post.data.gallery && findGallery(galleries, post.data.gallery) === gallery),
+    },
   }));
 }
 
 interface Props {
   gallery: GallerySection;
   others: GallerySection[];
+  posts: Post[];
 }
 
-const { gallery, others } = Astro.props;
+const { gallery, others, posts } = Astro.props;
 const count = (n: number) => `${n} ${n === 1 ? 'image' : 'images'}`;
 ---
 
@@ -28,7 +35,21 @@ const count = (n: number) => `${n} ${n === 1 ? 'image' : 'images'}`;
   {gallery.description && <p class="description">{gallery.description}</p>}
   <p class="meta count">{count(gallery.images.length)}</p>
 
-  <div class="grid">
+  {posts.length > 0 && (
+    <section class="posts" aria-labelledby="posts-heading">
+      <h2 id="posts-heading">{posts.length === 1 ? 'Read the post' : 'Read the posts'}</h2>
+      <ul>
+        {posts.map((post) => (
+          <li>
+            <a href={postUrl(post)}>{post.data.title}</a>
+            <p class="meta"><time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time></p>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  <div class:list={["grid", gallery.layout]}>
     {gallery.images.map(({ src, alt, date, caption }) => (
       <figure>
         <Image src={src} alt={alt} widths={[320, 640, 960, 1600]} sizes="(min-width: 75rem) 18rem, (min-width: 48rem) 33vw, 50vw" data-zoomable />
@@ -78,9 +99,51 @@ const count = (n: number) => `${n} ${n === 1 ? 'image' : 'images'}`;
     margin: 0.5rem 0 2rem;
   }
 
+  .posts {
+    margin: 0 0 2rem;
+  }
+
+  .posts h2 {
+    color: var(--peach);
+    font-size: 1.25rem;
+  }
+
+  .posts ul {
+    margin: 0.25rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .posts li {
+    padding-block: 0.25rem;
+  }
+
+  .posts a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    font-weight: 700;
+  }
+
+  .posts p {
+    margin: 0;
+  }
+
   .grid {
     columns: 2;
     column-gap: 0.75rem;
+  }
+
+  /* Reads across in order, row by row, for images that are all one shape */
+  .grid.rows {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    align-items: start;
+  }
+
+  .grid.rows figure {
+    margin: 0;
   }
 
   figure {
@@ -131,11 +194,19 @@ const count = (n: number) => `${n} ${n === 1 ? 'image' : 'images'}`;
     .grid {
       columns: 3;
     }
+
+    .grid.rows {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
   }
 
   @media (min-width: 75rem) {
     .grid {
       columns: 4;
+    }
+
+    .grid.rows {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
 </style>

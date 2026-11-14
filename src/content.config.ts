@@ -18,6 +18,8 @@ const posts = defineCollection({
     category: z.string(),
     tags: z.array(z.string()).default([]),
     image: z.object({ url: image(), alt: z.string().default('') }).optional(),
+    // A folder in src/assets/gallery, e.g. learning-to-draw. The post links to that gallery and the gallery links back.
+    gallery: z.string().trim().min(1).optional(),
     draft: z.boolean().default(false),
   }),
 });

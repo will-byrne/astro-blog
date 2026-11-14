@@ -1,6 +1,6 @@
 import type { ImageMetadata } from 'astro';
 import { describe, expect, it } from 'vitest';
-import { buildSections, describeFile, humanise, previewImages } from '../../src/lib/gallery';
+import { buildSections, describeFile, findGallery, humanise, previewImages } from '../../src/lib/gallery';
 
 const img = (name: string) => ({ src: name, width: 100, height: 100, format: 'jpg' }) as unknown as ImageMetadata;
 
@@ -66,6 +66,20 @@ describe('buildSections', () => {
   it('sorts undated images by file name', () => {
     const [section] = buildSections(glob('ai/c.jpg', 'ai/a.jpg', 'ai/b.jpg'));
     expect(files(section)).toEqual(['a.jpg', 'b.jpg', 'c.jpg']);
+  });
+
+  it('lays images out in columns unless section.json asks for rows', () => {
+    const sections = buildSections(glob('ai/a.jpg', 'draw/b.jpg'), config('draw', { layout: 'rows' }));
+    expect(sections.map((s) => [s.id, s.layout])).toEqual([['ai', 'columns'], ['draw', 'rows']]);
+  });
+
+  it('rejects a layout it does not know', () => {
+    expect(() => buildSections(glob('draw/b.jpg'), config('draw', { layout: 'masonry' }))).toThrow(/draw\/section.json: layout/);
+  });
+
+  it('sorts numbered file names by number, padded or not', () => {
+    const [section] = buildSections(glob('draw/10_caterpie.jpg', 'draw/151_mew.jpg', 'draw/9_blastoise.jpg', 'draw/002_ivysaur.jpg'));
+    expect(files(section)).toEqual(['002_ivysaur.jpg', '9_blastoise.jpg', '10_caterpie.jpg', '151_mew.jpg']);
   });
 
   it('sorts dated images oldest first by default, then undated ones', () => {
@@ -177,5 +191,22 @@ describe('previewImages', () => {
   it('is empty when the cover is the only image', () => {
     const [section] = buildSections(glob('ai/a.jpg'));
     expect(previewImages(section)).toEqual([]);
+  });
+});
+
+describe('findGallery', () => {
+  const galleries = buildSections(glob('learning-to-draw/a.jpg', 'My Drawings/b.jpg'));
+
+  it('finds a gallery by its folder name', () => {
+    expect(findGallery(galleries, 'learning-to-draw').id).toBe('learning-to-draw');
+    expect(findGallery(galleries, 'My Drawings').id).toBe('my-drawings');
+  });
+
+  it('finds a gallery by its URL id', () => {
+    expect(findGallery(galleries, 'my-drawings').title).toBe('My Drawings');
+  });
+
+  it('names the galleries that exist when the name is wrong', () => {
+    expect(() => findGallery(galleries, 'drawings')).toThrow(/no gallery called "drawings".*learning-to-draw, my-drawings/);
   });
 });

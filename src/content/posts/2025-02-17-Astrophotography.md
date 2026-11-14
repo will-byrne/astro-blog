@@ -10,6 +10,7 @@ tags:
 image:
   url: ../../assets/images/andromeda.jpeg
   alt: Andromeda galaxy
+gallery: astrophotography
 ---
 
 I started astrophotography as a hobby in 2018 with a friend. We initially went out with just a DSLR and a tripod, and the images were a bit of a mess. It turns out it’s actually quite complicated to do. My gallery (of two pictures as of writing) can be found on my [Telescopious](https://telescopius.com/) [Gallery](https://telescopius.com/profile/lunaaeterna)

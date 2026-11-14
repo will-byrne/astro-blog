@@ -2,6 +2,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { slugify } from '../../src/lib/slugify';
+import { readPosts } from '../helpers/content';
 import { exists, page } from './dist';
 
 const GALLERY_DIR = resolve('src/assets/gallery');
@@ -69,8 +70,35 @@ describe.each(folders)('the $name gallery details', ({ name, url }) => {
     for (const { alt } of Object.values(images)) if (alt) expect(alts()).toContain(alt);
   });
 
+  it('uses the layout from section.json', () => {
+    const layout = existsSync(configPath) ? (JSON.parse(readFileSync(configPath, 'utf8')).layout ?? 'columns') : 'columns';
+    expect(page(url).querySelector('main .grid')?.classList.contains(layout)).toBe(true);
+  });
+
   it('shows the captions from section.json', () => {
     const expected = Object.values(images).flatMap(({ caption }) => (caption ? [caption] : []));
     expect(captions().sort()).toEqual(expected.sort());
   });
+});
+
+// A post with `gallery:` in its frontmatter links to that gallery, and the gallery links back
+const linked = readPosts()
+  .filter((post) => !post.data.draft && post.data.gallery)
+  .map((post) => ({ file: post.file, post: `/posts/${post.slug}/`, gallery: `/gallery/${slugify(post.data.gallery)}/` }));
+
+describe.each(linked)('$file and its gallery', ({ post, gallery }) => {
+  it('links from the post to the gallery', () => {
+    expect(page(post).querySelector(`aside.gallery-link a[href="${gallery}"]`)).toBeTruthy();
+  });
+
+  it('links from the gallery back to the post', () => {
+    expect(page(gallery).querySelector(`main .posts a[href="${post}"]`)).toBeTruthy();
+  });
+});
+
+it('only lists posts on a gallery that name it', () => {
+  for (const { url } of folders) {
+    const shown = page(url).querySelectorAll('main .posts a').map((a) => a.getAttribute('href'));
+    expect(shown.sort(), url).toEqual(linked.filter((l) => l.gallery === url).map((l) => l.post).sort());
+  }
 });

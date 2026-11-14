@@ -8,6 +8,8 @@
 //     "title": "Learning to draw",      // defaults to the folder name, e.g. "my_drawings" -> "My drawings"
 //     "description": "Shown under the heading",
 //     "order": 2,                        // lower comes first; sections without one go last, by title
+//     "layout": "rows",                  // "rows" reads across in order, best for images of one shape;
+//                                        // "columns" (the default) packs mixed shapes, reading down each column
 //     "newestFirst": true,               // for dated files, e.g. 2026-11-06-first-sketch.jpg
 //     "cover": "2026-11-06-hands.jpg",   // the image on the /gallery/ card; defaults to the newest
 //     "images": {                        // alt text and captions, by file name
@@ -15,7 +17,8 @@
 //     }
 //   }
 // Without an alt, the file name is used, e.g. "sith_cat.jpeg" -> "Sith cat".
-// A file named YYYY-MM-DD-name.ext shows its date and sorts by it.
+// A file named YYYY-MM-DD-name.ext shows its date and sorts by it. Other files sort by name, with any numbers in
+// order, e.g. 9_weedle.jpg before 10_caterpie.jpg.
 import { z } from 'astro/zod';
 import type { ImageMetadata } from 'astro';
 import { slugify } from './slugify';
@@ -25,6 +28,7 @@ export const sectionSchema = z
     title: z.string().min(1).optional(),
     description: z.string().optional(),
     order: z.number().optional(),
+    layout: z.enum(['columns', 'rows']).default('columns'),
     newestFirst: z.boolean().default(false),
     cover: z.string().min(1).optional(),
     images: z
@@ -54,6 +58,7 @@ export interface GallerySection {
   title: string;
   description?: string;
   order?: number;
+  layout: 'columns' | 'rows';
   /** Shown on the /gallery/ card */
   cover: GalleryImage;
   images: GalleryImage[];
@@ -70,6 +75,13 @@ export const previewImages = (section: GallerySection, count = 4) =>
   newest(section.images)
     .filter((image) => image !== section.cover)
     .slice(0, count);
+
+/** The gallery a post's `gallery` field names, by folder name or URL id, e.g. "learning-to-draw" */
+export function findGallery(galleries: GallerySection[], name: string): GallerySection {
+  const gallery = galleries.find((section) => section.id === (slugify(name) || name));
+  if (!gallery) throw new Error(`gallery: there is no gallery called "${name}". The galleries are: ${galleries.map((g) => g.id).join(', ')}`);
+  return gallery;
+}
 
 const DATE_PREFIX = /^(\d{4}-\d{2}-\d{2})[-_ ]?/;
 
@@ -135,7 +147,8 @@ export function buildSections(
       if (a.date && b.date && a.date.getTime() !== b.date.getTime()) return (a.date.getTime() - b.date.getTime()) * direction;
       if (a.date && !b.date) return -1;
       if (!a.date && b.date) return 1;
-      return a.file.localeCompare(b.file) * direction;
+      // Numbers compare as numbers, so 9_x.jpg comes before 10_x.jpg
+      return a.file.localeCompare(b.file, 'en', { numeric: true }) * direction;
     });
     const cover = config.cover ? sorted.find((image) => image.file === config.cover) : newest(sorted)[0];
     if (!cover) throw new Error(`${folder}/section.json: cover: there is no image called ${config.cover} in this folder`);
@@ -144,6 +157,7 @@ export function buildSections(
       title: config.title ?? humanise(folder),
       description: config.description,
       order: config.order,
+      layout: config.layout,
       cover,
       images: sorted,
     };

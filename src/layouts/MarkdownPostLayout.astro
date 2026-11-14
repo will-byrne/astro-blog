@@ -3,6 +3,8 @@ import { Image } from "astro:assets";
 import BaseLayout from "./BaseLayout.astro";
 import Icon from "../components/Icon.astro";
 import TableOfContents from "../components/TableOfContents.astro";
+import { findGallery, previewImages } from "../lib/gallery";
+import { getGalleries } from "../lib/gallery-content";
 import { formatDate, getExcerpt, getPosts, getReadingTime, getRelatedPosts, postUrl, slugify, type Post } from "../lib/posts";
 
 const { post, headings } = Astro.props as { post: Post; headings: { depth: number; slug: string; text: string }[] };
@@ -13,6 +15,10 @@ const index = posts.findIndex((other) => other.id === post.id);
 const newer = posts[index - 1];
 const older = posts[index + 1];
 const related = getRelatedPosts(post, posts);
+// Fails the build if the post names a gallery that does not exist
+const gallery = post.data.gallery ? findGallery(getGalleries(), post.data.gallery) : undefined;
+const galleryThumbs = gallery ? [gallery.cover, ...previewImages(gallery, 3)] : [];
+const imageCount = (n: number) => `${n} ${n === 1 ? "image" : "images"}`;
 ---
 
 <BaseLayout pageTitle={title} description={getExcerpt(post)} image={image?.url} imageAlt={image?.alt} ogType="article">
@@ -39,6 +45,19 @@ const related = getRelatedPosts(post, posts);
       <div class="prose">
         <slot />
       </div>
+
+      {gallery && (
+        <aside class="gallery-link" aria-label="Gallery">
+          <div class="gallery-text">
+            <p class="meta">From the gallery</p>
+            <p class="gallery-title"><a href={`/gallery/${gallery.id}/`}>{gallery.title}</a></p>
+            <p class="meta">{imageCount(gallery.images.length)}</p>
+          </div>
+          <div class="gallery-thumbs" aria-hidden="true">
+            {galleryThumbs.map((thumb) => <Image src={thumb.src} alt="" widths={[96, 192]} sizes="5rem" />)}
+          </div>
+        </aside>
+      )}
 
       <footer>
         {tags.length > 0 && (
@@ -127,6 +146,67 @@ const related = getRelatedPosts(post, posts);
   /* Headings in posts should not push the first line of text down */
   .prose > :global(:first-child) {
     margin-top: 0;
+  }
+
+  /* The whole box is the link, like the cards on /gallery/ */
+  .gallery-link {
+    position: relative;
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 2.5rem;
+    padding: 0.75rem 1rem;
+    background: var(--mantle);
+    border: 2px solid var(--surface0);
+    border-radius: 0.75rem;
+    transition: background-color 150ms ease, border-color 150ms ease;
+  }
+
+  .gallery-link:hover,
+  .gallery-link:focus-within {
+    background: color-mix(in srgb, var(--accent) 8%, var(--mantle));
+    border-color: var(--accent);
+  }
+
+  .gallery-link p {
+    margin: 0;
+  }
+
+  .gallery-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .gallery-title a {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .gallery-title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .gallery-link:hover .gallery-title a,
+  .gallery-link:focus-within .gallery-title a {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 3px;
+    text-underline-offset: 0.2em;
+  }
+
+  .gallery-thumbs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+  }
+
+  .gallery-thumbs img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    border-radius: 0.375rem;
+    object-fit: cover;
   }
 
   footer {
@@ -227,7 +307,18 @@ const related = getRelatedPosts(post, posts);
     margin: 0;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .gallery-link {
+      transition: none;
+    }
+  }
+
   @media (min-width: 40rem) {
+    .gallery-link {
+      grid-template-columns: 1fr 20rem;
+      align-items: center;
+    }
+
     .post-nav {
       grid-template-columns: 1fr 1fr;
     }

@@ -1,0 +1,64 @@
+{
+  "title": "Learning to draw",
+  "description": "My drawings of the original 151 Pokémon, in Pokédex order, drawn in Procreate on my iPad as I learn to draw.",
+  "layout": "rows",
+  "cover": "003_Venusaur.jpg",
+  "images": {
+    "001_Bulbasaur.jpg": {
+      "alt": "A drawing of Bulbasaur, a pale green creature with dark green spots, red eyes and a large leaf bulb on its back",
+      "caption": "#001 Bulbasaur"
+    },
+    "002_Ivysaur.jpg": {
+      "alt": "A drawing of Ivysaur, a blue-green creature with leaves and a pink flower bud on its back",
+      "caption": "#002 Ivysaur"
+    },
+    "003_Venusaur.jpg": {
+      "alt": "A shaded drawing of Venusaur, a blue-green creature with a large pink flower and palm-like leaves on its back",
+      "caption": "#003 Venusaur"
+    },
+    "004_Charmander.jpg": {
+      "alt": "A drawing of Charmander, a small orange lizard standing upright with a flame on the tip of its tail",
+      "caption": "#004 Charmander"
+    },
+    "005_Charmeleon.jpg": {
+      "alt": "A drawing of Charmeleon, a red lizard with a horn on the back of its head and a flame on the tip of its tail",
+      "caption": "#005 Charmeleon"
+    },
+    "006_Charizard.jpg": {
+      "alt": "A drawing of Charizard, an orange dragon with blue-green wings spread wide and a cream belly",
+      "caption": "#006 Charizard"
+    },
+    "007_Squirtle.jpg": {
+      "alt": "A drawing of Squirtle, a small light blue turtle with a brown shell and a curled tail",
+      "caption": "#007 Squirtle"
+    },
+    "008_Wartortle.jpg": {
+      "alt": "A drawing of Wartortle, a lilac-blue turtle with feathery ears and a large white fluffy tail",
+      "caption": "#008 Wartortle"
+    },
+    "009_Blastoise.jpg": {
+      "alt": "A drawing of Blastoise, a large blue turtle with a heavy brown shell and water cannons sticking out of it",
+      "caption": "#009 Blastoise"
+    },
+    "010_Caterpie.jpg": {
+      "alt": "A drawing of Caterpie, a green caterpillar with a yellow underside, a big eye and a red forked antenna",
+      "caption": "#010 Caterpie"
+    },
+    "011_Metapod.jpg": {
+      "alt": "A drawing of Metapod, a green pointed cocoon with a single sleepy eye",
+      "caption": "#011 Metapod"
+    },
+    "012_Butterfree.jpg": {
+      "alt": "A drawing of Butterfree, a purple butterfly with red eyes and white wings edged in black",
+      "caption": "#012 Butterfree"
+    },
+    "013_Weedle.jpg": {
+      "alt": "A drawing of Weedle, a brown segmented larva with a pink nose and a white stinger on its head and tail",
+      "caption": "#013 Weedle"
+    },
+    "014_Kakuna.jpg": {
+      "alt": "A drawing of Kakuna, a yellow cocoon with stubby arms and narrow black eyes",
+      "caption": "#014 Kakuna"
+    }
+  }
+}
