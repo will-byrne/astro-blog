@@ -65,7 +65,10 @@ searchDialog.addEventListener('click', (event) => {
 
 document.addEventListener('keydown', (event) => {
   if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return;
-  if (event.target.closest('input, textarea, select, [contenteditable]') || document.querySelector('dialog[open]')) return;
+  // After a dialog closes, Chrome leaves focus on its hidden input until the next frame, so a / pressed
+  // straight away comes from there. That is not typing, so it still opens the search.
+  const typing = event.target.closest('input, textarea, select, [contenteditable]') && !event.target.closest('dialog:not([open])');
+  if (typing || document.querySelector('dialog[open]')) return;
   event.preventDefault();
   openSearch();
 });

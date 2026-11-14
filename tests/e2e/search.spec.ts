@@ -48,8 +48,24 @@ test.describe('search', () => {
 
     // The text is kept and selected, ready to type over
     await page.locator('body').press('/');
+    await expect(page.getByRole('dialog', { name: 'Search posts' })).toBeVisible();
     await expect(page.locator('#search-input')).toHaveValue('a/b');
     expect(await page.locator('#search-input').evaluate((input: HTMLInputElement) => input.selectionEnd! - input.selectionStart!)).toBe(3);
+  });
+
+  test('reopens with the / key straight after closing', async ({ page }) => {
+    await page.locator('body').press('/');
+    await page.keyboard.type('a');
+    // Close and press / with no frame in between, which a slow machine can do
+    const reopened = await page.evaluate(() => {
+      const dialog = document.getElementById('search') as HTMLDialogElement;
+      dialog.close();
+      (document.activeElement ?? document.body).dispatchEvent(
+        new KeyboardEvent('keydown', { key: '/', bubbles: true, cancelable: true }),
+      );
+      return dialog.open;
+    });
+    expect(reopened).toBe(true);
   });
 
   test('closes with its button or a click outside', async ({ page }) => {
