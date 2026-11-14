@@ -14,7 +14,7 @@ description: A musing on my current goal of learning to draw
 gallery: learning-to-draw
 image:
   url: ../../assets/gallery/learning-to-draw/003_Venusaur.jpg
-  alt: A screenshot of the blog
+  alt: My drawing of Venusaur
 ---
 
 ## Previously
