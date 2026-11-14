@@ -24,7 +24,7 @@ When I lost my job last year I decided that it was finally time to get round to 
 My goal is to get to the point where I can draw things that people look at and recognise, that they may even enjoy seeing. I would like to be able to draw cartoons or landscapes without taking days to do a 'quick' sketch.
 
 ### Issues
-The same problem holds here as I mentioned in my previous post about [music](/posts/clarinet), I am my own worst critic and always harshly judge my own drawings, seeing every imperfection or jagged line like a personal failing.
+The same problem holds here as I mentioned in my previous post about [music](/posts/clarinet/), I am my own worst critic and always harshly judge my own drawings, seeing every imperfection or jagged line like a personal failing.
 
 I also suffer with dysgraphia, which affects my fine motor control and makes it painful to use a pen / pencil for fine detail for longer than 10 - 20 minutes making regular practice hard.
 
