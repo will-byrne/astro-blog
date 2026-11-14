@@ -9,6 +9,7 @@ tags:
   - Drawing
   - Procreate
   - iPad
+  - Pokemon
 description: A musing on my current goal of learning to draw
 gallery: learning-to-draw
 image:
