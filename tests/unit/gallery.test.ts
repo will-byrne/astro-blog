@@ -174,6 +174,11 @@ describe('image details from section.json', () => {
     expect(section.images.find((i) => i.file === 'moon.jpg')?.sky).toEqual({ camera: 'Nikon D5600', mount: 'Sky Guider Pro' });
   });
 
+  it('fails the build on a position it cannot read', () => {
+    expect(() => buildSections(glob('a/m31.jpg'), config('a', { images: { 'm31.jpg': { sky: { ra: '00:42:44' } } } }))).toThrow(/20h 59m 17s/);
+    expect(() => buildSections(glob('a/m31.jpg'), config('a', { images: { 'm31.jpg': { sky: { dec: '41 16 09' } } } }))).toThrow(/44° 31′ 44″/);
+  });
+
   it('leaves out sky details with nothing in them', () => {
     const [section] = buildSections(glob('a/m31.jpg'), config('a', { images: { 'm31.jpg': { sky: {} } } }));
     expect(section.images[0].sky).toBeUndefined();

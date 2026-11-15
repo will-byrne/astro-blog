@@ -603,6 +603,17 @@ button {
   object-fit: contain;
 }
 
+/* The star maps are 4:3, so fit the width to the screen's height as well */
+#lightbox .lightbox-drawing {
+  width: min(100%, calc((100dvh - 2rem) * 4 / 3), 80rem);
+}
+
+#lightbox .lightbox-drawing svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 #lightbox button {
   position: fixed;
   top: 0.75rem;

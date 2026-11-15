@@ -80,6 +80,7 @@ const socialImageAlt = image ? (imageAlt ?? '') : `${SITE_TITLE}: ${SITE_DESCRIP
     <SearchDialog />
     <dialog id="lightbox" aria-label="Enlarged image">
       <img alt="" />
+      <div class="lightbox-drawing" hidden></div>
       <button type="button" class="icon-button" aria-label="Close image"><Icon name="close" /></button>
     </dialog>
     <script>

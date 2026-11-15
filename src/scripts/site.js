@@ -76,6 +76,7 @@ document.addEventListener('keydown', (event) => {
 // Image lightbox
 const lightbox = document.getElementById('lightbox');
 const lightboxImage = lightbox.querySelector('img');
+const lightboxDrawing = lightbox.querySelector('.lightbox-drawing');
 
 // The page only downloads the size it needs, so fetch the largest one when an image is opened
 function largestSource(img) {
@@ -88,6 +89,8 @@ function largestSource(img) {
 }
 
 function openLightbox(img) {
+  lightboxImage.hidden = false;
+  lightboxDrawing.hidden = true;
   lightboxImage.src = largestSource(img);
   lightboxImage.alt = img.alt;
   lightbox.showModal();
@@ -107,8 +110,21 @@ document.querySelectorAll('.prose img, [data-zoomable]').forEach((img) => {
   });
 });
 
+// Drawings made as SVG on the page, like the star maps, open as a copy so they keep the theme's colours
+document.querySelectorAll('[data-zoomable-svg]').forEach((button) => {
+  button.addEventListener('click', () => {
+    lightboxImage.hidden = true;
+    lightboxDrawing.replaceChildren(button.querySelector('svg').cloneNode(true));
+    lightboxDrawing.hidden = false;
+    lightbox.showModal();
+  });
+});
+
 lightbox.addEventListener('click', () => lightbox.close());
-lightbox.addEventListener('close', () => lightboxImage.removeAttribute('src'));
+lightbox.addEventListener('close', () => {
+  lightboxImage.removeAttribute('src');
+  lightboxDrawing.replaceChildren();
+});
 
 // Copy buttons on code blocks
 document.addEventListener('click', async (event) => {

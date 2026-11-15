@@ -16,6 +16,8 @@
         "catalogue": "M31",
         "type": "Spiral galaxy",
         "constellation": "Andromeda",
+        "ra": "00h 42m 44s",
+        "dec": "+41° 16′ 09″",
         "distance": "About 2.5 million light-years",
         "processing": "StarTools"
       }
@@ -28,6 +30,8 @@
         "catalogue": "NGC 7000",
         "type": "Emission nebula",
         "constellation": "Cygnus",
+        "ra": "20h 59m 17s",
+        "dec": "+44° 31′ 44″",
         "distance": "About 2,600 light-years",
         "processing": "StarTools"
       }
@@ -40,6 +44,8 @@
         "catalogue": "NGC 7000",
         "type": "Emission nebula",
         "constellation": "Cygnus",
+        "ra": "20h 59m 17s",
+        "dec": "+44° 31′ 44″",
         "distance": "About 2,600 light-years",
         "processing": "Claude"
       }
@@ -52,6 +58,8 @@
         "catalogue": "M31",
         "type": "Spiral galaxy",
         "constellation": "Andromeda",
+        "ra": "00h 42m 44s",
+        "dec": "+41° 16′ 09″",
         "distance": "About 2.5 million light-years",
         "processing": "astro-processor"
       }
@@ -64,6 +72,8 @@
         "catalogue": "NGC 7000",
         "type": "Emission nebula",
         "constellation": "Cygnus",
+        "ra": "20h 59m 17s",
+        "dec": "+44° 31′ 44″",
         "distance": "About 2,600 light-years",
         "processing": "astro-processor"
       }

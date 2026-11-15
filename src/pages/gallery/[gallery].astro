@@ -1,5 +1,6 @@
 ---
 import { Image } from 'astro:assets';
+import SkyMap from '../../components/SkyMap.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getGalleries } from '../../lib/gallery-content';
 import { findGallery, skyRows, type GallerySection } from '../../lib/gallery';
@@ -60,6 +61,7 @@ const count = (n: number) => `${n} ${n === 1 ? 'image' : 'images'}`;
             {sky && (
               <details class="sky">
                 <summary>Sky details</summary>
+                {sky.ra && sky.dec && <SkyMap ra={sky.ra} dec={sky.dec} target={sky.target} constellation={sky.constellation} />}
                 <dl>
                   {skyRows(sky).map(({ label, value }) => (
                     <div>

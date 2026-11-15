@@ -40,6 +40,23 @@ test.describe('gallery', () => {
     await expect(details.locator('dl')).toBeVisible();
   });
 
+  test('a star map opens full size in the lightbox', async ({ page }) => {
+    await page.goto('/gallery/astrophotography/');
+    await page.locator('.sky summary').first().click();
+    const map = page.locator('.sky-map').first();
+    await map.click();
+    const enlarged = page.locator('#lightbox .lightbox-drawing svg');
+    await expect(enlarged).toBeVisible();
+    await expect(enlarged).toHaveAttribute('aria-label', (await map.locator('svg').getAttribute('aria-label'))!);
+    expect((await enlarged.boundingBox())!.width).toBeGreaterThan((await map.boundingBox())!.width);
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#lightbox')).toBeHidden();
+    // Photos still open as photos afterwards
+    await page.locator('.grid img').first().click();
+    await expect(page.locator('#lightbox img')).toBeVisible();
+    await expect(enlarged).toHaveCount(0);
+  });
+
   test('the header marks Gallery as the current page on gallery pages', async ({ page }) => {
     await page.goto('/gallery/ai/');
     await expect(page.locator('header nav a[aria-current="page"]')).toHaveText('Gallery');

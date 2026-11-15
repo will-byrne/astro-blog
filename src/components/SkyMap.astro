@@ -1,0 +1,125 @@
+---
+// A star map around an astrophotography target, drawn at build time. See src/lib/sky-map.ts.
+// Clicking it opens it full size in the lightbox (see site.js).
+import sky from '../data/sky.json';
+import { buildSkyMap, parseDeclination, parseRightAscension, type SkyData } from '../lib/sky-map';
+
+interface Props {
+  ra: string;
+  dec: string;
+  /** e.g. "Andromeda Galaxy" */
+  target?: string;
+  /** e.g. "Andromeda"; its lines and name are picked out */
+  constellation?: string;
+}
+
+const { ra, dec, target, constellation } = Astro.props;
+const map = buildSkyMap(sky as unknown as SkyData, parseRightAscension(ra)!, parseDeclination(dec)!, { constellation, target });
+const name = target ?? 'the target';
+const description = map.home
+  ? `Star map: ${name} in the constellation ${map.home}, with the nearby stars and constellation lines. North is up and east is left.`
+  : `Star map: where ${name} is in the sky, with the nearby stars and constellation lines. North is up and east is left.`;
+const { x, y } = map.target;
+---
+
+<button type="button" class="sky-map" data-zoomable-svg aria-label={`Enlarge star map of ${name}`}>
+  <svg viewBox={`0 0 ${map.width} ${map.height}`} role="img" aria-label={description}>
+    <rect class="background" width={map.width} height={map.height} rx="8" />
+    <g class="lines">
+      {map.lines.map((line) => <path d={line.d} class:list={{ home: line.home }} />)}
+    </g>
+    <g class="stars">
+      {map.stars.map((star) => <circle cx={star.x} cy={star.y} r={star.r} />)}
+    </g>
+    <g class="star-names">
+      {map.stars.filter((star) => star.name).map((star) => (
+        <text x={star.nameLeft ? star.x - star.r - 3 : star.x + star.r + 3} y={star.y + 5} text-anchor={star.nameLeft ? 'end' : 'start'}>{star.name}</text>
+      ))}
+    </g>
+    <g class="constellations">
+      {map.labels.map((label) => <text x={label.x} y={label.y} text-anchor="middle" class:list={{ home: label.home }}>{label.name}</text>)}
+    </g>
+    <g class="target">
+      <circle cx={x} cy={y} r="10" />
+      <path d={`M${x - 17} ${y}h6M${x + 11} ${y}h6M${x} ${y - 17}v6M${x} ${y + 11}v6`} />
+      {target && <text x={x} y={y + map.labelGap}>{target}</text>}
+    </g>
+    <text class="compass" x="10" y={map.height - 10}>N ↑  E ←</text>
+  </svg>
+</button>
+<p class="hint">Tap or click the map to enlarge it.</p>
+
+<style>
+  .sky-map {
+    display: block;
+    width: 100%;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 0.5rem;
+    cursor: zoom-in;
+  }
+
+  .hint {
+    margin: 0.25rem 0 0.5rem;
+    color: var(--subtext1);
+    font-size: 0.8rem;
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    font-family: inherit;
+  }
+
+  .background {
+    fill: var(--crust);
+  }
+
+  .lines path {
+    fill: none;
+    stroke: var(--surface2);
+    stroke-width: 1;
+    stroke-linejoin: round;
+  }
+
+  .lines path.home {
+    stroke: var(--subtext1);
+    stroke-width: 1.5;
+  }
+
+  .stars circle {
+    fill: var(--text);
+  }
+
+  text {
+    fill: var(--subtext1);
+    font-size: 14px;
+    paint-order: stroke;
+    stroke: var(--crust);
+    stroke-width: 3px;
+    stroke-linejoin: round;
+  }
+
+  .constellations text.home {
+    fill: var(--text);
+    font-weight: 700;
+  }
+
+  .target circle,
+  .target path {
+    fill: none;
+    stroke: var(--peach);
+    stroke-width: 2.5;
+  }
+
+  .target text {
+    fill: var(--peach);
+    font-size: 16px;
+    font-weight: 700;
+    text-anchor: middle;
+    stroke-width: 5px;
+  }
+</style>

@@ -21,8 +21,9 @@
 //     "target": "Andromeda Galaxy", "catalogue": "M31", "type": "Spiral galaxy", "constellation": "Andromeda",
 //     "distance": "About 2.5 million light-years", "camera": "Nikon D5600", "lens": "Samyang 135mm f/2",
 //     "mount": "iOptron Sky Guider Pro", "exposure": "120 × 30 s at ISO 800", "location": "Back garden",
-//     "processing": "StarTools"
+//     "processing": "StarTools", "ra": "00h 42m 44s", "dec": "+41° 16′ 09″"
 //   }
+// With both "ra" and "dec", the panel also shows a star map around the target (see sky-map.ts).
 // A "sky" at the top level of section.json applies to every image in the folder, e.g. the camera and mount you
 // always use. An image's own "sky" adds to it, and its values win where both give the same field.
 // Without an alt, the file name is used, e.g. "sith_cat.jpeg" -> "Sith cat".
@@ -31,6 +32,7 @@
 import { z } from 'astro/zod';
 import type { ImageMetadata } from 'astro';
 import { slugify } from './slugify';
+import { parseDeclination, parseRightAscension } from './sky-map';
 
 /** The labels for the sky details, in the order they are shown */
 export const SKY_FIELDS = {
@@ -38,6 +40,8 @@ export const SKY_FIELDS = {
   catalogue: 'Catalogue',
   type: 'Type',
   constellation: 'Constellation',
+  ra: 'Right ascension',
+  dec: 'Declination',
   distance: 'Distance',
   camera: 'Camera',
   lens: 'Lens or telescope',
@@ -54,6 +58,8 @@ const skySchema = z
     catalogue: text,
     type: text,
     constellation: text,
+    ra: text.refine((value) => value === undefined || parseRightAscension(value) !== undefined, 'write it like "20h 59m 17s"'),
+    dec: text.refine((value) => value === undefined || parseDeclination(value) !== undefined, 'write it like "+44° 31′ 44″"'),
     distance: text,
     camera: text,
     lens: text,
