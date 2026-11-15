@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import TopicNav from '../../components/TopicNav.astro';
+import TermChart from '../../components/TermChart.astro';
 import { getCategories, getPosts } from '../../lib/posts';
 
 const categories = getCategories(await getPosts());
@@ -9,9 +10,10 @@ const categories = getCategories(await getPosts());
 <BaseLayout pageTitle="Categories" ogType="article">
   <h1 class="page-title">Categories</h1>
   <TopicNav />
-  <ul class="cycle">
+  <TermChart noun="categories" terms={categories} basePath="/categories/" title="Posts per category" />
+  <ul class="cycle" data-term-list>
     {categories.map(({ slug, label, posts }) => (
-      <li>
+      <li data-key={slug}>
         <a href={`/categories/${slug}/`}>
           <span>{label}</span>
           <span class="count">{posts.length} {posts.length === 1 ? 'post' : 'posts'}</span>
@@ -45,6 +47,17 @@ const categories = getCategories(await getPosts());
       grid-template-columns: 1fr 1fr;
       column-gap: 3rem;
     }
+  }
+
+  /* Its entry in the chart is hovered: the background reaches past the text without moving it */
+  .picked a {
+    background: var(--mantle);
+    box-shadow: -0.5rem 0 0 var(--mantle), 0.5rem 0 0 var(--mantle);
+  }
+
+  .picked a > span:first-child {
+    text-decoration: underline 2px;
+    text-underline-offset: 0.2em;
   }
 
   .count {

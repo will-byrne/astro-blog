@@ -1,0 +1,446 @@
+---
+import type { Term } from '../lib/posts';
+import ChartLegend, { type LegendItem } from './ChartLegend.astro';
+
+interface Props {
+  terms: Term[];
+  basePath: string;
+  title: string;
+  // Plural name for the terms, used in the donut's centre ("29 tags")
+  noun: string;
+  // Terms with fewer posts are summarised rather than drawn individually,
+  // so a long tail of single-use tags doesn't drown out the rest
+  minPosts?: number;
+}
+
+const { terms, basePath, title, noun, minPosts = 1 } = Astro.props;
+
+const views = [
+  { id: 'bars', label: 'Bars' },
+  { id: 'donut', label: 'Donut' },
+  { id: 'waffle', label: 'Waffle' },
+] as const;
+
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
+
+// Every view colours a term by its place in the alphabetical list below the chart,
+// so a term looks the same everywhere on the page
+const listPosition = new Map(terms.map((term, i) => [term.slug, i % 8]));
+const shown = terms.filter((term) => term.posts.length >= minPosts);
+const hidden = terms.length - shown.length;
+
+// Bars are ranked by count
+const ranked = [...shown].sort((a, b) => b.posts.length - a.posts.length || a.label.localeCompare(b.label));
+const max = Math.max(1, ...ranked.map((term) => term.posts.length));
+
+// Donut and waffle keep alphabetical order, so neighbouring slices take neighbouring
+// colours from the cycle and never share one. The summarised tail becomes a grey slice
+const slices: LegendItem[] = shown.map(({ slug, label, posts }) => ({
+  key: slug,
+  label,
+  count: posts.length,
+  href: `${basePath}${slug}/`,
+  cycle: listPosition.get(slug),
+}));
+if (hidden > 0) {
+  slices.push({ key: 'other', label: `${hidden} more, used once each`, count: hidden });
+}
+const total = slices.reduce((sum, slice) => sum + slice.count, 0);
+
+// Donut geometry, in a 200×200 viewBox
+const OUTER = 96;
+const INNER = 60;
+const point = (r: number, angle: number) =>
+  `${(100 + r * Math.sin(angle)).toFixed(3)} ${(100 - r * Math.cos(angle)).toFixed(3)}`;
+function arc(start: number, end: number) {
+  // A lone slice is a full ring, which a single arc can't draw
+  if (end - start >= Math.PI * 2 - 1e-6) {
+    return `M ${point(OUTER, 0)} A ${OUTER} ${OUTER} 0 1 1 ${point(OUTER, Math.PI)} A ${OUTER} ${OUTER} 0 1 1 ${point(OUTER, 0)} Z
+            M ${point(INNER, 0)} A ${INNER} ${INNER} 0 1 0 ${point(INNER, Math.PI)} A ${INNER} ${INNER} 0 1 0 ${point(INNER, 0)} Z`;
+  }
+  const large = end - start > Math.PI ? 1 : 0;
+  return `M ${point(OUTER, start)} A ${OUTER} ${OUTER} 0 ${large} 1 ${point(OUTER, end)}
+          L ${point(INNER, end)} A ${INNER} ${INNER} 0 ${large} 0 ${point(INNER, start)} Z`;
+}
+let angle = 0;
+const arcs = slices.map((slice) => {
+  const start = angle;
+  angle += (slice.count / total) * Math.PI * 2;
+  return { ...slice, d: arc(start, angle) };
+});
+
+// Waffle: one square per post, filled in slice order
+const squares = slices.flatMap((slice) => Array.from({ length: slice.count }, () => slice));
+
+const summary = slices.map((slice) => `${slice.label}: ${plural(slice.count, 'post')}`).join(', ');
+---
+{shown.length > 0 && (
+  <figure class="term-chart" data-term-chart>
+    <div class="head">
+      <figcaption>
+        <span class="title">{title}</span>
+        {hidden > 0 && <span class="note">Plus {hidden} used only once, listed below</span>}
+      </figcaption>
+      <fieldset class="switch">
+        <legend class="sr-only">Chart type</legend>
+        {views.map(({ id, label }, i) => (
+          <label>
+            <input type="radio" name={`chart-view-${basePath}`} value={id} checked={i === 0} />
+            <span>{label}</span>
+          </label>
+        ))}
+      </fieldset>
+    </div>
+
+    <div class="view view-bars">
+      <ol>
+        {ranked.map(({ slug, label, posts }) => (
+          <li data-cycle={listPosition.get(slug)} data-key={slug}>
+            <a href={`${basePath}${slug}/`}>
+              <span class="label">{label}</span>
+              <span class="track" aria-hidden="true">
+                <span class="bar" style={`--share: ${(posts.length / max) * 100}%`}></span>
+              </span>
+              <span class="count">{plural(posts.length, 'post')}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </div>
+
+    <div class="view view-donut view-parts">
+      <svg viewBox="0 0 200 200" role="img" aria-label={`Donut chart. ${summary}`}>
+        {arcs.map((slice) => (
+          <path d={slice.d} data-cycle={slice.cycle} data-key={slice.key} class:list={['slice', { other: slice.key === 'other' }]}>
+            <title>{`${slice.label}: ${plural(slice.count, 'post')}`}</title>
+          </path>
+        ))}
+        <text x="100" y="98" class="total">{terms.length}</text>
+        <text x="100" y="122" class="total-label">{noun}</text>
+      </svg>
+      <ChartLegend items={slices} />
+    </div>
+
+    <div class="view view-waffle view-parts">
+      <div class="waffle" role="img" aria-label={`Waffle chart, one square per post. ${summary}`}>
+        {squares.map((slice) => (
+          <span data-cycle={slice.cycle} data-key={slice.key} class:list={['square', { other: slice.key === 'other' }]} title={`${slice.label}: ${plural(slice.count, 'post')}`}></span>
+        ))}
+      </div>
+      <ChartLegend items={slices} />
+    </div>
+  </figure>
+)}
+
+<script>
+  const STORAGE_KEY = 'term-chart-view';
+
+  for (const chart of document.querySelectorAll<HTMLElement>('[data-term-chart]')) {
+    const radios = [...chart.querySelectorAll<HTMLInputElement>('.switch input')];
+
+    let saved: string | null = null;
+    try {
+      saved = localStorage.getItem(STORAGE_KEY);
+    } catch {
+      // Without storage every visit starts on bars
+    }
+    const match = radios.find((radio) => radio.value === saved);
+    if (match) match.checked = true;
+
+    for (const radio of radios) {
+      radio.addEventListener('change', () => {
+        try {
+          localStorage.setItem(STORAGE_KEY, radio.value);
+        } catch {
+          // The choice lasts for this page only
+        }
+      });
+    }
+
+    // The page's own list of terms (marked data-term-list), highlighted alongside the chart.
+    // The grey "used once" slice stands for every term the chart doesn't draw
+    const listItems = [...document.querySelectorAll<HTMLElement>('[data-term-list] [data-key]')];
+    const drawn = new Set([...chart.querySelectorAll<HTMLElement>('.view-bars [data-key]')].map((row) => row.dataset.key));
+    const matches = (itemKey: string | undefined, key: string | undefined) =>
+      key !== undefined && (itemKey === key || (key === 'other' && !drawn.has(itemKey)));
+
+    // Hovering a bar, slice, square or legend entry picks out every mark for that term
+    for (const view of chart.querySelectorAll<HTMLElement>('.view')) {
+      const marks = [...view.querySelectorAll<HTMLElement | SVGElement>('[data-key]')];
+      const pick = (key: string | undefined) => {
+        view.classList.toggle('focusing', key !== undefined);
+        for (const mark of marks) mark.classList.toggle('picked', mark.dataset.key === key);
+        for (const item of listItems) item.classList.toggle('picked', matches(item.dataset.key, key));
+      };
+      for (const mark of marks) {
+        mark.addEventListener('mouseenter', () => pick(mark.dataset.key));
+        mark.addEventListener('focusin', () => pick(mark.dataset.key));
+        mark.addEventListener('mouseleave', () => pick(undefined));
+        mark.addEventListener('focusout', () => pick(undefined));
+      }
+    }
+  }
+</script>
+
+<style>
+  .term-chart {
+    margin: 0 0 2.5rem;
+  }
+
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1rem;
+    margin-bottom: 1rem;
+  }
+
+  figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 1rem;
+  }
+
+  .title {
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  .note {
+    color: var(--subtext1);
+    font-size: 1rem;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* Chart type switch: a segmented control built from radios, so it works without JS */
+  .switch {
+    display: inline-flex;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0.25rem;
+    background: var(--mantle);
+    border: 0;
+    border-radius: 0.6rem;
+  }
+
+  .switch label {
+    position: relative;
+  }
+
+  .switch input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .switch span {
+    display: inline-flex;
+    align-items: center;
+    min-height: calc(var(--tap) - 0.5rem);
+    padding-inline: 0.85rem;
+    border-radius: 0.4rem;
+    color: var(--subtext1);
+    font-size: 1rem;
+  }
+
+  .switch label:hover span {
+    color: var(--text);
+  }
+
+  .switch input:checked + span {
+    background: var(--surface0);
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  .switch input:focus-visible + span {
+    outline: 2px solid var(--peach);
+    outline-offset: 2px;
+  }
+
+  /* Only the chosen view shows */
+  .view {
+    display: none;
+  }
+
+  .term-chart:has(input[value='bars']:checked) .view-bars,
+  .term-chart:has(input[value='donut']:checked) .view-donut,
+  .term-chart:has(input[value='waffle']:checked) .view-waffle {
+    display: block;
+  }
+
+  .term-chart:has(input[value='donut']:checked) .view-donut,
+  .term-chart:has(input[value='waffle']:checked) .view-waffle {
+    display: grid;
+  }
+
+  /* Bars */
+  ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .view-bars a {
+    display: grid;
+    grid-template-columns: minmax(7rem, 14rem) 1fr 4.5rem;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: var(--tap);
+    padding-inline: 0.5rem;
+    border-radius: 0.5rem;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .view-bars a:hover,
+  .view-bars a:focus-visible {
+    background: var(--mantle);
+  }
+
+  .view-bars a:hover .label,
+  .view-bars a:focus-visible .label {
+    text-decoration: underline;
+  }
+
+  .track {
+    display: block;
+  }
+
+  .bar {
+    display: block;
+    width: var(--share);
+    min-width: 4px;
+    height: 0.75rem;
+    background: var(--accent);
+    border-radius: 0 4px 4px 0;
+  }
+
+  .count {
+    color: var(--subtext1);
+    font-size: 1rem;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  /* Donut and waffle: the graphic beside its legend */
+  .view-parts {
+    grid-template-columns: minmax(0, 18rem) minmax(0, 1fr);
+    align-items: center;
+    gap: 1.5rem 3rem;
+  }
+
+  .view-donut svg {
+    display: block;
+    width: 100%;
+    max-width: 18rem;
+    height: auto;
+  }
+
+  .slice {
+    fill: var(--accent);
+    stroke: var(--base);
+    stroke-width: 2;
+    stroke-linejoin: round;
+    transition: opacity 0.15s ease;
+  }
+
+  .slice.other,
+  .square.other {
+    --accent: var(--surface2);
+  }
+
+  .total {
+    fill: var(--text);
+    font-size: 2.25rem;
+    font-weight: 700;
+    text-anchor: middle;
+  }
+
+  .total-label {
+    fill: var(--subtext1);
+    font-size: 1rem;
+    text-anchor: middle;
+  }
+
+  .waffle {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 2px;
+    width: 100%;
+    max-width: 18rem;
+  }
+
+  .square {
+    aspect-ratio: 1;
+    background: var(--accent);
+    border-radius: 3px;
+    transition: opacity 0.15s ease;
+  }
+
+  /* Hovering a slice, square or legend entry dims everything else */
+  .focusing .slice:not(.picked),
+  .focusing .square:not(.picked) {
+    opacity: 0.3;
+  }
+
+  @media (max-width: 40rem) {
+    .view-parts {
+      grid-template-columns: 1fr;
+      justify-items: center;
+    }
+
+    .view-parts :global(.legend) {
+      justify-self: stretch;
+    }
+  }
+
+  @media (max-width: 30rem) {
+    .view-bars a {
+      grid-template-columns: 1fr auto;
+      grid-template-areas:
+        'label count'
+        'track track';
+      gap: 0.25rem 0.75rem;
+      padding-block: 0.4rem;
+    }
+
+    .label {
+      grid-area: label;
+    }
+
+    .track {
+      grid-area: track;
+    }
+
+    .count {
+      grid-area: count;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .bar,
+    .square {
+      forced-color-adjust: none;
+      background: CanvasText;
+    }
+
+    .slice {
+      forced-color-adjust: none;
+      fill: CanvasText;
+      stroke: Canvas;
+    }
+  }
+</style>

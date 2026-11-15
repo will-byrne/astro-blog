@@ -1,0 +1,96 @@
+---
+export interface LegendItem {
+  key: string;
+  label: string;
+  count: number;
+  href?: string;
+  cycle?: number;
+}
+
+interface Props {
+  items: LegendItem[];
+}
+
+const { items } = Astro.props;
+const plural = (n: number) => `${n} post${n === 1 ? '' : 's'}`;
+---
+<ul class="legend">
+  {items.map(({ key, label, count, href, cycle }) => (
+    <li data-cycle={cycle} data-key={key} class:list={{ other: !href }}>
+      {href ? (
+        <a href={href}>
+          <span class="swatch" aria-hidden="true"></span>
+          <span class="label">{label}</span>
+          <span class="count">{plural(count)}</span>
+        </a>
+      ) : (
+        <span class="row">
+          <span class="swatch" aria-hidden="true"></span>
+          <span class="label">{label}</span>
+          <span class="count">{plural(count)}</span>
+        </span>
+      )}
+    </li>
+  ))}
+</ul>
+
+<style>
+  .legend {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  a,
+  .row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: var(--tap);
+    padding-inline: 0.5rem;
+    border-radius: 0.5rem;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  /* .picked: this term's slice or squares are hovered */
+  a:hover,
+  a:focus-visible,
+  .picked > * {
+    background: var(--mantle);
+  }
+
+  a:hover .label,
+  a:focus-visible .label {
+    text-decoration: underline;
+  }
+
+  .swatch {
+    width: 0.9rem;
+    height: 0.9rem;
+    background: var(--accent);
+    border-radius: 3px;
+  }
+
+  .other {
+    --accent: var(--surface2);
+  }
+
+  .other .label {
+    color: var(--subtext1);
+  }
+
+  .count {
+    color: var(--subtext1);
+    font-size: 1rem;
+    white-space: nowrap;
+  }
+
+  @media (forced-colors: active) {
+    .swatch {
+      forced-color-adjust: none;
+      background: CanvasText;
+    }
+  }
+</style>

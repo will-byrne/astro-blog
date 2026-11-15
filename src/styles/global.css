@@ -256,44 +256,53 @@ button {
   color: var(--crust);
 }
 
-/* Accent colours follow position in a list, never what an item is, so new items need no styling */
+/* Accent colours follow position in a list, never what an item is, so new items need no styling.
+   data-cycle lets an item reordered elsewhere (e.g. a chart) keep its list position's colour */
 .cycle > :nth-child(8n + 1),
-.year:nth-of-type(8n + 1) {
+.year:nth-of-type(8n + 1),
+[data-cycle='0'] {
   --accent: var(--mauve);
 }
 
 .cycle > :nth-child(8n + 2),
-.year:nth-of-type(8n + 2) {
+.year:nth-of-type(8n + 2),
+[data-cycle='1'] {
   --accent: var(--pink);
 }
 
 .cycle > :nth-child(8n + 3),
-.year:nth-of-type(8n + 3) {
+.year:nth-of-type(8n + 3),
+[data-cycle='2'] {
   --accent: var(--peach);
 }
 
 .cycle > :nth-child(8n + 4),
-.year:nth-of-type(8n + 4) {
+.year:nth-of-type(8n + 4),
+[data-cycle='3'] {
   --accent: var(--yellow);
 }
 
 .cycle > :nth-child(8n + 5),
-.year:nth-of-type(8n + 5) {
+.year:nth-of-type(8n + 5),
+[data-cycle='4'] {
   --accent: var(--green);
 }
 
 .cycle > :nth-child(8n + 6),
-.year:nth-of-type(8n + 6) {
+.year:nth-of-type(8n + 6),
+[data-cycle='5'] {
   --accent: var(--teal);
 }
 
 .cycle > :nth-child(8n + 7),
-.year:nth-of-type(8n + 7) {
+.year:nth-of-type(8n + 7),
+[data-cycle='6'] {
   --accent: var(--sapphire);
 }
 
 .cycle > :nth-child(8n + 8),
-.year:nth-of-type(8n + 8) {
+.year:nth-of-type(8n + 8),
+[data-cycle='7'] {
   --accent: var(--blue);
 }
 
