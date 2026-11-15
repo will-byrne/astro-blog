@@ -1,6 +1,6 @@
 import type { ImageMetadata } from 'astro';
 import { describe, expect, it } from 'vitest';
-import { buildSections, describeFile, findGallery, humanise, previewImages } from '../../src/lib/gallery';
+import { buildSections, describeFile, findGallery, humanise, previewImages, skyRows } from '../../src/lib/gallery';
 
 const img = (name: string) => ({ src: name, width: 100, height: 100, format: 'jpg' }) as unknown as ImageMetadata;
 
@@ -158,6 +158,31 @@ describe('image details from section.json', () => {
     expect(section.images.find((i) => i.file === 'sith_cat.jpeg')).toMatchObject({ alt: 'Sith cat', caption: 'Only a caption' });
   });
 
+  it('adds sky details given for a file', () => {
+    const sky = { target: 'Andromeda Galaxy', catalogue: 'M31', camera: 'Nikon D5600' };
+    const [section] = buildSections(glob('a/m31.jpg', 'a/moon.jpg'), config('a', { images: { 'm31.jpg': { sky } } }));
+    expect(section.images.find((i) => i.file === 'm31.jpg')?.sky).toEqual(sky);
+    expect(section.images.find((i) => i.file === 'moon.jpg')?.sky).toBeUndefined();
+  });
+
+  it('gives every image the gallery-wide sky details, letting an image add to or override them', () => {
+    const [section] = buildSections(
+      glob('a/m31.jpg', 'a/moon.jpg'),
+      config('a', { sky: { camera: 'Nikon D5600', mount: 'Sky Guider Pro' }, images: { 'm31.jpg': { sky: { target: 'M31', mount: 'EQ6' } } } }),
+    );
+    expect(section.images.find((i) => i.file === 'm31.jpg')?.sky).toEqual({ camera: 'Nikon D5600', mount: 'EQ6', target: 'M31' });
+    expect(section.images.find((i) => i.file === 'moon.jpg')?.sky).toEqual({ camera: 'Nikon D5600', mount: 'Sky Guider Pro' });
+  });
+
+  it('leaves out sky details with nothing in them', () => {
+    const [section] = buildSections(glob('a/m31.jpg'), config('a', { images: { 'm31.jpg': { sky: {} } } }));
+    expect(section.images[0].sky).toBeUndefined();
+  });
+
+  it('fails the build on a misspelt sky detail', () => {
+    expect(() => buildSections(glob('a/m31.jpg'), config('a', { images: { 'm31.jpg': { sky: { constelation: 'Andromeda' } } } }))).toThrow(/constelation|Unrecognized/);
+  });
+
   it('keeps the date from the file name alongside a caption', () => {
     const [section] = buildSections(glob('d/2026-11-06-hands.jpg'), config('d', { images: { '2026-11-06-hands.jpg': { caption: 'Week one' } } }));
     expect(section.images[0]).toMatchObject({ caption: 'Week one', date: new Date('2026-11-06T00:00:00Z') });
@@ -208,5 +233,15 @@ describe('findGallery', () => {
 
   it('names the galleries that exist when the name is wrong', () => {
     expect(() => findGallery(galleries, 'drawings')).toThrow(/no gallery called "drawings".*learning-to-draw, my-drawings/);
+  });
+});
+
+describe('skyRows', () => {
+  it('labels the details in a fixed order, leaving out any not given', () => {
+    expect(skyRows({ processing: 'StarTools', target: 'Andromeda Galaxy', constellation: 'Andromeda' })).toEqual([
+      { label: 'Target', value: 'Andromeda Galaxy' },
+      { label: 'Constellation', value: 'Andromeda' },
+      { label: 'Processing', value: 'StarTools' },
+    ]);
   });
 });

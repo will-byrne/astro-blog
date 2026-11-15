@@ -16,12 +16,62 @@
 //       "2026-11-06-hands.jpg": { "alt": "A pencil sketch of two hands", "caption": "Week one" }
 //     }
 //   }
+// An image entry may also have "sky", shown as a "Sky details" panel under the image. Every field is optional text:
+//   "sky": {
+//     "target": "Andromeda Galaxy", "catalogue": "M31", "type": "Spiral galaxy", "constellation": "Andromeda",
+//     "distance": "About 2.5 million light-years", "camera": "Nikon D5600", "lens": "Samyang 135mm f/2",
+//     "mount": "iOptron Sky Guider Pro", "exposure": "120 × 30 s at ISO 800", "location": "Back garden",
+//     "processing": "StarTools"
+//   }
+// A "sky" at the top level of section.json applies to every image in the folder, e.g. the camera and mount you
+// always use. An image's own "sky" adds to it, and its values win where both give the same field.
 // Without an alt, the file name is used, e.g. "sith_cat.jpeg" -> "Sith cat".
 // A file named YYYY-MM-DD-name.ext shows its date and sorts by it. Other files sort by name, with any numbers in
 // order, e.g. 9_weedle.jpg before 10_caterpie.jpg.
 import { z } from 'astro/zod';
 import type { ImageMetadata } from 'astro';
 import { slugify } from './slugify';
+
+/** The labels for the sky details, in the order they are shown */
+export const SKY_FIELDS = {
+  target: 'Target',
+  catalogue: 'Catalogue',
+  type: 'Type',
+  constellation: 'Constellation',
+  distance: 'Distance',
+  camera: 'Camera',
+  lens: 'Lens or telescope',
+  mount: 'Mount',
+  exposure: 'Exposure',
+  location: 'Location',
+  processing: 'Processing',
+} as const;
+
+const text = z.string().trim().min(1).optional();
+const skySchema = z
+  .object({
+    target: text,
+    catalogue: text,
+    type: text,
+    constellation: text,
+    distance: text,
+    camera: text,
+    lens: text,
+    mount: text,
+    exposure: text,
+    location: text,
+    processing: text,
+  } satisfies Record<keyof typeof SKY_FIELDS, unknown>)
+  .strict();
+
+export type SkyDetails = z.infer<typeof skySchema>;
+
+/** The sky details as label and value pairs, leaving out any not given */
+export const skyRows = (sky: SkyDetails) =>
+  Object.entries(SKY_FIELDS).flatMap(([key, label]) => {
+    const value = sky[key as keyof SkyDetails];
+    return value ? [{ label, value }] : [];
+  });
 
 export const sectionSchema = z
   .object({
@@ -31,10 +81,17 @@ export const sectionSchema = z
     layout: z.enum(['columns', 'rows']).default('columns'),
     newestFirst: z.boolean().default(false),
     cover: z.string().min(1).optional(),
+    sky: skySchema.optional(),
     images: z
       .record(
         z.string(),
-        z.object({ alt: z.string().trim().min(1).optional(), caption: z.string().trim().min(1).optional() }).strict(),
+        z
+          .object({
+            alt: z.string().trim().min(1).optional(),
+            caption: z.string().trim().min(1).optional(),
+            sky: skySchema.optional(),
+          })
+          .strict(),
       )
       .default({}),
   })
@@ -49,6 +106,8 @@ export interface GalleryImage {
   /** From a YYYY-MM-DD- prefix on the file name */
   date?: Date;
   caption?: string;
+  /** Astrophotography details from section.json */
+  sky?: SkyDetails;
   file: string;
 }
 
@@ -140,6 +199,8 @@ export function buildSections(
       const details = config.images[image.file];
       if (details?.alt) image.alt = details.alt;
       if (details?.caption) image.caption = details.caption;
+      const sky = { ...config.sky, ...details?.sky };
+      if (Object.values(sky).some(Boolean)) image.sky = sky;
     }
     const direction = config.newestFirst ? -1 : 1;
     const sorted = [...list].sort((a, b) => {

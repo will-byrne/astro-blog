@@ -31,6 +31,15 @@ test.describe('gallery', () => {
     expect(onScreen[0]).toBe('#001 Bulbasaur');
   });
 
+  test('sky details open under an astrophotography image', async ({ page }) => {
+    await page.goto('/gallery/astrophotography/');
+    const details = page.locator('.grid figure .sky').first();
+    await expect(details.locator('dl')).toBeHidden();
+    await details.getByText('Sky details').click();
+    await expect(details.locator('dt').first()).toHaveText('Target');
+    await expect(details.locator('dl')).toBeVisible();
+  });
+
   test('the header marks Gallery as the current page on gallery pages', async ({ page }) => {
     await page.goto('/gallery/ai/');
     await expect(page.locator('header nav a[aria-current="page"]')).toHaveText('Gallery');
