@@ -84,6 +84,20 @@ export function getRelatedPosts(post: Post, posts: Post[], limit = 3): Post[] {
     .slice(0, limit);
 }
 
+// Markdown links to a post, e.g. [text](/posts/ipad_ai/) or [text](/posts/ipad_ai/#heading), with or without the
+// trailing slash or the site's own domain. Images are left out, as ![alt](...) is not a link to read.
+const POST_LINK = /(?<!!)\[[^\]]*\]\(\s*(?:https?:\/\/[^/\s)]+)?\/posts\/([^/#?\s)]+)\/?(?:[#?][^\s)]*)?\s*(?:"[^"]*")?\)/g;
+
+/** The ids of the posts a post's text links to */
+export function linkedPostIds(post: Post): Set<string> {
+  return new Set([...(post.body ?? '').matchAll(POST_LINK)].map((match) => decodeURIComponent(match[1])));
+}
+
+/** Posts whose text links to this one, newest first */
+export function getBacklinks(post: Post, posts: Post[]): Post[] {
+  return posts.filter((other) => other.id !== post.id && linkedPostIds(other).has(post.id));
+}
+
 export function plainText(markdown: string): string {
   return markdown
     .replace(/^```.*$/gm, ' ')

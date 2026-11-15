@@ -6,7 +6,7 @@ import SeriesNav from "../components/SeriesNav.astro";
 import TableOfContents from "../components/TableOfContents.astro";
 import { findGallery, previewImages } from "../lib/gallery";
 import { getGalleries } from "../lib/gallery-content";
-import { formatDate, getExcerpt, getPosts, getReadingTime, getRelatedPosts, getSeries, postUrl, slugify, type Post } from "../lib/posts";
+import { SITE_TITLE, formatDate, getBacklinks, getExcerpt, getPosts, getReadingTime, getRelatedPosts, getSeries, postUrl, slugify, type Post } from "../lib/posts";
 
 const { post, headings } = Astro.props as { post: Post; headings: { depth: number; slug: string; text: string }[] };
 const { title, pubDate, updated, image, category, tags } = post.data;
@@ -15,7 +15,9 @@ const posts = await getPosts();
 const index = posts.findIndex((other) => other.id === post.id);
 const newer = posts[index - 1];
 const older = posts[index + 1];
-const related = getRelatedPosts(post, posts);
+const backlinks = getBacklinks(post, posts);
+// Posts already listed as linking here are left out of related posts, so none shows twice
+const related = getRelatedPosts(post, posts.filter((other) => !backlinks.includes(other)));
 const series = getSeries(post, posts);
 const nextPart = series?.posts[series.index + 1];
 // When the next part is also the next newer post, the Newer link says so instead of showing it twice
@@ -26,7 +28,15 @@ const galleryThumbs = gallery ? [gallery.cover, ...previewImages(gallery, 3)] : 
 const imageCount = (n: number) => `${n} ${n === 1 ? "image" : "images"}`;
 ---
 
-<BaseLayout pageTitle={title} description={getExcerpt(post)} image={image?.url} imageAlt={image?.alt} ogType="article">
+<BaseLayout
+  pageTitle={title}
+  description={getExcerpt(post)}
+  ogType="article"
+  socialCard={{
+    url: `${postUrl(post)}card.png`,
+    alt: image?.alt ? `${title}, with the post's cover image: ${image.alt}` : `${title}, a post on ${SITE_TITLE}`,
+  }}
+>
   <div class="reading-progress" aria-hidden="true"><div></div></div>
   <article class="post">
     <header>
@@ -96,6 +106,21 @@ const imageCount = (n: number) => `${n} ${n === 1 ? "image" : "images"}`;
           {older && <a href={postUrl(older)} rel="prev"><span class="meta">Older</span>{older.data.title}</a>}
           {newer && <a href={postUrl(newer)} rel="next" class="next"><span class="meta">{nextPartIsNewer ? `Newer, and next in ${series!.name}` : "Newer"}</span>{newer.data.title}</a>}
         </nav>
+
+        {backlinks.length > 0 && (
+          <section class="related backlinks">
+            <h2>Posts that link here</h2>
+            <ul>
+              {backlinks.map((other) => (
+                <li>
+                  <a href={postUrl(other)}>{other.data.title}</a>
+                  <p class="meta"><time datetime={other.data.pubDate.toISOString()}>{formatDate(other.data.pubDate)}</time> · {getReadingTime(other)} min read</p>
+                  <p class="excerpt">{getExcerpt(other)}</p>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         {related.length > 0 && (
           <section class="related">

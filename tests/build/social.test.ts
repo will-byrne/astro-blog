@@ -37,7 +37,20 @@ it('uses the default image, with alt text, on pages without their own', () => {
   }
 });
 
-it("uses a post's cover image and its alt text", () => {
-  expect(meta('/posts/Astrophotography/', 'og:image')).toMatch(/\/andromeda\.[\w-]+\.jpeg$/);
-  expect(meta('/posts/Astrophotography/', 'og:image:alt')).toBe('Andromeda galaxy');
+describe('post cards', () => {
+  const posts = urls.filter((url) => /^\/posts\/[^/]+\/$/.test(url));
+
+  it.each(posts)('%s uses its own generated card', (url) => {
+    expect(meta(url, 'og:image')).toBe(`${SITE}${url}card.png`);
+    expect(meta(url, 'og:image:type')).toBe('image/png');
+  });
+
+  it("describes a post's card, including its cover image", () => {
+    expect(meta('/posts/Astrophotography/', 'og:image:alt')).toBe("Deep Space Object Astrophotography, with the post's cover image: Andromeda galaxy");
+  });
+
+  it('describes the card of a post without a cover image', () => {
+    const url = posts.find((post) => !page(post).querySelector('article header figure'))!;
+    expect(meta(url, 'og:image:alt')).toMatch(/, a post on Will's Tech Blog$/);
+  });
 });

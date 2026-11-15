@@ -11,6 +11,8 @@ const {
   getPosts,
   getReadingTime,
   getSeries,
+  getBacklinks,
+  linkedPostIds,
   getRelatedPosts,
   getTags,
   groupByYear,
@@ -302,5 +304,46 @@ describe('getRelatedPosts with a series', () => {
     const unrelatedSeries = makePost({ id: 'elsewhere', series: 'Other', tags: ['iPad'] });
     const loose = makePost({ id: 'loose', tags: ['iPad'] });
     expect(getRelatedPosts(post, [post, part2, unrelatedSeries, loose]).map((p) => p.id).sort()).toEqual(['elsewhere', 'loose']);
+  });
+});
+
+describe('linkedPostIds', () => {
+  it.each([
+    ['[a](/posts/ipad_ai/)', 'ipad_ai'],
+    ['[a](/posts/ipad_ai)', 'ipad_ai'],
+    ['[a](/posts/ipad_ai/#background)', 'ipad_ai'],
+    ['[a](https://willbyrne.dev/posts/ipad_ai/)', 'ipad_ai'],
+    ['[a]( /posts/ipad_ai/ "A title")', 'ipad_ai'],
+    ['[Blogging from my iPad](/posts/Blogging-from-my-iPad/)', 'Blogging-from-my-iPad'],
+  ])('finds the post in %j', (body, id) => {
+    expect([...linkedPostIds(makePost({ body }))]).toEqual([id]);
+  });
+
+  it.each([
+    ['an image', '![a](/posts/ipad_ai/cover.jpg)'],
+    ['another part of the site', '[a](/tags/ipad/)'],
+    ['a post list page', '[a](/posts/)'],
+    ['plain text', 'see /posts/ipad_ai/ for more'],
+  ])('ignores %s', (_, body) => {
+    expect(linkedPostIds(makePost({ body })).size).toBe(0);
+  });
+
+  it('counts each post once', () => {
+    expect([...linkedPostIds(makePost({ body: '[a](/posts/x/) and [b](/posts/x/#y) and [c](/posts/z/)' }))]).toEqual(['x', 'z']);
+  });
+});
+
+describe('getBacklinks', () => {
+  it('lists the posts that link to a post, keeping their order', () => {
+    const target = makePost({ id: 'clarinet' });
+    const newer = makePost({ id: 'newer', body: 'Like my [music](/posts/clarinet/) post' });
+    const older = makePost({ id: 'older', body: '[Clarinet](/posts/clarinet)' });
+    const unrelated = makePost({ id: 'other', body: '[Something](/posts/godot/)' });
+    expect(getBacklinks(target, [newer, unrelated, target, older]).map((p) => p.id)).toEqual(['newer', 'older']);
+  });
+
+  it('ignores a post linking to itself', () => {
+    const post = makePost({ id: 'self', body: '[top](/posts/self/#top)' });
+    expect(getBacklinks(post, [post])).toEqual([]);
   });
 });

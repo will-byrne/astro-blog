@@ -19,18 +19,24 @@ interface Props {
   /** Describes the image for people who cannot see it in a link preview */
   imageAlt?: string;
   ogType?: 'website' | 'article' | 'profile';
+  /** A ready-made 1200x630 PNG for link previews, e.g. a post's card from /posts/<id>/card.png; used instead of `image` */
+  socialCard?: { url: string; alt: string };
 }
 
-const { pageTitle, description = SITE_DESCRIPTION, image, imageAlt, ogType = 'website' } = Astro.props;
+const { pageTitle, description = SITE_DESCRIPTION, image, imageAlt, ogType = 'website', socialCard } = Astro.props;
 const title = pageTitle === SITE_TITLE ? SITE_TITLE : `${pageTitle} | ${SITE_TITLE}`;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
 // Cropped to the 1.91:1 shape link previews use, up to 1200x630. Images are never enlarged, so a small
 // image gets the largest crop of that shape it can fill, and the tags below always give the real size.
-const socialSource = image ?? defaultSocialImage;
-const socialWidth = Math.floor(Math.min(1200, socialSource.width, (socialSource.height * 1200) / 630));
-const socialHeight = Math.round((socialWidth * 630) / 1200);
-const socialImage = await getImage({ src: socialSource, width: socialWidth, height: socialHeight, fit: 'cover', format: 'jpeg' });
-const socialImageAlt = image ? (imageAlt ?? '') : `${SITE_TITLE}: ${SITE_DESCRIPTION}`;
+async function cropForPreview(source: ImageMetadata) {
+  const width = Math.floor(Math.min(1200, source.width, (source.height * 1200) / 630));
+  const height = Math.round((width * 630) / 1200);
+  const { src } = await getImage({ src: source, width, height, fit: 'cover', format: 'jpeg' });
+  return { src, width, height, type: 'image/jpeg' };
+}
+const social = socialCard
+  ? { src: socialCard.url, width: 1200, height: 630, type: 'image/png', alt: socialCard.alt }
+  : { ...(await cropForPreview(image ?? defaultSocialImage)), alt: image ? (imageAlt ?? '') : `${SITE_TITLE}: ${SITE_DESCRIPTION}` };
 ---
 <html lang="en">
   <head>
@@ -59,11 +65,11 @@ const socialImageAlt = image ? (imageAlt ?? '') : `${SITE_TITLE}: ${SITE_DESCRIP
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:site_name" content={SITE_TITLE} />
     <meta property="og:type" content={ogType} />
-    <meta property="og:image" content={new URL(socialImage.src, Astro.site)} />
-    <meta property="og:image:type" content="image/jpeg" />
-    <meta property="og:image:width" content={String(socialWidth)} />
-    <meta property="og:image:height" content={String(socialHeight)} />
-    {socialImageAlt && <meta property="og:image:alt" content={socialImageAlt} />}
+    <meta property="og:image" content={new URL(social.src, Astro.site)} />
+    <meta property="og:image:type" content={social.type} />
+    <meta property="og:image:width" content={String(social.width)} />
+    <meta property="og:image:height" content={String(social.height)} />
+    {social.alt && <meta property="og:image:alt" content={social.alt} />}
     <meta property="og:locale" content="en_GB" />
     <meta name="twitter:card" content="summary_large_image" />
   </head>

@@ -195,3 +195,23 @@ describe('sitemap', () => {
 it('robots.txt points to the sitemap', () => {
   expect(readDist('/robots.txt')).toContain(`Sitemap: ${SITE}/sitemap-index.xml`);
 });
+
+describe('backlinks', () => {
+  const backlinks = (url: string) => page(url).querySelectorAll('.backlinks li > a').map((a) => a.getAttribute('href'));
+
+  it('lists the posts whose text links to a post', () => {
+    expect(backlinks('/posts/clarinet/')).toEqual(['/posts/learning-to-draw/']);
+    expect(backlinks('/posts/digital-playground/')).toEqual(expect.arrayContaining(['/posts/jekyll-to-astro/', '/posts/ai-tdd/']));
+  });
+
+  it('leaves a post with nothing linking to it without the section', () => {
+    expect(page('/posts/learning-to-draw/').querySelector('.backlinks')).toBeNull();
+  });
+
+  it('never lists a post as both linking here and related', () => {
+    for (const url of pageUrls().filter((u) => /^\/posts\/[^/]+\/$/.test(u))) {
+      const related = page(url).querySelectorAll('.related:not(.backlinks) li > a').map((a) => a.getAttribute('href'));
+      for (const link of backlinks(url)) expect(related).not.toContain(link);
+    }
+  });
+});
