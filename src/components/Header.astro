@@ -8,13 +8,18 @@ import { SITE_TITLE } from '../lib/posts';
 const links = [
   { href: '/', label: 'Journal' },
   { href: '/archives/', label: 'Archive' },
+  { href: '/categories/', label: 'Topics' },
   { href: '/gallery/', label: 'Gallery' },
   { href: '/resume/', label: 'Resume' },
   { href: '/about/', label: 'About' },
 ];
 const path = Astro.url.pathname.replace(/\/?$/, '/');
-const isCurrent = (href: string) =>
-  href === '/' ? path === '/' || /^\/(page\d+|posts)\//.test(path) : path.startsWith(href);
+const isCurrent = (href: string) => {
+  if (href === '/') return path === '/' || /^\/(page\d+|posts)\//.test(path);
+  // Topics covers both categories and tags; their pages switch between the two
+  if (href === '/categories/') return /^\/(categories|tags)\//.test(path);
+  return path.startsWith(href);
+};
 ---
 <header class="site-header">
   <div class="top">
@@ -109,6 +114,14 @@ const isCurrent = (href: string) =>
       justify-content: space-between;
       gap: 0.25rem;
       font-size: 1rem;
+    }
+  }
+
+  /* Too narrow for six links on one line: two even rows of three instead */
+  @media (max-width: 23rem) {
+    nav {
+      display: grid;
+      grid-template-columns: repeat(3, auto);
     }
   }
 
