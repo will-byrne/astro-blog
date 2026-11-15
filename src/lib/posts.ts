@@ -49,13 +49,37 @@ export function groupByYear(posts: Post[]): [number, Post[]][] {
   return [...years];
 }
 
-// Posts sharing the most tags and category, newest first on a tie
+export interface Series {
+  name: string;
+  /** Every part, oldest first */
+  posts: Post[];
+  /** Where this post comes in `posts`, from 0 */
+  index: number;
+}
+
+const seriesSlug = (post: Post) => (post.data.series ? slugify(post.data.series) : undefined);
+
+/** The series a post is part of, matched by name ignoring case, or undefined if it is not in one */
+export function getSeries(post: Post, posts: Post[]): Series | undefined {
+  const slug = seriesSlug(post);
+  if (!slug) return undefined;
+  const parts = posts
+    .filter((other) => seriesSlug(other) === slug)
+    .sort((a, b) => a.data.pubDate.getTime() - b.data.pubDate.getTime());
+  // The post itself may be missing from `posts`, e.g. a draft in a production build
+  if (!parts.some((other) => other.id === post.id)) return undefined;
+  return { name: post.data.series!, posts: parts, index: parts.findIndex((other) => other.id === post.id) };
+}
+
+// Posts sharing the most tags and category, newest first on a tie.
+// Other parts of the same series are left out, as the series box already lists them.
 export function getRelatedPosts(post: Post, posts: Post[], limit = 3): Post[] {
+  const series = seriesSlug(post);
   const score = (other: Post) =>
     other.data.tags.filter((tag) => post.data.tags.includes(tag)).length +
     (other.data.category === post.data.category ? 0.5 : 0);
   return posts
-    .filter((other) => other.id !== post.id && score(other) > 0)
+    .filter((other) => other.id !== post.id && score(other) > 0 && (!series || seriesSlug(other) !== series))
     .sort((a, b) => score(b) - score(a))
     .slice(0, limit);
 }

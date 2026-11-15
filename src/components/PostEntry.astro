@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import { formatDate, getExcerpt, postUrl, type Post } from '../lib/posts';
+import { formatDate, getExcerpt, getReadingTime, postUrl, type Post } from '../lib/posts';
 
 interface Props {
   post: Post;
@@ -13,7 +13,7 @@ const { title, pubDate, category, image } = post.data;
 <li class="entry">
   <article>
     <div class="text">
-      <p class="meta"><time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time> · {category}</p>
+      <p class="meta"><time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time> · {category} · {getReadingTime(post)} min read</p>
       <Heading class="title"><a href={postUrl(post)}>{title}</a></Heading>
       <p class="excerpt">{getExcerpt(post)}</p>
     </div>

@@ -90,4 +90,57 @@ test.describe('post page', () => {
     await expect(page).toHaveURL(new RegExp(`${target}$`));
     await expect(page.locator(target)).toBeInViewport();
   });
+
+  test('the progress bar fills as the post is read', async ({ page }) => {
+    await page.goto('/posts/ai-tdd/');
+    const bar = page.locator('.reading-progress > div');
+    const width = () => bar.evaluate((el) => el.getBoundingClientRect().width);
+    expect(await width()).toBe(0);
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 2));
+    await expect.poll(width).toBeGreaterThan(0);
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await expect.poll(width).toBe(page.viewportSize()!.width);
+  });
+
+  test('a post in a series lists the parts and links to the next one', async ({ page }) => {
+    await page.goto('/posts/Blogging-from-my-iPad/');
+    const series = page.getByRole('navigation', { name: 'Series: My new iPad' });
+    await expect(series).toContainText('Part 1 of 3');
+    await expect(series.locator('[aria-current="page"]')).toHaveText('Blogging from my iPad');
+    await expect(series.getByRole('link')).toHaveText(['iPad AI', 'iPad Shortcuts For Blogging']);
+    // The next part is also the next newer post, so it shows once, in the Newer link
+    await expect(page.locator('.next-part')).toHaveCount(0);
+    await expect(page.locator('.post-nav .next')).toContainText('Newer, and next in My new iPad');
+  });
+
+  test('hovering a link to another post shows a preview of it', async ({ page }) => {
+    await page.goto('/posts/ipad_shortcuts/');
+    const preview = page.locator('.post-preview');
+    await page.locator('.prose a[href="/posts/Blogging-from-my-iPad/"]').first().hover();
+    await expect(preview).toBeVisible();
+    await expect(preview.locator('.preview-title')).toHaveText('Blogging from my iPad');
+    await expect(preview).toContainText('min read');
+    await expect(preview).toHaveAttribute('aria-hidden', 'true');
+    await page.mouse.move(0, 0);
+    await expect(preview).toBeHidden();
+  });
+
+  test('tabbing to a link to another post shows its preview, and Escape hides it', async ({ page }) => {
+    await page.goto('/posts/ipad_shortcuts/');
+    const link = page.locator('.prose a[href="/posts/Blogging-from-my-iPad/"]').first();
+    await link.focus();
+    await page.keyboard.press('Shift+Tab');
+    await page.keyboard.press('Tab');
+    const preview = page.locator('.post-preview');
+    await expect(preview).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(preview).toBeHidden();
+  });
+
+  test('links to other sites get no preview', async ({ page }) => {
+    await page.goto('/posts/ipad_shortcuts/');
+    await page.locator('.prose a[href^="https://www.marcogomiero.com"]').first().hover();
+    await page.waitForTimeout(600);
+    await expect(page.locator('.post-preview')).toBeHidden();
+  });
 });

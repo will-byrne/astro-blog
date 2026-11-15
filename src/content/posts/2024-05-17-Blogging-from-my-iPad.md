@@ -4,6 +4,7 @@ pubDate: '2024-05-17'
 updated: "2024-05-22T17:30:55+01:00"
 author: Will Byrne
 category: iPad
+series: My new iPad
 tags:
   - Blog
   - iPad

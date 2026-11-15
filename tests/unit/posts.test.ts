@@ -10,6 +10,7 @@ const {
   getExcerpt,
   getPosts,
   getReadingTime,
+  getSeries,
   getRelatedPosts,
   getTags,
   groupByYear,
@@ -261,5 +262,45 @@ describe('getPosts', () => {
     useCollection([]);
     await getPosts();
     expect(getCollection).toHaveBeenCalledWith('posts', expect.any(Function));
+  });
+});
+
+describe('getSeries', () => {
+  const first = makePost({ id: 'first', series: 'My new iPad', pubDate: '2024-05-17' });
+  const third = makePost({ id: 'third', series: 'My new iPad', pubDate: '2024-05-21' });
+  const second = makePost({ id: 'second', series: 'my new ipad', pubDate: '2024-05-18' });
+  const other = makePost({ id: 'other', series: 'Something else' });
+  const alone = makePost({ id: 'alone' });
+  const posts = [third, other, first, alone, second];
+
+  it('lists the parts oldest first, matching the name ignoring case', () => {
+    expect(getSeries(second, posts)?.posts.map((p) => p.id)).toEqual(['first', 'second', 'third']);
+  });
+
+  it('knows where the post comes in the series', () => {
+    expect(getSeries(first, posts)?.index).toBe(0);
+    expect(getSeries(third, posts)?.index).toBe(2);
+  });
+
+  it('uses the name as the post writes it', () => {
+    expect(getSeries(first, posts)?.name).toBe('My new iPad');
+  });
+
+  it('is undefined for a post not in a series', () => {
+    expect(getSeries(alone, posts)).toBeUndefined();
+  });
+
+  it('is undefined when the post itself is not in the list, e.g. a draft', () => {
+    expect(getSeries(first, [second, third])).toBeUndefined();
+  });
+});
+
+describe('getRelatedPosts with a series', () => {
+  it('leaves out other parts of the same series', () => {
+    const post = makePost({ id: 'part-1', series: 'iPad', tags: ['iPad'] });
+    const part2 = makePost({ id: 'part-2', series: 'iPad', tags: ['iPad'] });
+    const unrelatedSeries = makePost({ id: 'elsewhere', series: 'Other', tags: ['iPad'] });
+    const loose = makePost({ id: 'loose', tags: ['iPad'] });
+    expect(getRelatedPosts(post, [post, part2, unrelatedSeries, loose]).map((p) => p.id).sort()).toEqual(['elsewhere', 'loose']);
   });
 });

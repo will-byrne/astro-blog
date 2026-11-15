@@ -2,10 +2,11 @@
 import { Image } from "astro:assets";
 import BaseLayout from "./BaseLayout.astro";
 import Icon from "../components/Icon.astro";
+import SeriesNav from "../components/SeriesNav.astro";
 import TableOfContents from "../components/TableOfContents.astro";
 import { findGallery, previewImages } from "../lib/gallery";
 import { getGalleries } from "../lib/gallery-content";
-import { formatDate, getExcerpt, getPosts, getReadingTime, getRelatedPosts, postUrl, slugify, type Post } from "../lib/posts";
+import { formatDate, getExcerpt, getPosts, getReadingTime, getRelatedPosts, getSeries, postUrl, slugify, type Post } from "../lib/posts";
 
 const { post, headings } = Astro.props as { post: Post; headings: { depth: number; slug: string; text: string }[] };
 const { title, pubDate, updated, image, category, tags } = post.data;
@@ -15,6 +16,10 @@ const index = posts.findIndex((other) => other.id === post.id);
 const newer = posts[index - 1];
 const older = posts[index + 1];
 const related = getRelatedPosts(post, posts);
+const series = getSeries(post, posts);
+const nextPart = series?.posts[series.index + 1];
+// When the next part is also the next newer post, the Newer link says so instead of showing it twice
+const nextPartIsNewer = nextPart !== undefined && nextPart.id === newer?.id;
 // Fails the build if the post names a gallery that does not exist
 const gallery = post.data.gallery ? findGallery(getGalleries(), post.data.gallery) : undefined;
 const galleryThumbs = gallery ? [gallery.cover, ...previewImages(gallery, 3)] : [];
@@ -22,6 +27,7 @@ const imageCount = (n: number) => `${n} ${n === 1 ? "image" : "images"}`;
 ---
 
 <BaseLayout pageTitle={title} description={getExcerpt(post)} image={image?.url} imageAlt={image?.alt} ogType="article">
+  <div class="reading-progress" aria-hidden="true"><div></div></div>
   <article class="post">
     <header>
       <h1>{title}</h1>
@@ -57,6 +63,8 @@ const imageCount = (n: number) => `${n} ${n === 1 ? "image" : "images"}`;
     <TableOfContents headings={headings} />
 
     <div class="body">
+      {series && <SeriesNav series={series} />}
+
       <div class="prose">
         <slot />
       </div>
@@ -75,11 +83,18 @@ const imageCount = (n: number) => `${n} ${n === 1 ? "image" : "images"}`;
       )}
 
       <footer>
+        {nextPart && !nextPartIsNewer && (
+          <a class="next-part" href={postUrl(nextPart)}>
+            <span class="meta">Next in {series!.name}</span>
+            {nextPart.data.title}
+          </a>
+        )}
+
         <button type="button" id="share" class="share"><Icon name="share" /><span>Share</span></button>
 
         <nav class="post-nav" aria-label="More posts">
           {older && <a href={postUrl(older)} rel="prev"><span class="meta">Older</span>{older.data.title}</a>}
-          {newer && <a href={postUrl(newer)} rel="next" class="next"><span class="meta">Newer</span>{newer.data.title}</a>}
+          {newer && <a href={postUrl(newer)} rel="next" class="next"><span class="meta">{nextPartIsNewer ? `Newer, and next in ${series!.name}` : "Newer"}</span>{newer.data.title}</a>}
         </nav>
 
         {related.length > 0 && (
@@ -89,7 +104,8 @@ const imageCount = (n: number) => `${n} ${n === 1 ? "image" : "images"}`;
               {related.map((other) => (
                 <li>
                   <a href={postUrl(other)}>{other.data.title}</a>
-                  <p class="meta"><time datetime={other.data.pubDate.toISOString()}>{formatDate(other.data.pubDate)}</time></p>
+                  <p class="meta"><time datetime={other.data.pubDate.toISOString()}>{formatDate(other.data.pubDate)}</time> · {getReadingTime(other)} min read</p>
+                  <p class="excerpt">{getExcerpt(other)}</p>
                 </li>
               ))}
             </ul>
@@ -100,7 +116,68 @@ const imageCount = (n: number) => `${n} ${n === 1 ? "image" : "images"}`;
   </article>
 </BaseLayout>
 
+<script>
+  // The bar at the top fills as the post is read: empty at the start of the text, full at its end
+  const bar = document.querySelector<HTMLElement>('.reading-progress > div');
+  const text = document.querySelector<HTMLElement>('.post .prose');
+  if (bar && text) {
+    let queued = false;
+    const update = () => {
+      queued = false;
+      const { top, height } = text.getBoundingClientRect();
+      const scrollable = height - window.innerHeight;
+      const done = scrollable > 0 ? -top / scrollable : top + height <= window.innerHeight ? 1 : 0;
+      bar.style.transform = `scaleX(${Math.min(1, Math.max(0, done))})`;
+    };
+    const queue = () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(update);
+    };
+    window.addEventListener('scroll', queue, { passive: true });
+    window.addEventListener('resize', queue);
+    update();
+  }
+</script>
+
 <style>
+  .reading-progress {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 20;
+    height: 4px;
+    pointer-events: none;
+  }
+
+  .reading-progress > div {
+    height: 100%;
+    background: var(--mauve);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  .next-part {
+    display: block;
+    margin-bottom: 1.5rem;
+    padding: 0.75rem 1rem;
+    background: var(--mantle);
+    border: 2px solid var(--surface1);
+    border-radius: 0.75rem;
+    color: var(--text);
+    font-weight: 700;
+    line-height: 1.35;
+    text-decoration: none;
+  }
+
+  .next-part:hover {
+    border-color: var(--mauve);
+  }
+
+  .next-part .meta {
+    display: block;
+    font-weight: 400;
+  }
+
   .post {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
@@ -337,6 +414,16 @@ const imageCount = (n: number) => `${n} ${n === 1 ? "image" : "images"}`;
 
   .related p {
     margin: 0;
+  }
+
+  .related .excerpt {
+    display: -webkit-box;
+    margin-top: 0.25rem;
+    overflow: hidden;
+    color: var(--subtext1);
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
   }
 
   @media (prefers-reduced-motion: reduce) {

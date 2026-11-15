@@ -1,0 +1,78 @@
+---
+// Lists the parts of a series at the top of a post, with this post marked.
+import { postUrl, type Series } from '../lib/posts';
+
+interface Props {
+  series: Series;
+}
+
+const { series } = Astro.props;
+const { name, posts, index } = series;
+---
+
+<nav class="series" aria-label={`Series: ${name}`}>
+  <p class="meta">Part {index + 1} of {posts.length} in the series</p>
+  <p class="name">{name}</p>
+  <ol>
+    {posts.map((part, i) => (
+      <li>
+        {i === index
+          ? <span aria-current="page">{part.data.title}</span>
+          : <a href={postUrl(part)}>{part.data.title}</a>}
+      </li>
+    ))}
+  </ol>
+</nav>
+
+<style>
+  .series {
+    margin: 0 0 2rem;
+    padding: 1rem 1.25rem;
+    background: var(--mantle);
+    border: 2px solid var(--surface0);
+    border-radius: 0.75rem;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  .name {
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+
+  ol {
+    margin: 0.5rem 0 0;
+    padding-left: 1.75rem;
+  }
+
+  li {
+    padding-block: 0.125rem;
+  }
+
+  li::marker {
+    color: var(--subtext1);
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+  }
+
+  [aria-current] {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    font-weight: 700;
+  }
+
+  [aria-current]::after {
+    content: '(you are here)';
+    margin-left: 0.5rem;
+    color: var(--subtext1);
+    font-size: 0.9rem;
+    font-weight: 400;
+  }
+</style>

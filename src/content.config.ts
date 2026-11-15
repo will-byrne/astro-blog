@@ -20,6 +20,8 @@ const posts = defineCollection({
     image: z.object({ url: image(), alt: z.string().default('') }).optional(),
     // A folder in src/assets/gallery, e.g. learning-to-draw. The post links to that gallery and the gallery links back.
     gallery: z.string().trim().min(1).optional(),
+    // Posts with the same series name are linked as parts, in date order, e.g. "My new iPad"
+    series: z.string().trim().min(1).optional(),
     draft: z.boolean().default(false),
   }),
 });
