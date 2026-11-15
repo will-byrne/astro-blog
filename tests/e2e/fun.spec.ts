@@ -48,6 +48,8 @@ test.describe('fun', () => {
     await expect(html).toHaveAttribute('data-unicorn', '');
     await expect(page).toHaveTitle(/^🦄 Neigh! iPad AI/);
     await expect(page.locator('#fun-status')).toHaveText(/Unicorn mode on/);
+    // Rainbow sparkles appear all over the page
+    await expect.poll(() => page.locator('.sparkle.rainbow').count()).toBeGreaterThanOrEqual(4);
     // It lasts for the visit
     await page.reload();
     await expect(html).toHaveAttribute('data-unicorn', '');
@@ -55,6 +57,8 @@ test.describe('fun', () => {
     for (const key of KONAMI) await page.keyboard.press(key);
     await expect(html).not.toHaveAttribute('data-unicorn');
     await expect(page).toHaveTitle(/^iPad AI/);
+    // and stop when it is turned off
+    await expect(page.locator('.sparkle.rainbow')).toHaveCount(0);
   });
 
   test('a wrong key starts the Konami code again', async ({ page }) => {
@@ -149,6 +153,14 @@ test.describe('fun', () => {
   test.describe('with reduced motion', () => {
     test.beforeEach(async ({ page }) => {
       await page.emulateMedia({ reducedMotion: 'reduce' });
+    });
+
+    test('unicorn mode has no sparkles', async ({ page }) => {
+      await page.goto('/');
+      for (const key of KONAMI) await page.keyboard.press(key);
+      await expect(page.locator('html')).toHaveAttribute('data-unicorn', '');
+      await page.waitForTimeout(1000);
+      await expect(page.locator('.sparkle')).toHaveCount(0);
     });
 
     test('nothing runs or sparkles: the footer unicorn stands still', async ({ page }) => {

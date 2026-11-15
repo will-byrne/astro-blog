@@ -92,6 +92,25 @@ function sparkle(x, y, colour) {
 let sparkleColour = 0;
 const nextColour = () => PALETTE[sparkleColour++ % PALETTE.length];
 
+// Unicorn mode's sparkles: bigger, filled with a rainbow, and twinkling in place rather than drifting down.
+// At most this many are on the screen at once, so the page stays smooth.
+const MAX_RAINBOW_SPARKLES = 50;
+
+function rainbowSparkle() {
+  if (document.querySelectorAll('.sparkle.rainbow').length >= MAX_RAINBOW_SPARKLES) return;
+  const star = document.createElement('span');
+  star.className = 'sparkle rainbow';
+  star.setAttribute('aria-hidden', 'true');
+  star.textContent = ['✦', '✧', '✶', '★'][Math.floor(Math.random() * 4)];
+  star.style.left = `${Math.random() * window.innerWidth}px`;
+  star.style.top = `${Math.random() * window.innerHeight}px`;
+  star.style.setProperty('--size', `${1.8 + Math.random() * 1.8}rem`);
+  // Each one's rainbow runs at its own angle
+  star.style.setProperty('--angle', `${Math.floor(Math.random() * 360)}deg`);
+  star.addEventListener('animationend', () => star.remove());
+  document.body.append(star);
+}
+
 // Sparkle cursor: a switch in the footer, remembered between visits. Hidden when motion is reduced.
 const sparkleToggle = document.querySelector('.sparkle-toggle');
 let sparkleCursor = false;
@@ -140,10 +159,14 @@ function setUnicornMode(on) {
   if (on && !document.title.startsWith(NEIGH)) document.title = NEIGH + document.title;
   if (!on && document.title.startsWith(NEIGH)) document.title = document.title.slice(NEIGH.length);
   clearInterval(unicornSparkles);
-  // Every so often a sparkle appears somewhere on the screen
+  // Rainbow sparkles twinkle all over the screen, a pair at a time
   if (on && !reducedMotion.matches) {
-    unicornSparkles = setInterval(() => sparkle(Math.random() * window.innerWidth, Math.random() * window.innerHeight, nextColour()), 700);
+    unicornSparkles = setInterval(() => {
+      rainbowSparkle();
+      rainbowSparkle();
+    }, 250);
   }
+  if (!on) document.querySelectorAll('.sparkle.rainbow').forEach((star) => star.remove());
 }
 
 if ('unicorn' in root.dataset) setUnicornMode(true);

@@ -84,6 +84,37 @@
   }
 }
 
+/* Unicorn mode's sparkles: filled with the unicorn's rainbow (the same bright colours on every theme), with a soft
+   glow so they stand out on light and dark pages, twinkling in, spinning and fading out where they appear */
+.sparkle.rainbow {
+  /* Squeezed into the middle of the box, where the star itself is, so each shows the whole rainbow */
+  background: linear-gradient(var(--angle, 135deg), #ff5f8f 30%, #ff9f43, #ffd93d, #6bcb77, #4d96ff, #9b5de5 70%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 0.15rem rgb(255 255 255 / 0.5)) drop-shadow(0 0 0.1rem rgb(0 0 0 / 0.35));
+  animation: twinkle 1.6s ease-in-out forwards;
+}
+
+@keyframes twinkle {
+  0% {
+    opacity: 0;
+    transform: scale(0.2) rotate(0);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.15) rotate(40deg);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(0.9) rotate(90deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.3) rotate(160deg);
+  }
+}
+
 /* Unicorn mode, from the Konami code: rainbow headings with sparkles. The gradient uses each theme's own text
    colours, so headings stay readable. */
 :root[data-unicorn] :is(h1, h2, h3) {
