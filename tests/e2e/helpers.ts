@@ -5,6 +5,7 @@ export const THEMES = [
   { id: 'frappe', base: '#303446' },
   { id: 'macchiato', base: '#24273a' },
   { id: 'mocha', base: '#1e1e2e' },
+  { id: 'pan', base: '#1f1a2e' },
 ] as const;
 
 export type ThemeId = (typeof THEMES)[number]['id'];

@@ -4,6 +4,7 @@ import '@fontsource-variable/atkinson-hyperlegible-next/wght.css';
 import '@fontsource-variable/atkinson-hyperlegible-next/wght-italic.css';
 import '@fontsource-variable/atkinson-hyperlegible-mono/wght.css';
 import '../styles/global.css';
+import '../styles/fun.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Icon from '../components/Icon.astro';
@@ -44,11 +45,17 @@ const social = socialCard
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#24273a" />
     <script is:inline>
-      // Apply the saved flavour before the page paints
+      // Apply the saved flavour, and any fun modes from this visit, before the page paints
+      const root = document.documentElement;
       try {
         const theme = localStorage.getItem('theme');
-        if (['latte', 'frappe', 'macchiato', 'mocha'].includes(theme)) document.documentElement.dataset.theme = theme;
+        if (['latte', 'frappe', 'macchiato', 'mocha', 'pan'].includes(theme)) root.dataset.theme = theme;
+        // Night vision (n) and unicorn mode (the Konami code) last for the visit; see fun.js
+        if (sessionStorage.getItem('night') === 'on') root.dataset.night = '';
+        if (sessionStorage.getItem('unicorn') === 'on') root.dataset.unicorn = '';
       } catch {}
+      // Pride Month: the stripe across the top becomes the pan flag
+      if (new Date().getMonth() === 5) root.dataset.pride = '';
     </script>
     <meta name="generator" content={Astro.generator} />
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png" />
@@ -76,6 +83,7 @@ const social = socialCard
   <body>
     <a class="skip-link" href="#content">Skip to content</a>
     <div class="page-box">
+      <div class="pride-note" aria-hidden="true"><span>Happy Pride 🩷💛🩵</span></div>
       <Header />
       <main id="content">
         <slot />
@@ -89,8 +97,10 @@ const social = socialCard
       <div class="lightbox-drawing" hidden></div>
       <button type="button" class="icon-button" aria-label="Close image"><Icon name="close" /></button>
     </dialog>
+    <p id="fun-status" class="sr-only" aria-live="polite"></p>
     <script>
       import '../scripts/site.js';
+      import '../scripts/fun.js';
     </script>
     <style>
       #back-to-top {

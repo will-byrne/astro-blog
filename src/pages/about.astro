@@ -1,6 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { Image } from 'astro:assets';
 import Chips from '../components/Chips.astro';
+import avatar from '../assets/images/avatar.jpg';
 import { getResume } from '../lib/resume';
 
 const { basics, interests } = await getResume();
@@ -17,6 +19,13 @@ const goals = ['Finish sorting Irish FBR', 'Lose weight', 'Blog Improvements'];
     <p>There are no rules about what I post, the above was the intent when I started this project but I have decided that I will not allow that to stop me writing a post if I think that it will help me or others.</p>
 
     <h2 id="me">Me</h2>
+    <div class="avatar-box">
+      <!-- Click it a few times; see fun.js -->
+      <button type="button" class="avatar" data-coffee-avatar aria-label="Poke the unicorn">
+        <Image src={avatar} width={128} height={128} densities={[1, 2]} alt="" />
+      </button>
+      <p class="coffee-bubble" hidden>NEED MORE COFFEE <span aria-hidden="true">☕</span></p>
+    </div>
     <p>Hi, I am me. I am a human in my late 30s. I enjoy many hobbies including astrophotography, archery, bbqs, calligraphy, drawing, listening to music, playing music, board games, video games, reading, table top role playing games, and many others. I live by myself in a small village in the eastern UK, I like the quiet and the lack of light pollution for my stargazing.</p>
 
     <h2 id="work">Work</h2>
@@ -38,6 +47,81 @@ const goals = ['Finish sorting Irish FBR', 'Lose weight', 'Blog Improvements'];
 </BaseLayout>
 
 <style>
+  .avatar-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-block: 0.5rem 1rem;
+  }
+
+  .avatar {
+    flex: none;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .avatar img {
+    display: block;
+    width: 8rem;
+    height: 8rem;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px var(--surface0);
+  }
+
+  .avatar:global(.wiggle) {
+    animation: wiggle 400ms ease-in-out;
+  }
+
+  @keyframes wiggle {
+    25% {
+      rotate: -8deg;
+    }
+    75% {
+      rotate: 8deg;
+    }
+  }
+
+  .coffee-bubble {
+    position: relative;
+    margin: 0;
+    padding: 0.5rem 1rem;
+    background: var(--mantle);
+    border: 2px solid var(--peach);
+    border-radius: 1rem;
+    color: var(--peach);
+    font-size: 1.25rem;
+    font-weight: 800;
+  }
+
+  /* The bubble's tail, pointing at the avatar */
+  .coffee-bubble::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -0.6rem;
+    width: 1rem;
+    height: 1rem;
+    background: var(--mantle);
+    border-bottom: 2px solid var(--peach);
+    border-left: 2px solid var(--peach);
+    translate: 0 -50%;
+    rotate: 45deg;
+  }
+
+  .coffee-bubble[hidden] {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .avatar:global(.wiggle) {
+      animation: none;
+    }
+  }
+
   /* Goals sit beside the text once there is room */
   @media (min-width: 75rem) {
     .about {

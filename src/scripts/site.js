@@ -97,7 +97,8 @@ function openLightbox(img) {
 }
 
 document.querySelectorAll('.prose img, [data-zoomable]').forEach((img) => {
-  if (img.closest('a')) return;
+  // Images inside links or buttons already do something when clicked
+  if (img.closest('a, button')) return;
   img.setAttribute('data-zoomable', '');
   img.setAttribute('role', 'button');
   img.setAttribute('tabindex', '0');

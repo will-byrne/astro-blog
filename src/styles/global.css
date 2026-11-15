@@ -1,4 +1,4 @@
-/* Catppuccin, in all four flavours. Macchiato is the default; the theme picker sets data-theme on <html> */
+/* Catppuccin, in all four flavours, plus Pan. Macchiato is the default; the theme picker sets data-theme on <html> */
 :root,
 :root[data-theme='macchiato'] {
   --base: #24273a;
@@ -101,7 +101,31 @@
   color-scheme: dark;
 }
 
+:root[data-theme='pan'] {
+  /* The pansexual pride flag's pink, yellow and blue, on a deep plum night, made light enough to read as text */
+  --base: #1f1a2e;
+  --mantle: #19152a;
+  --crust: #130f20;
+  --surface0: #2f2843;
+  --surface1: #433a5c;
+  --surface2: #574d73;
+  --subtext1: #c9c1e0;
+  --text: #f0eaff;
+  --lavender: #c4b5ff;
+  --mauve: #ff6fb5;
+  --pink: #ff9fd0;
+  --peach: #ffb86b;
+  --yellow: #ffd800;
+  --green: #ffe680;
+  --teal: #7fd4ff;
+  --sapphire: #3dbdff;
+  --blue: #8fb4ff;
+  --stripes: var(--pan-flag);
+  color-scheme: dark;
+}
+
 :root {
+  --pan-flag: linear-gradient(to right, #ff218c 0 33.33%, #ffd800 0 66.67%, #21b1ff 0);
   --stripes: linear-gradient(
     to right,
     var(--mauve) 0 12.5%,
@@ -121,6 +145,41 @@
   --box: 76rem;
   --gutter: 1.25rem;
   --tap: 2.75rem;
+}
+
+/*
+  Night vision: pressing n turns the site red, like the red torches astronomers use so their eyes stay used
+  to the dark. It overrides whichever theme is chosen, so it comes after them all.
+*/
+:root[data-night] {
+  --base: #120606;
+  --mantle: #0d0404;
+  --crust: #080202;
+  --surface0: #2a0e0e;
+  --surface1: #3d1414;
+  --surface2: #521b1b;
+  --subtext1: #e06060;
+  --text: #ff7a7a;
+  --lavender: #ff8f8f;
+  --mauve: #ff6b6b;
+  --pink: #ff8a8a;
+  --peach: #ff9466;
+  --yellow: #ffa07a;
+  --green: #ff8a70;
+  --teal: #ff9b8f;
+  --sapphire: #ff8585;
+  --blue: #ff9999;
+  --stripes: linear-gradient(to right, #5c0a0a, #ff4d4d, #5c0a0a);
+  color-scheme: dark;
+}
+
+:root[data-night] :is(img, video, picture) {
+  filter: grayscale(1) sepia(1) hue-rotate(-50deg) saturate(5) brightness(0.65);
+}
+
+/* In June, the stripe across the top becomes the pan flag, whatever the theme (set in BaseLayout) */
+:root[data-pride] {
+  --stripes: var(--pan-flag);
 }
 
 *,
@@ -193,8 +252,9 @@ button {
   border-radius: 0.25rem;
 }
 
+/* Each new selection takes the next colour of the palette (see fun.js) */
 ::selection {
-  background: var(--surface2);
+  background: color-mix(in srgb, var(--selection, var(--surface2)) 20%, var(--base));
   color: var(--text);
 }
 

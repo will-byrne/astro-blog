@@ -1,18 +1,37 @@
 ---
 import Icon from './Icon.astro';
-
+import Unicorn from './Unicorn.astro';
 ---
 <footer class="site-footer">
+  <!-- A unicorn trots back and forth along the top of the footer, turning round at each end -->
+  <div class="unicorn-run" aria-hidden="true">
+    <div class="runner">
+      <span class="trail"></span>
+      <Unicorn width={44} />
+    </div>
+  </div>
   <div class="social cycle">
     <a class="icon-button" href="https://github.com/will-byrne" aria-label="GitHub" rel="me noopener noreferrer"><Icon name="github" /></a>
     <a class="icon-button" href="javascript:location.href = 'mailto:' + ['blog+will.alex.byrne','gmail.com'].join('@')" aria-label="Email"><Icon name="mail" /></a>
     <a class="icon-button" href="/feed.xml" aria-label="RSS feed"><Icon name="rss" /></a>
   </div>
+  <p class="made-with">
+    Made with
+    <svg class="rainbow" width="30" height="16" viewBox="0 0 30 16" aria-hidden="true">
+      <path d="M3 15a12 12 0 0 1 24 0" stroke="#ff218c" />
+      <path d="M7 15a8 8 0 0 1 16 0" stroke="#ffd800" />
+      <path d="M11 15a4 4 0 0 1 8 0" stroke="#21b1ff" />
+    </svg>
+    <span class="sr-only">rainbows</span>
+    and <span aria-hidden="true">☕</span><span class="sr-only">coffee</span>
+  </p>
   <p class="meta">© {new Date().getFullYear()} Will Byrne. Posts are licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Built with <a href="https://astro.build">Astro</a> in <a href="https://catppuccin.com">Catppuccin</a>.</p>
+  <button type="button" class="sparkle-toggle" aria-pressed="false" hidden>✨ Sparkle cursor</button>
 </footer>
 
 <style>
   .site-footer {
+    position: relative;
     margin-top: 4rem;
     padding-block: 1.5rem;
     border-top: 2px solid var(--surface0);
@@ -26,5 +45,119 @@ import Icon from './Icon.astro';
 
   p {
     margin: 0;
+  }
+
+  .made-with {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.25rem;
+    color: var(--subtext1);
+  }
+
+  .rainbow path {
+    fill: none;
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+
+  .sparkle-toggle {
+    min-height: var(--tap);
+    margin-top: 0.75rem;
+    padding-inline: 0.9rem;
+    background: var(--surface0);
+    border: 0;
+    border-radius: 0.5rem;
+    color: var(--text);
+    cursor: pointer;
+  }
+
+  .sparkle-toggle[aria-pressed='true'] {
+    background: var(--surface1);
+    font-weight: 700;
+  }
+
+  .sparkle-toggle[hidden] {
+    display: none;
+  }
+
+  /* Sits on the footer's top border. The runner (trail and unicorn) goes from one end to the other, then flips
+     round and comes back, so the trail is always behind it. */
+  .unicorn-run {
+    --runner: 6.75rem;
+    position: absolute;
+    top: -2.35rem;
+    left: 0;
+    right: 0;
+    height: 2.4rem;
+    overflow: hidden;
+    pointer-events: none;
+    container-type: inline-size;
+  }
+
+  .runner {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    align-items: flex-end;
+    width: var(--runner);
+    animation: patrol 18s linear infinite;
+  }
+
+  .runner :global(.unicorn) {
+    flex: none;
+    animation: gallop 300ms ease-in-out infinite alternate;
+  }
+
+  .trail {
+    flex: 1;
+    height: 0.6rem;
+    margin-bottom: 0.55rem;
+    background: linear-gradient(to bottom, #ff5f8f 0 16.6%, #ff9f43 0 33.3%, #ffd93d 0 50%, #6bcb77 0 66.6%, #4d96ff 0 83.3%, #9b5de5 0);
+    border-radius: 0.3rem 0 0 0.3rem;
+    mask-image: linear-gradient(to right, transparent, #000);
+  }
+
+  /* Across, turn, back, turn. 100cqw is the width of the footer. */
+  @keyframes patrol {
+    0% {
+      translate: 0 0;
+      scale: 1 1;
+    }
+    49.9% {
+      translate: calc(100cqw - var(--runner)) 0;
+      scale: 1 1;
+    }
+    50% {
+      translate: calc(100cqw - var(--runner)) 0;
+      scale: -1 1;
+    }
+    99.9% {
+      translate: 0 0;
+      scale: -1 1;
+    }
+    100% {
+      translate: 0 0;
+      scale: 1 1;
+    }
+  }
+
+  @keyframes gallop {
+    to {
+      translate: 0 -0.3rem;
+    }
+  }
+
+  /* With reduced motion it stands still at the start, without its trail */
+  @media (prefers-reduced-motion: reduce) {
+    .runner,
+    .runner :global(.unicorn) {
+      animation: none;
+    }
+
+    .trail {
+      visibility: hidden;
+    }
   }
 </style>

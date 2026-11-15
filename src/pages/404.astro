@@ -1,8 +1,115 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Unicorn from '../components/Unicorn.astro';
+import sky from '../data/sky.json';
+import { buildSkyMap, type SkyData } from '../lib/sky-map';
+
+// The real sky around Monoceros, the unicorn constellation, for a lost unicorn to float in. The middle is kept
+// clear of names, as the unicorn floats there.
+const map = buildSkyMap(sky as unknown as SkyData, 114.75, -6, { constellation: 'Monoceros', field: 70, width: 640, height: 300, clearCentre: 55 });
 ---
 
 <BaseLayout pageTitle="Page not found">
   <h1 class="page-title">Page not found</h1>
-  <p class="page-intro">That page doesn't exist. Try the <a href="/">journal</a> or the <a href="/archives/">archive</a>.</p>
+  <p class="page-intro">This page has galloped off into the nebula. Try the <a href="/">journal</a> or the <a href="/archives/">archive</a>.</p>
+
+  <figure class="lost">
+    <div class="sky">
+      <svg viewBox={`0 0 ${map.width} ${map.height}`} aria-hidden="true">
+        <rect class="background" width={map.width} height={map.height} rx="12" />
+        <g class="lines">
+          {map.lines.map((line) => <path d={line.d} class:list={{ home: line.home }} />)}
+        </g>
+        <g class="stars">
+          {map.stars.map((star) => <circle cx={star.x} cy={star.y} r={star.r} />)}
+        </g>
+        <g class="names">
+          {map.labels.filter((label) => label.home).map((label) => <text x={label.x} y={label.y} text-anchor="middle">{label.name}</text>)}
+        </g>
+      </svg>
+      <div class="floater"><Unicorn width={110} /></div>
+    </div>
+    <figcaption class="meta">
+      Behind the lost unicorn is Monoceros, a real constellation of a unicorn, just east of Orion. Its stars are faint,
+      so you need a properly dark sky to see it.
+    </figcaption>
+  </figure>
 </BaseLayout>
+
+<style>
+  .lost {
+    margin: 2rem 0 0;
+  }
+
+  .sky {
+    position: relative;
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .background {
+    fill: var(--crust);
+  }
+
+  .lines path {
+    fill: none;
+    stroke: var(--surface2);
+    stroke-width: 1;
+  }
+
+  .lines path.home {
+    stroke: var(--subtext1);
+    stroke-width: 1.5;
+  }
+
+  .stars circle {
+    fill: var(--text);
+  }
+
+  .names text {
+    fill: var(--text);
+    font-size: 15px;
+    font-weight: 700;
+    paint-order: stroke;
+    stroke: var(--crust);
+    stroke-width: 4px;
+  }
+
+  .floater {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: min(110px, 22%);
+    translate: -50% -50%;
+    animation: float 4s ease-in-out infinite alternate;
+  }
+
+  .floater :global(.unicorn) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  @keyframes float {
+    from {
+      transform: translateY(-6px) rotate(-6deg);
+    }
+    to {
+      transform: translateY(6px) rotate(4deg);
+    }
+  }
+
+  figcaption {
+    margin-top: 0.75rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .floater {
+      animation: none;
+    }
+  }
+</style>

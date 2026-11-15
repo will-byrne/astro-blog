@@ -1,12 +1,14 @@
 ---
 import Icon from './Icon.astro';
 
-// Lightest to darkest. Each swatch previews the flavour with its own base and mauve
+// The Catppuccin flavours lightest to darkest, then Pan. Each swatch previews the flavour with its own base and
+// mauve; Pan's shows its flag instead
 const themes = [
   { id: 'latte', label: 'Latte', icon: 'sun', base: '#eff1f5', ink: '#8839ef' },
   { id: 'frappe', label: 'Frappé', icon: 'sunset', base: '#303446', ink: '#ca9ee6' },
   { id: 'macchiato', label: 'Macchiato', icon: 'moon', base: '#24273a', ink: '#c6a0f6' },
   { id: 'mocha', label: 'Mocha', icon: 'moon-star', base: '#1e1e2e', ink: '#cba6f7' },
+  { id: 'pan', label: 'Pan', icon: 'heart', base: '#1f1a2e', ink: '#1f1a2e', flag: 'linear-gradient(#ff218c 0 33.33%, #ffd800 0 66.67%, #21b1ff 0)' },
 ] as const;
 ---
 <div class="theme-picker" data-theme-picker>
@@ -14,11 +16,11 @@ const themes = [
     <Icon name="palette" />
   </button>
   <ul id="theme-menu" class="menu" hidden>
-    {themes.map(({ id, label, icon, base, ink }) => (
+    {themes.map((theme) => (
       <li>
-        <button type="button" data-theme-option={id} data-base={base} aria-pressed="false">
-          <span class="swatch" style={`background:${base};color:${ink}`}><Icon name={icon} /></span>
-          {label}
+        <button type="button" data-theme-option={theme.id} data-base={theme.base} aria-pressed="false">
+          <span class="swatch" style={`background:${'flag' in theme ? theme.flag : theme.base};color:${theme.ink}`}><Icon name={theme.icon} /></span>
+          {theme.label}
         </button>
       </li>
     ))}

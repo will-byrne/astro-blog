@@ -1,0 +1,122 @@
+/*
+  The playful extras: pride, unicorns, sparkles and rainbows. See src/scripts/fun.js for what turns them on.
+  Nothing here flashes, and nothing moves for people who ask their device for reduced motion.
+*/
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Visited links in posts get an underline in the palette, a different colour for each link, so the posts you have
+   read leave a rainbow behind. Browsers only allow colour changes on visited links, so the line is made thicker
+   for all of them. */
+.prose a {
+  text-decoration-thickness: 2px;
+}
+
+.prose :is(p, li) a:nth-of-type(8n + 1):visited { text-decoration-color: var(--mauve); }
+.prose :is(p, li) a:nth-of-type(8n + 2):visited { text-decoration-color: var(--pink); }
+.prose :is(p, li) a:nth-of-type(8n + 3):visited { text-decoration-color: var(--peach); }
+.prose :is(p, li) a:nth-of-type(8n + 4):visited { text-decoration-color: var(--yellow); }
+.prose :is(p, li) a:nth-of-type(8n + 5):visited { text-decoration-color: var(--green); }
+.prose :is(p, li) a:nth-of-type(8n + 6):visited { text-decoration-color: var(--teal); }
+.prose :is(p, li) a:nth-of-type(8n + 7):visited { text-decoration-color: var(--sapphire); }
+.prose :is(p, li) a:nth-of-type(8n + 8):visited { text-decoration-color: var(--blue); }
+
+/* Pride Month: hovering the pan flag stripe at the top says hello */
+.pride-note {
+  display: none;
+}
+
+:root[data-pride] .pride-note {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 4;
+  display: flex;
+  justify-content: center;
+  height: 0.9rem;
+}
+
+.pride-note span {
+  align-self: flex-start;
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  background: var(--mantle);
+  border: 2px solid var(--surface1);
+  border-radius: 0.5rem;
+  color: var(--text);
+  font-weight: 700;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease;
+}
+
+.pride-note:hover span {
+  opacity: 1;
+}
+
+/* The sparkle trail behind the pointer, and the sparkles of unicorn mode */
+.sparkle {
+  position: fixed;
+  z-index: 50;
+  color: var(--sparkle, var(--yellow));
+  font-size: var(--size, 1rem);
+  line-height: 1;
+  pointer-events: none;
+  translate: -50% -50%;
+  animation: sparkle 800ms ease-out forwards;
+}
+
+@keyframes sparkle {
+  from {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(1.25rem) scale(0.3) rotate(90deg);
+  }
+}
+
+/* Unicorn mode, from the Konami code: rainbow headings with sparkles. The gradient uses each theme's own text
+   colours, so headings stay readable. */
+:root[data-unicorn] :is(h1, h2, h3) {
+  background: linear-gradient(90deg, var(--mauve), var(--pink), var(--peach), var(--yellow), var(--green), var(--teal), var(--sapphire), var(--blue));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+:root[data-unicorn] h1::after {
+  content: ' 🦄✨' / '';
+}
+
+/* Coffee cups falling from the avatar on the About page */
+.coffee-cup {
+  position: fixed;
+  top: -3rem;
+  z-index: 50;
+  font-size: 2rem;
+  pointer-events: none;
+  animation: coffee-fall var(--fall, 2.5s) cubic-bezier(0.4, 0, 0.9, 0.6) var(--delay, 0s) forwards;
+}
+
+@keyframes coffee-fall {
+  to {
+    transform: translateY(calc(100vh + 6rem)) rotate(var(--spin, 360deg));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pride-note span {
+    transition: none;
+  }
+}

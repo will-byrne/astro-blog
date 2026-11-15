@@ -93,13 +93,15 @@ export interface SkyMapOptions {
   target?: string;
   /** How many degrees of sky the map shows across */
   field?: number;
+  /** Half the width and height of the space kept free of names in the middle, for the target's ring or a picture */
+  clearCentre?: number;
   width?: number;
   height?: number;
 }
 
 /** Lays out a map centred on the target */
 export function buildSkyMap(data: SkyData, ra: number, dec: number, options: SkyMapOptions = {}): SkyMap {
-  const { constellation, target, field = 50, width = 320, height = 240 } = options;
+  const { constellation, target, field = 50, width = 320, height = 240, clearCentre = 22 } = options;
   const project = projector(ra, dec);
   // Projected distance from the centre to the left and right edges
   const scale = width / 2 / (2 * Math.tan((field / 4) * RAD));
@@ -119,7 +121,7 @@ export function buildSkyMap(data: SkyData, ra: number, dec: number, options: Sky
   // Boxes are [left, top, right, bottom]; a label is checked by its baseline, so it reaches about 14px above.
   const nameHalf = target ? (target.length * 9.5) / 2 + 4 : 0;
   const keepClear: number[][] = [
-    [centre.x - 22, centre.y - 22, centre.x + 22, centre.y + 22],
+    [centre.x - clearCentre, centre.y - clearCentre, centre.x + clearCentre, centre.y + clearCentre],
     [centre.x - nameHalf, centre.y + labelGap - 16, centre.x + nameHalf, centre.y + labelGap + 5],
     [0, height - 26, 75, height],
   ];

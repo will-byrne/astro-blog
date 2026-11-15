@@ -3,10 +3,12 @@ import { describe, expect, it } from 'vitest';
 
 // Reads each flavour's colours straight from the stylesheet and checks that text stays readable
 const css = readFileSync('src/styles/global.css', 'utf8');
-const FLAVOURS = ['latte', 'frappe', 'macchiato', 'mocha'] as const;
+// Night vision is not a theme but swaps every colour the same way, so it gets the same checks
+const FLAVOURS = ['latte', 'frappe', 'macchiato', 'mocha', 'pan', 'night'] as const;
 
 function palette(flavour: string): Record<string, string> {
-  const block = css.match(new RegExp(`:root\\[data-theme='${flavour}'\\]\\s*\\{([^}]*)\\}`))?.[1];
+  const selector = flavour === 'night' ? ':root\\[data-night\\]' : `:root\\[data-theme='${flavour}'\\]`;
+  const block = css.match(new RegExp(`${selector}\\s*\\{([^}]*)\\}`))?.[1];
   if (!block) throw new Error(`No colours for ${flavour} in global.css`);
   return Object.fromEntries([...block.matchAll(/--([\w-]+):\s*(#[0-9a-f]{6})\b/gi)].map(([, name, hex]) => [name, hex.toLowerCase()]));
 }
@@ -61,6 +63,12 @@ describe.each(FLAVOURS)('%s', (flavour) => {
     // Journal titles turn the accent colour on hover. They are bold and at least 1.3rem (20.8px),
     // which WCAG counts as large text, so they need 3:1
     expect(contrast(colours[accent], box), `${accent} title on the ${accent} box`).toBeGreaterThanOrEqual(AA_LARGE);
+  });
+
+  it.each(CYCLE)('selected text stays readable when the selection is %s', (accent) => {
+    // Matches color-mix(in srgb, var(--selection) 20%, var(--base)) in ::selection
+    const highlight = mix(colours[accent], colours.base, 0.2);
+    expect(contrast(colours.text, highlight), `text on the ${accent} selection`).toBeGreaterThanOrEqual(AA);
   });
 });
 

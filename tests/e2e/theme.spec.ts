@@ -72,8 +72,9 @@ test.describe('theme picker', () => {
     await page.keyboard.press('ArrowUp');
     await page.keyboard.press('ArrowUp');
     await expect(page.locator('[data-theme-option="latte"]')).toBeFocused();
+    // Up from the first wraps round to the last
     await page.keyboard.press('ArrowUp');
-    await expect(page.locator('[data-theme-option="mocha"]')).toBeFocused();
+    await expect(page.locator('[data-theme-option="pan"]')).toBeFocused();
 
     await page.keyboard.press('Escape');
     await expect(page.locator('#theme-menu')).toBeHidden();

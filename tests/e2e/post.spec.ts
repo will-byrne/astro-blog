@@ -93,7 +93,7 @@ test.describe('post page', () => {
 
   test('the progress bar fills as the post is read', async ({ page }) => {
     await page.goto('/posts/ai-tdd/');
-    const bar = page.locator('.reading-progress > div');
+    const bar = page.locator('.reading-progress .fill');
     const width = () => bar.evaluate((el) => el.getBoundingClientRect().width);
     expect(await width()).toBe(0);
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 2));

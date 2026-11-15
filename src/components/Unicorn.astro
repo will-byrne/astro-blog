@@ -1,0 +1,25 @@
+---
+// The pixel-art unicorn (see src/lib/unicorn.ts). Decorative, so screen readers skip it.
+import { UNICORN_SIZE, unicornPaths } from '../lib/unicorn';
+
+interface Props {
+  /** Width in CSS pixels; the height follows */
+  width?: number;
+  class?: string;
+}
+
+const { width = 44, class: className } = Astro.props;
+const height = Math.round((width * UNICORN_SIZE.height) / UNICORN_SIZE.width);
+---
+
+<svg
+  class:list={['unicorn', className]}
+  width={width}
+  height={height}
+  viewBox={`0 0 ${UNICORN_SIZE.width} ${UNICORN_SIZE.height}`}
+  shape-rendering="crispEdges"
+  aria-hidden="true"
+  focusable="false"
+>
+  {unicornPaths().map(({ fill, d }) => <path fill={fill} d={d} />)}
+</svg>
