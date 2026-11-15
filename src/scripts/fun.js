@@ -1,8 +1,8 @@
 /**
  * The playful extras. Styles are in src/styles/fun.css.
  *
- *  - Konami code (↑ ↑ ↓ ↓ ← → ← → B A): unicorn mode, for the rest of the visit
- *  - n: night vision, red like an astronomer's torch, for the rest of the visit
+ *  - Konami code (↑ ↑ ↓ ↓ ← → ← → B A), or pressing the footer unicorn: unicorn mode, for the rest of the visit
+ *  - n, or pressing the moon in the footer: night vision, red like an astronomer's torch, for the rest of the visit
  *  - A sparkle trail behind the pointer, off unless switched on in the footer
  *  - Each new text selection in the next colour of the palette
  *  - The avatar on the About page, which needs more coffee
@@ -72,7 +72,7 @@ console.log(
   'color: #b8c0e0; font-style: italic;',
   'Unicorn by Maija Haavisto',
   'color: #c6a0f6; font-weight: bold;',
-  'Hello, curious one! 🦄\nPsst: try ↑ ↑ ↓ ↓ ← → ← → B A, or press n under a dark sky.',
+  'Hello, curious one! 🦄\nPsst: try ↑ ↑ ↓ ↓ ← → ← → B A (or catch the unicorn in the footer),\nand press n (or the moon) under a dark sky.',
 );
 
 // Sparkles
@@ -152,8 +152,11 @@ window.addEventListener(
 // Unicorn mode
 const NEIGH = '🦄 Neigh! ';
 let unicornSparkles;
+const unicornButton = document.querySelector('[data-unicorn-toggle]');
+const moonButton = document.querySelector('[data-night-toggle]');
 
 function setUnicornMode(on) {
+  unicornButton?.setAttribute('aria-pressed', String(on));
   if (on) root.dataset.unicorn = '';
   else delete root.dataset.unicorn;
   if (on && !document.title.startsWith(NEIGH)) document.title = NEIGH + document.title;
@@ -169,7 +172,28 @@ function setUnicornMode(on) {
   if (!on) document.querySelectorAll('.sparkle.rainbow').forEach((star) => star.remove());
 }
 
-if ('unicorn' in root.dataset) setUnicornMode(true);
+function toggleUnicornMode() {
+  const on = !('unicorn' in root.dataset);
+  setUnicornMode(on);
+  remember('unicorn', on);
+  announce(on ? 'Unicorn mode on. Neigh!' : 'Unicorn mode off');
+}
+
+setUnicornMode('unicorn' in root.dataset);
+unicornButton?.addEventListener('click', toggleUnicornMode);
+
+// Night vision
+function toggleNightVision() {
+  const on = !('night' in root.dataset);
+  if (on) root.dataset.night = '';
+  else delete root.dataset.night;
+  moonButton?.setAttribute('aria-pressed', String(on));
+  remember('night', on);
+  announce(on ? 'Night vision on' : 'Night vision off');
+}
+
+moonButton?.setAttribute('aria-pressed', String('night' in root.dataset));
+moonButton?.addEventListener('click', toggleNightVision);
 
 const KONAMI = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
 let konamiStep = 0;
@@ -182,23 +206,14 @@ document.addEventListener('keydown', (event) => {
     konamiStep += 1;
     if (konamiStep === KONAMI.length) {
       konamiStep = 0;
-      const on = !('unicorn' in root.dataset);
-      setUnicornMode(on);
-      remember('unicorn', on);
-      announce(on ? 'Unicorn mode on. Neigh!' : 'Unicorn mode off');
+      toggleUnicornMode();
     }
     return;
   }
   konamiStep = key === KONAMI[0] ? 1 : 0;
 
   // Night vision. The Konami code has no n in it, so the two never clash.
-  if (key === 'n') {
-    const on = !('night' in root.dataset);
-    if (on) root.dataset.night = '';
-    else delete root.dataset.night;
-    remember('night', on);
-    announce(on ? 'Night vision on. Press n again to turn it off.' : 'Night vision off');
-  }
+  if (key === 'n') toggleNightVision();
 });
 
 // Rainbow selection: each new selection takes the next colour

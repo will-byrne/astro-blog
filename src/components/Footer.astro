@@ -15,15 +15,15 @@ import Unicorn from './Unicorn.astro';
     <a class="icon-button" href="javascript:location.href = 'mailto:' + ['blog+will.alex.byrne','gmail.com'].join('@')" aria-label="Email"><Icon name="mail" /></a>
     <a class="icon-button" href="/feed.xml" aria-label="RSS feed"><Icon name="rss" /></a>
   </div>
+  <!-- The unicorn and the moon are buttons: unicorn mode and night vision (see fun.js). Each emoji and its comma
+       are written with nothing between them, so no space shows before the comma. -->
   <p class="made-with">
     Made with
-    <svg class="rainbow" width="30" height="16" viewBox="0 0 30 16" aria-hidden="true">
-      <path d="M3 15a12 12 0 0 1 24 0" stroke="#ff218c" />
-      <path d="M7 15a8 8 0 0 1 16 0" stroke="#ffd800" />
-      <path d="M11 15a4 4 0 0 1 8 0" stroke="#21b1ff" />
-    </svg>
-    <span class="sr-only">rainbows</span>
-    and <span aria-hidden="true">☕</span><span class="sr-only">coffee</span>
+    <svg class="rainbow" width="30" height="16" viewBox="0 0 30 16" aria-hidden="true"><path d="M3 15a12 12 0 0 1 24 0" stroke="#ff218c" /><path d="M7 15a8 8 0 0 1 16 0" stroke="#ffd800" /><path d="M11 15a4 4 0 0 1 8 0" stroke="#21b1ff" /></svg><span class="sr-only">rainbows</span>,
+    <button type="button" class="made-with-button" data-unicorn-toggle aria-pressed="false" aria-label="Unicorn mode"><span aria-hidden="true">🦄</span></button>,
+    <span aria-hidden="true">☕</span><span class="sr-only">coffee</span>
+    and
+    <button type="button" class="made-with-button" data-night-toggle aria-pressed="false" aria-label="Night vision"><span aria-hidden="true">🌙</span></button>
   </p>
   <p class="meta">© {new Date().getFullYear()} Will Byrne. Posts are licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Built with <a href="https://astro.build">Astro</a> in <a href="https://catppuccin.com">Catppuccin</a>.</p>
   <button type="button" class="sparkle-toggle" aria-pressed="false" hidden>✨ Sparkle cursor</button>
@@ -47,12 +47,46 @@ import Unicorn from './Unicorn.astro';
     margin: 0;
   }
 
+  /* Ordinary text, so the commas sit right after each emoji */
   .made-with {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
     margin-bottom: 0.25rem;
     color: var(--subtext1);
+  }
+
+  .rainbow {
+    display: inline;
+    vertical-align: -0.1em;
+  }
+
+  /* Emoji-sized to look like part of the sentence, with a full-size area to tap */
+  .made-with-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--tap);
+    height: var(--tap);
+    margin-inline: -0.3rem;
+    vertical-align: middle;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 0.5rem;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .made-with-button:hover {
+    background: var(--surface0);
+  }
+
+  /* A soft glow shows which mode is on */
+  .made-with-button[aria-pressed='true'] {
+    background: var(--surface0);
+  }
+
+  .made-with-button[aria-pressed='true'] span {
+    filter: drop-shadow(0 0 0.3rem var(--yellow));
   }
 
   .rainbow path {

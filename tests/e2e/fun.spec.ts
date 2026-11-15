@@ -34,6 +34,50 @@ test.describe('fun', () => {
     await expect(html).not.toHaveAttribute('data-night');
   });
 
+  test('pressing the 🦄 in "Made with" turns unicorn mode on and off', async ({ page }) => {
+    await page.goto('/posts/ipad_ai/');
+    const html = page.locator('html');
+    const unicorn = page.getByRole('button', { name: 'Unicorn mode' });
+    await expect(unicorn).toHaveAttribute('aria-pressed', 'false');
+    await expect(unicorn).toHaveText('🦄');
+    await unicorn.click();
+    await expect(html).toHaveAttribute('data-unicorn', '');
+    await expect(unicorn).toHaveAttribute('aria-pressed', 'true');
+    await expect(page).toHaveTitle(/^🦄 Neigh! /);
+    // The keyboard and the button stay in step
+    for (const key of KONAMI) await page.keyboard.press(key);
+    await expect(html).not.toHaveAttribute('data-unicorn');
+    await expect(unicorn).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  test('pressing the 🌙 in "Made with" turns night vision on and off', async ({ page }) => {
+    await page.goto('/');
+    const html = page.locator('html');
+    const moon = page.getByRole('button', { name: 'Night vision' });
+    await expect(moon).toHaveText('🌙');
+    await moon.click();
+    await expect(html).toHaveAttribute('data-night', '');
+    await expect(moon).toHaveAttribute('aria-pressed', 'true');
+    await page.reload();
+    await expect(page.getByRole('button', { name: 'Night vision' })).toHaveAttribute('aria-pressed', 'true');
+    await page.getByRole('button', { name: 'Night vision' }).click();
+    await expect(html).not.toHaveAttribute('data-night');
+  });
+
+  test('the 🦄 and 🌙 are big enough to tap', async ({ page }) => {
+    await page.goto('/');
+    for (const name of ['Unicorn mode', 'Night vision']) {
+      const box = (await page.getByRole('button', { name }).boundingBox())!;
+      expect(box.width, name).toBeGreaterThanOrEqual(44);
+      expect(box.height, name).toBeGreaterThanOrEqual(44);
+    }
+  });
+
+  test('the "Made with" line reads naturally', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('.made-with')).toHaveText(/Made with\s*rainbows,\s*🦄,\s*☕\s*coffee\s*and\s*🌙/);
+  });
+
   test('typing n in the search box does not turn on night vision', async ({ page }) => {
     await page.goto('/');
     await page.keyboard.press('/');
