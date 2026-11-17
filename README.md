@@ -81,7 +81,7 @@ The resume page reads `resume.json` from a GitHub gist at build time. If the gis
 - Hover previews when you point at a link to another post
 - Search, an archive, an RSS feed (`/feed.xml`) and a sitemap
 - A share card image made for each post
-- Themes: the four Catppuccin flavours and Pan. Code blocks follow the chosen theme
+- Themes: the four Catppuccin flavours, swapped for pride flags in pride mode (always on in June). Code blocks follow the chosen theme
 - Fonts picked to be easy to read: Atkinson Hyperlegible Next and Atkinson Hyperlegible Mono
 
 ### Easter eggs
@@ -89,7 +89,7 @@ The resume page reads `resume.json` from a GitHub gist at build time. If the gis
 - Unicorn mode: the Konami code (↑ ↑ ↓ ↓ ← → ← → B A), or press the unicorn in the footer
 - Night vision: press `n`, or the moon in the footer
 - A sparkle trail, switched on in the footer
-- Something extra for Pride Month
+- Pride mode: press `p`, or the rainbow in the footer, to swap the themes for pride flags (Rainbow, Trans, Bi, Lesbian, Non-binary, Asexual and Pan), starting on Rainbow. It stays on until turned off, and is always on in June
 - A hello in the browser console
 
 All of these stay still for anyone who asks their device for reduced motion. The code is in `src/scripts/fun.js` and `src/styles/fun.css`.

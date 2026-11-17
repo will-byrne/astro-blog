@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 const KONAMI = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
 
 test.describe('fun', () => {
-  test('in June the stripe becomes the pan flag and says Happy Pride', async ({ page }) => {
+  test('in June the stripe says Happy Pride', async ({ page }) => {
     await page.clock.setFixedTime(new Date('2026-06-15T12:00:00Z'));
     await page.goto('/');
     await expect(page.locator('html')).toHaveAttribute('data-pride', '');
@@ -11,7 +11,7 @@ test.describe('fun', () => {
     await expect(note).toHaveCSS('opacity', '0');
     await page.locator('.pride-note').hover();
     await expect(note).toHaveCSS('opacity', '1');
-    await expect(note).toHaveText('Happy Pride 🩷💛🩵');
+    await expect(note).toHaveText('Happy Pride 🌈');
   });
 
   test('the rest of the year the stripe is the usual palette', async ({ page }) => {
@@ -19,6 +19,103 @@ test.describe('fun', () => {
     await page.goto('/');
     await expect(page.locator('html')).not.toHaveAttribute('data-pride');
     await expect(page.locator('.pride-note')).toBeHidden();
+  });
+
+  test('pressing the rainbow in "Made with" turns pride mode on and off, and it is remembered', async ({ page }) => {
+    await page.clock.setFixedTime(new Date('2026-11-15T12:00:00Z'));
+    await page.goto('/');
+    const html = page.locator('html');
+    const picker = page.getByRole('button', { name: 'Change theme' });
+    const options = page.locator('#theme-menu button:visible');
+    const rainbow = page.getByRole('button', { name: 'Pride mode' });
+    await expect(rainbow).toHaveAttribute('aria-pressed', 'false');
+
+    // On: the pride flags, starting on Rainbow
+    await rainbow.click();
+    await expect(html).toHaveAttribute('data-pride', '');
+    await expect(html).toHaveAttribute('data-theme', 'rainbow');
+    await expect(rainbow).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('#fun-status')).toHaveText(/Pride mode on/);
+    await expect(page.locator('.page-box')).toHaveCSS('background-color', 'rgb(27, 26, 36)');
+    await picker.click();
+    await expect(options).toHaveText(['Rainbow', 'Trans', 'Bi', 'Lesbian', 'Non-binary', 'Asexual', 'Pan']);
+    await page.locator('[data-theme-option="bi"]').click();
+
+    // It lasts between visits, with the flag chosen
+    await page.reload();
+    await expect(html).toHaveAttribute('data-pride', '');
+    await expect(html).toHaveAttribute('data-theme', 'bi');
+
+    // Off: back to the flavours, and the one from before
+    await rainbow.click();
+    await expect(html).not.toHaveAttribute('data-pride');
+    await expect(html).toHaveAttribute('data-theme', 'macchiato');
+    await expect(rainbow).toHaveAttribute('aria-pressed', 'false');
+    await picker.click();
+    await expect(options).toHaveText(['Latte', 'Frappé', 'Macchiato', 'Mocha']);
+
+    // On again, it picks up the flag from last time
+    await page.keyboard.press('Escape');
+    await rainbow.click();
+    await expect(html).toHaveAttribute('data-theme', 'bi');
+  });
+
+  test('p turns pride mode on and off', async ({ page }) => {
+    await page.clock.setFixedTime(new Date('2026-11-15T12:00:00Z'));
+    await page.goto('/');
+    const html = page.locator('html');
+    await page.keyboard.press('p');
+    await expect(html).toHaveAttribute('data-pride', '');
+    await expect(html).toHaveAttribute('data-theme', 'rainbow');
+    await page.keyboard.press('p');
+    await expect(html).not.toHaveAttribute('data-pride');
+    await expect(html).toHaveAttribute('data-theme', 'macchiato');
+  });
+
+  test('in June pride mode stays on', async ({ page }) => {
+    await page.clock.setFixedTime(new Date('2026-06-15T12:00:00Z'));
+    await page.goto('/');
+    const html = page.locator('html');
+    const rainbow = page.getByRole('button', { name: 'Pride mode' });
+    await expect(rainbow).toHaveAttribute('aria-pressed', 'true');
+    await rainbow.click();
+    await expect(html).toHaveAttribute('data-pride', '');
+    await expect(html).toHaveAttribute('data-theme', 'rainbow');
+    await expect(page.locator('#fun-status')).toHaveText(/Pride Month/);
+  });
+
+  test('each ☕ is another cup: the unicorn speeds up, the fifth rains coffee and the tenth is decaf', async ({ page }) => {
+    await page.goto('/');
+    const coffee = page.getByRole('button', { name: 'Coffee' });
+    const note = page.locator('.coffee-note');
+    const runSpeed = () =>
+      page.evaluate(() =>
+        document
+          .querySelector('.unicorn-run')!
+          .getAnimations({ subtree: true })
+          .find((a) => (a as CSSAnimation).animationName === 'patrol')!.playbackRate,
+      );
+
+    await coffee.click();
+    await expect(note).toBeVisible();
+    await expect(note).toHaveText("Cup 1: Ah, that's better");
+    await expect(page.locator('#fun-status')).toHaveText("Cup 1: Ah, that's better");
+    await expect(coffee).toHaveAttribute('data-cups', '1');
+    expect(await runSpeed()).toBeCloseTo(1.25);
+
+    for (let i = 0; i < 4; i++) await coffee.click();
+    await expect(note).toHaveText('Cup 5: It is raining coffee!');
+    await expect(page.locator('.coffee-cup').first()).toBeAttached();
+
+    // The cups last for the visit
+    await page.reload();
+    await expect(coffee).toHaveAttribute('data-cups', '5');
+    expect(await runSpeed()).toBeCloseTo(2.25);
+
+    for (let i = 0; i < 5; i++) await page.keyboard.press('c');
+    await expect(note).toHaveText("Cup 10: That's enough. Switching to decaf");
+    await expect(coffee).not.toHaveAttribute('data-cups');
+    expect(await runSpeed()).toBe(1);
   });
 
   test('n turns night vision on and off, and it lasts for the visit', async ({ page }) => {
@@ -75,7 +172,9 @@ test.describe('fun', () => {
 
   test('the "Made with" line reads naturally', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('.made-with')).toHaveText(/Made with\s*rainbows,\s*🦄,\s*☕\s*coffee\s*and\s*🌙/);
+    await expect(page.locator('.made-with')).toHaveText(/Made with\s*,\s*🦄,\s*☕\s*and\s*🌙/);
+    // The rainbow is a button, so it has no text of its own
+    await expect(page.locator('.made-with').getByRole('button', { name: 'Pride mode' }).locator('svg.rainbow')).toBeVisible();
   });
 
   test('typing n in the search box does not turn on night vision', async ({ page }) => {
@@ -213,6 +312,14 @@ test.describe('fun', () => {
       const runner = page.locator('.unicorn-run .runner');
       await expect(runner.locator('.unicorn')).toBeVisible();
       expect(await runner.evaluate((el) => getComputedStyle(el).animationName)).toBe('none');
+    });
+
+    test('the caffeine meter still talks, without steam or falling cups', async ({ page }) => {
+      await page.goto('/');
+      for (let i = 0; i < 5; i++) await page.keyboard.press('c');
+      await expect(page.locator('.coffee-note')).toHaveText('Cup 5: It is raining coffee!');
+      await expect(page.locator('.steam')).toHaveCount(0);
+      await expect(page.locator('.coffee-cup')).toHaveCount(0);
     });
 
     test('no unicorn runs at the end of a post', async ({ page }) => {

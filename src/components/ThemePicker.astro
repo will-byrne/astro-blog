@@ -1,15 +1,9 @@
 ---
 import Icon from './Icon.astro';
+import { PRIDE_THEMES, YEAR_THEMES } from '../lib/themes';
 
-// The Catppuccin flavours lightest to darkest, then Pan. Each swatch previews the flavour with its own base and
-// mauve; Pan's shows its flag instead
-const themes = [
-  { id: 'latte', label: 'Latte', icon: 'sun', base: '#eff1f5', ink: '#8839ef' },
-  { id: 'frappe', label: 'Frappé', icon: 'sunset', base: '#303446', ink: '#ca9ee6' },
-  { id: 'macchiato', label: 'Macchiato', icon: 'moon', base: '#24273a', ink: '#c6a0f6' },
-  { id: 'mocha', label: 'Mocha', icon: 'moon-star', base: '#1e1e2e', ink: '#cba6f7' },
-  { id: 'pan', label: 'Pan', icon: 'heart', base: '#1f1a2e', ink: '#1f1a2e', flag: 'linear-gradient(#ff218c 0 33.33%, #ffd800 0 66.67%, #21b1ff 0)' },
-] as const;
+// Every theme is in the page; theme.ts shows the flavours, or the pride flags in pride mode
+const themes = [...YEAR_THEMES.map((theme) => ({ ...theme, season: 'year' })), ...PRIDE_THEMES.map((theme) => ({ ...theme, season: 'pride' }))];
 ---
 <div class="theme-picker" data-theme-picker>
   <button type="button" class="icon-button" aria-label="Change theme" aria-expanded="false" aria-controls="theme-menu" data-theme-toggle>
@@ -17,9 +11,9 @@ const themes = [
   </button>
   <ul id="theme-menu" class="menu" hidden>
     {themes.map((theme) => (
-      <li>
-        <button type="button" data-theme-option={theme.id} data-base={theme.base} aria-pressed="false">
-          <span class="swatch" style={`background:${'flag' in theme ? theme.flag : theme.base};color:${theme.ink}`}><Icon name={theme.icon} /></span>
+      <li hidden={theme.season === 'pride'}>
+        <button type="button" data-theme-option={theme.id} data-season={theme.season} data-base={theme.base} aria-pressed="false">
+          <span class="swatch" style={`background:${theme.flag ? `linear-gradient(var(--flag-${theme.id}))` : theme.base};color:${theme.ink}`}><Icon name={theme.icon} /></span>
           {theme.label}
         </button>
       </li>
@@ -28,49 +22,32 @@ const themes = [
 </div>
 
 <script>
-  const STORAGE_KEY = 'theme';
-  const DEFAULT_THEME = 'macchiato';
-  const root = document.documentElement;
+  import { applyTheme, chooseTheme, currentTheme, themeOptions } from '../scripts/theme';
+
   const picker = document.querySelector<HTMLElement>('[data-theme-picker]')!;
   const toggle = picker.querySelector<HTMLButtonElement>('[data-theme-toggle]')!;
   const menu = picker.querySelector<HTMLUListElement>('.menu')!;
-  const options = [...picker.querySelectorAll<HTMLButtonElement>('[data-theme-option]')];
-  const themeColor = document.querySelector('meta[name="theme-color"]');
-
-  function applyTheme(id: string) {
-    root.dataset.theme = id;
-    for (const option of options) {
-      const current = option.dataset.themeOption === id;
-      option.setAttribute('aria-pressed', String(current));
-      if (current) themeColor?.setAttribute('content', option.dataset.base!);
-    }
-  }
 
   function setOpen(open: boolean) {
     menu.hidden = !open;
     toggle.setAttribute('aria-expanded', String(open));
+    const options = themeOptions();
     if (open) (options.find((o) => o.getAttribute('aria-pressed') === 'true') ?? options[0]).focus();
   }
 
-  applyTheme(root.dataset.theme || DEFAULT_THEME);
+  applyTheme(currentTheme());
 
   toggle.addEventListener('click', () => setOpen(menu.hidden));
 
-  for (const option of options) {
+  for (const option of picker.querySelectorAll<HTMLButtonElement>('[data-theme-option]')) {
     option.addEventListener('click', () => {
-      const id = option.dataset.themeOption!;
-      applyTheme(id);
-      try {
-        localStorage.setItem(STORAGE_KEY, id);
-      } catch {
-        // Without storage the choice lasts for this page only
-      }
+      chooseTheme(option.dataset.themeOption!);
       setOpen(false);
       toggle.focus();
     });
   }
 
-  // Close on Escape or a click elsewhere; arrow keys move through the flavours
+  // Close on Escape or a click elsewhere; arrow keys move through the themes
   picker.addEventListener('keydown', (event) => {
     if (menu.hidden) return;
     if (event.key === 'Escape') {
@@ -78,6 +55,7 @@ const themes = [
       toggle.focus();
     } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
       event.preventDefault();
+      const options = themeOptions();
       const step = event.key === 'ArrowDown' ? 1 : -1;
       const index = options.indexOf(document.activeElement as HTMLButtonElement);
       options[(index + step + options.length) % options.length].focus();
@@ -112,7 +90,8 @@ const themes = [
     border-radius: 0.75rem;
   }
 
-  .menu[hidden] {
+  .menu[hidden],
+  .menu li[hidden] {
     display: none;
   }
 

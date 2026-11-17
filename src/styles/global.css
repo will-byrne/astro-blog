@@ -1,4 +1,7 @@
-/* Catppuccin, in all four flavours, plus Pan. Macchiato is the default; the theme picker sets data-theme on <html> */
+/*
+  Catppuccin, in all four flavours, and the pride flags that replace them in June (Pan is also an easter egg the rest
+  of the year; see src/lib/themes.ts). Macchiato is the default; the theme picker sets data-theme on <html>.
+*/
 :root,
 :root[data-theme='macchiato'] {
   --base: #24273a;
@@ -120,12 +123,157 @@
   --teal: #7fd4ff;
   --sapphire: #3dbdff;
   --blue: #8fb4ff;
-  --stripes: var(--pan-flag);
+  --stripes: linear-gradient(to right, var(--flag-pan));
+  color-scheme: dark;
+}
+
+/*
+  The pride flags. Each puts its flag in the stripe across the top and takes its accents from the flag's colours,
+  made light (or, for Trans, dark) enough to read as text. Where a flag has fewer colours than the palette, the
+  rest are lighter and darker shades of the ones it has.
+*/
+:root[data-theme='rainbow'] {
+  --base: #1b1a24;
+  --mantle: #16151e;
+  --crust: #111017;
+  --surface0: #2b2a38;
+  --surface1: #3d3b4e;
+  --surface2: #514f65;
+  --subtext1: #c3c0d4;
+  --text: #eeecf6;
+  --lavender: #b4a8ff;
+  --mauve: #c98bff;
+  --pink: #ff8fc4;
+  --peach: #ff9f43;
+  --yellow: #ffe14d;
+  --green: #5fd47a;
+  --teal: #4fd8c4;
+  --sapphire: #4fb4ff;
+  --blue: #86a6ff;
+  --stripes: linear-gradient(to right, var(--flag-rainbow));
+  color-scheme: dark;
+}
+
+/* Trans is the light one, after the flag's white stripe, so June still has a light theme */
+:root[data-theme='trans'] {
+  --base: #fdf7fa;
+  --mantle: #f6edf2;
+  --crust: #efe2e9;
+  --surface0: #ecdde6;
+  --surface1: #dccbd6;
+  --surface2: #c9b6c3;
+  --subtext1: #5e4c63;
+  --text: #3a2c3e;
+  --lavender: #5b54c4;
+  --mauve: #8a3fae;
+  --pink: #b0306f;
+  --peach: #b2401f;
+  --yellow: #8a5a00;
+  --green: #2b7a3b;
+  --teal: #00717a;
+  --sapphire: #006b94;
+  --blue: #2d5fc4;
+  --stripes: linear-gradient(to right, var(--flag-trans));
+  color-scheme: light;
+}
+
+:root[data-theme='bi'] {
+  --base: #1c1630;
+  --mantle: #171228;
+  --crust: #110d1f;
+  --surface0: #2c2445;
+  --surface1: #3f355e;
+  --surface2: #534877;
+  --subtext1: #c8bfe3;
+  --text: #efeaff;
+  --lavender: #b7aaff;
+  --mauve: #c58ae0;
+  --pink: #ff6fae;
+  --peach: #ff9a8a;
+  --yellow: #f5c8ff;
+  --green: #e59ad6;
+  --teal: #9fb8ff;
+  --sapphire: #7aa2ff;
+  --blue: #8f9cff;
+  --stripes: linear-gradient(to right, var(--flag-bi));
+  color-scheme: dark;
+}
+
+:root[data-theme='lesbian'] {
+  --base: #261a1f;
+  --mantle: #20151a;
+  --crust: #191014;
+  --surface0: #382930;
+  --surface1: #4c3a43;
+  --surface2: #614d57;
+  --subtext1: #dcc4cd;
+  --text: #fcecf2;
+  --lavender: #e6a8d4;
+  --mauve: #e07ab8;
+  --pink: #ff8fc8;
+  --peach: #ff8a4c;
+  --yellow: #ffb380;
+  --green: #f0a0c0;
+  --teal: #ffc4a3;
+  --sapphire: #d98fc4;
+  --blue: #c99be6;
+  --stripes: linear-gradient(to right, var(--flag-lesbian));
+  color-scheme: dark;
+}
+
+:root[data-theme='nonbinary'] {
+  --base: #1e1c22;
+  --mantle: #18171c;
+  --crust: #121115;
+  --surface0: #2f2c35;
+  --surface1: #423e4a;
+  --surface2: #56515f;
+  --subtext1: #c9c4d2;
+  --text: #f4f2f7;
+  --lavender: #c9a8f0;
+  --mauve: #b98aef;
+  --pink: #e0a3ff;
+  --peach: #ffe066;
+  --yellow: #fcf434;
+  --green: #e8e27a;
+  --teal: #d6c8ff;
+  --sapphire: #a99cf5;
+  --blue: #9fa8ff;
+  --stripes: linear-gradient(to right, var(--flag-nonbinary));
+  color-scheme: dark;
+}
+
+:root[data-theme='ace'] {
+  --base: #161417;
+  --mantle: #111012;
+  --crust: #0b0a0c;
+  --surface0: #2a262c;
+  --surface1: #3d383f;
+  --surface2: #514b54;
+  --subtext1: #bdb6c2;
+  --text: #f2eff4;
+  --lavender: #d0a6e0;
+  --mauve: #c77ddb;
+  --pink: #e09ae6;
+  --peach: #d9a6c9;
+  --yellow: #e3e0e6;
+  --green: #b9b3bd;
+  --teal: #c9b8d6;
+  --sapphire: #b893e0;
+  --blue: #a99bea;
+  --stripes: linear-gradient(to right, var(--flag-ace));
   color-scheme: dark;
 }
 
 :root {
-  --pan-flag: linear-gradient(to right, #ff218c 0 33.33%, #ffd800 0 66.67%, #21b1ff 0);
+  /* The flags' own colours, as gradient stops: across the top stripe, and down each swatch in the theme picker */
+  --flag-pan: #ff218c 0 33.33%, #ffd800 0 66.67%, #21b1ff 0;
+  --flag-rainbow: #e40303 0 16.67%, #ff8c00 0 33.33%, #ffed00 0 50%, #008026 0 66.67%, #004dff 0 83.33%, #750787 0;
+  --flag-trans: #5bcefa 0 20%, #f5a9b8 0 40%, #ffffff 0 60%, #f5a9b8 0 80%, #5bcefa 0;
+  --flag-bi: #d60270 0 40%, #9b4f96 0 60%, #0038a8 0;
+  --flag-lesbian: #d52d00 0 14.29%, #ef7627 0 28.57%, #ff9a56 0 42.86%, #ffffff 0 57.14%, #d162a4 0 71.43%, #b55690 0 85.71%, #a30262 0;
+  --flag-nonbinary: #fcf434 0 25%, #ffffff 0 50%, #9c59d1 0 75%, #2c2c2c 0;
+  --flag-ace: #000000 0 25%, #a3a3a3 0 50%, #ffffff 0 75%, #800080 0;
   --stripes: linear-gradient(
     to right,
     var(--mauve) 0 12.5%,
@@ -175,11 +323,6 @@
 
 :root[data-night] :is(img, video, picture) {
   filter: grayscale(1) sepia(1) hue-rotate(-50deg) saturate(5) brightness(0.65);
-}
-
-/* In June, the stripe across the top becomes the pan flag, whatever the theme (set in BaseLayout) */
-:root[data-pride] {
-  --stripes: var(--pan-flag);
 }
 
 *,
@@ -589,7 +732,8 @@ button {
   color: var(--shiki-macchiato);
 }
 
-:root[data-theme='latte'] .code-block code span {
+/* Trans is the only light pride flag, so it borrows Latte's highlighting; the dark ones keep Macchiato's */
+:root:is([data-theme='latte'], [data-theme='trans']) .code-block code span {
   color: var(--shiki-latte);
 }
 

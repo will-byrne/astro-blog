@@ -10,6 +10,7 @@ import Footer from '../components/Footer.astro';
 import Icon from '../components/Icon.astro';
 import SearchDialog from '../components/SearchDialog.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../lib/posts';
+import { PRIDE_DEFAULT_THEME, PRIDE_MODE_KEY, PRIDE_STORAGE_KEY, PRIDE_THEMES, STORAGE_KEY, YEAR_THEMES } from '../lib/themes';
 // Made from scripts/og-default.html; used for link previews when a page has no image of its own
 import defaultSocialImage from '../assets/images/og-default.png';
 
@@ -44,18 +45,29 @@ const social = socialCard
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#24273a" />
-    <script is:inline>
-      // Apply the saved flavour, and any fun modes from this visit, before the page paints
+    <script is:inline define:vars={{ yearThemes: YEAR_THEMES.map((t) => t.id), prideThemes: PRIDE_THEMES.map((t) => t.id), prideDefault: PRIDE_DEFAULT_THEME, storageKey: STORAGE_KEY, prideStorageKey: PRIDE_STORAGE_KEY, prideModeKey: PRIDE_MODE_KEY }}>
+      // Apply the saved theme, and any fun modes, before the page paints. In pride mode, on all June and turned on by
+      // the rainbow in the footer the rest of the year, the picker offers pride flags instead; see src/lib/themes.ts
       const root = document.documentElement;
-      try {
-        const theme = localStorage.getItem('theme');
-        if (['latte', 'frappe', 'macchiato', 'mocha', 'pan'].includes(theme)) root.dataset.theme = theme;
-        // Night vision (n) and unicorn mode (the Konami code) last for the visit; see fun.js
-        if (sessionStorage.getItem('night') === 'on') root.dataset.night = '';
-        if (sessionStorage.getItem('unicorn') === 'on') root.dataset.unicorn = '';
-      } catch {}
-      // Pride Month: the stripe across the top becomes the pan flag
-      if (new Date().getMonth() === 5) root.dataset.pride = '';
+      // Blocked storage throws as soon as it is touched, so it is only named inside the try
+      const read = (storage, key) => {
+        try {
+          return window[storage].getItem(key);
+        } catch {
+          return null;
+        }
+      };
+      const june = new Date().getMonth() === 5;
+      const pride = june || read('localStorage', prideModeKey) === 'on';
+      const theme = read('localStorage', pride ? prideStorageKey : storageKey);
+      if (pride) {
+        root.dataset.pride = '';
+        root.dataset.theme = prideDefault;
+      }
+      if ((pride ? prideThemes : yearThemes).includes(theme)) root.dataset.theme = theme;
+      // Night vision (n) and unicorn mode (the Konami code) last for the visit; see fun.js
+      if (read('sessionStorage', 'night') === 'on') root.dataset.night = '';
+      if (read('sessionStorage', 'unicorn') === 'on') root.dataset.unicorn = '';
     </script>
     <meta name="generator" content={Astro.generator} />
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png" />
@@ -83,7 +95,7 @@ const social = socialCard
   <body>
     <a class="skip-link" href="#content">Skip to content</a>
     <div class="page-box">
-      <div class="pride-note" aria-hidden="true"><span>Happy Pride 🩷💛🩵</span></div>
+      <div class="pride-note" aria-hidden="true"><span>Happy Pride 🌈</span></div>
       <Header />
       <main id="content">
         <slot />

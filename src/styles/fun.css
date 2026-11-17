@@ -28,7 +28,7 @@
 .prose :is(p, li) a:nth-of-type(8n + 7):visited { text-decoration-color: var(--sapphire); }
 .prose :is(p, li) a:nth-of-type(8n + 8):visited { text-decoration-color: var(--blue); }
 
-/* Pride Month: hovering the pan flag stripe at the top says hello */
+/* Pride Month: hovering the flag stripe at the top says hello */
 .pride-note {
   display: none;
 }

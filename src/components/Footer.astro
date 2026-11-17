@@ -15,13 +15,14 @@ import Unicorn from './Unicorn.astro';
     <a class="icon-button" href="javascript:location.href = 'mailto:' + ['blog+will.alex.byrne','gmail.com'].join('@')" aria-label="Email"><Icon name="mail" /></a>
     <a class="icon-button" href="/feed.xml" aria-label="RSS feed"><Icon name="rss" /></a>
   </div>
-  <!-- The unicorn and the moon are buttons: unicorn mode and night vision (see fun.js). Each emoji and its comma
+  <!-- The rainbow, the unicorn, the coffee and the moon are buttons: pride mode, unicorn mode, the caffeine meter
+       and night vision (see fun.js). Each emoji and its comma
        are written with nothing between them, so no space shows before the comma. -->
   <p class="made-with">
     Made with
-    <svg class="rainbow" width="30" height="16" viewBox="0 0 30 16" aria-hidden="true"><path d="M3 15a12 12 0 0 1 24 0" stroke="#ff218c" /><path d="M7 15a8 8 0 0 1 16 0" stroke="#ffd800" /><path d="M11 15a4 4 0 0 1 8 0" stroke="#21b1ff" /></svg><span class="sr-only">rainbows</span>,
+    <button type="button" class="made-with-button" data-pride-toggle aria-pressed="false" aria-label="Pride mode"><svg class="rainbow" width="30" height="16" viewBox="0 0 30 16" aria-hidden="true"><path d="M3 15a12 12 0 0 1 24 0" stroke="#ff218c" /><path d="M7 15a8 8 0 0 1 16 0" stroke="#ffd800" /><path d="M11 15a4 4 0 0 1 8 0" stroke="#21b1ff" /></svg></button>,
     <button type="button" class="made-with-button" data-unicorn-toggle aria-pressed="false" aria-label="Unicorn mode"><span aria-hidden="true">🦄</span></button>,
-    <span aria-hidden="true">☕</span><span class="sr-only">coffee</span>
+    <span class="coffee"><button type="button" class="made-with-button" data-coffee aria-label="Coffee"><span aria-hidden="true">☕</span></button><span class="coffee-note" aria-hidden="true" hidden></span></span>
     and
     <button type="button" class="made-with-button" data-night-toggle aria-pressed="false" aria-label="Night vision"><span aria-hidden="true">🌙</span></button>
   </p>
@@ -81,12 +82,73 @@ import Unicorn from './Unicorn.astro';
   }
 
   /* A soft glow shows which mode is on */
-  .made-with-button[aria-pressed='true'] {
+  .made-with-button:is([aria-pressed='true'], [data-cups]) {
     background: var(--surface0);
   }
 
-  .made-with-button[aria-pressed='true'] span {
+  .made-with-button:is([aria-pressed='true'], [data-cups]) :is(span, svg) {
     filter: drop-shadow(0 0 0.3rem var(--yellow));
+  }
+
+  /* The caffeine meter: steam rises from the cup, and a note above it says how it is going */
+  .coffee {
+    position: relative;
+  }
+
+  .coffee .made-with-button {
+    position: relative;
+  }
+
+  .coffee :global(.steam) {
+    position: absolute;
+    top: 0.3rem;
+    left: calc(50% - 0.15rem);
+    width: 0.3rem;
+    height: 0.8rem;
+    background: var(--subtext1);
+    border-radius: 50%;
+    filter: blur(1px);
+    opacity: 0;
+    pointer-events: none;
+    animation: steam 1.2s ease-out var(--delay, 0s) forwards;
+  }
+
+  @keyframes steam {
+    0% {
+      opacity: 0;
+      translate: 0 0;
+    }
+    30% {
+      opacity: 0.6;
+    }
+    100% {
+      opacity: 0;
+      translate: var(--drift, 0.3rem) -1.75rem;
+    }
+  }
+
+  .coffee-note {
+    position: absolute;
+    bottom: calc(100% + 0.6rem);
+    left: 50%;
+    z-index: 4;
+    width: max-content;
+    max-width: 12rem;
+    padding: 0.25rem 0.75rem;
+    background: var(--mantle);
+    border: 2px solid var(--surface1);
+    border-radius: 0.5rem;
+    color: var(--text);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.4;
+    text-align: center;
+    translate: -50% 0;
+    pointer-events: none;
+  }
+
+  .coffee-note[hidden] {
+    display: none;
   }
 
   .rainbow path {

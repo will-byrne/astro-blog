@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 // Reads each flavour's colours straight from the stylesheet and checks that text stays readable
 const css = readFileSync('src/styles/global.css', 'utf8');
 // Night vision is not a theme but swaps every colour the same way, so it gets the same checks
-const FLAVOURS = ['latte', 'frappe', 'macchiato', 'mocha', 'pan', 'night'] as const;
+const FLAVOURS = ['latte', 'frappe', 'macchiato', 'mocha', 'rainbow', 'trans', 'bi', 'lesbian', 'nonbinary', 'ace', 'pan', 'night'] as const;
 
 function palette(flavour: string): Record<string, string> {
   const selector = flavour === 'night' ? ':root\\[data-night\\]' : `:root\\[data-theme='${flavour}'\\]`;
