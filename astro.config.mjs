@@ -8,6 +8,12 @@ import rehypeProse from './src/lib/rehype-prose.mjs';
 export default defineConfig({
   site: 'https://willbyrne.dev',
   integrations: [sitemap()],
+  vite: {
+    server: {
+      // .direnv symlinks into the Nix store; watching it means crawling every flake input
+      watch: { ignored: ['**/.direnv/**'] },
+    },
+  },
   image: {
     // Gives images in Markdown a set of sizes for the browser to choose from
     layout: 'constrained',

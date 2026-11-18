@@ -800,6 +800,11 @@ button {
   justify-content: center;
 }
 
+/* The global img rule sets display, which would otherwise beat the hidden attribute */
+#lightbox [hidden] {
+  display: none;
+}
+
 #lightbox img {
   max-width: 100%;
   max-height: 100%;
