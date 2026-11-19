@@ -41,7 +41,9 @@ jobs:
         run: yarn test:build
 
   e2e:
-    runs-on: ubuntu-latest
+    # Playwright 1.58 cannot install Chromium's dependencies on ubuntu-26.04,
+    # which ubuntu-latest now points to. Unpin this once Playwright supports it.
+    runs-on: ubuntu-24.04
     env:
       RESUME_FILE: src/data/resume.json
 
