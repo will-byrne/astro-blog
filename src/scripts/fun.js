@@ -117,8 +117,10 @@ function rainbowSparkle() {
   document.body.append(star);
 }
 
-// Sparkle cursor: a switch in the footer, remembered between visits. Hidden when motion is reduced.
+// Sparkle cursor: a switch in the footer, remembered between visits. Hidden when motion is reduced, and on
+// touch-only devices (phones, tablets), where there's no cursor for it to trail.
 const sparkleToggle = document.querySelector('.sparkle-toggle');
+const hasMouse = window.matchMedia('(any-hover: hover) and (any-pointer: fine)');
 let sparkleCursor = false;
 let lastSparkle = 0;
 
@@ -131,7 +133,10 @@ function setSparkleCursor(on) {
 }
 
 if (sparkleToggle && !reducedMotion.matches) {
-  sparkleToggle.hidden = false;
+  // Shown or hidden as a mouse comes and goes, say a tablet with a mouse plugged in
+  const showToggle = () => (sparkleToggle.hidden = !hasMouse.matches);
+  showToggle();
+  hasMouse.addEventListener('change', showToggle);
   let saved;
   try {
     saved = localStorage.getItem('sparkles');
