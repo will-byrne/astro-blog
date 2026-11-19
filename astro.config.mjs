@@ -2,7 +2,7 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import { rehypeHeadingIds } from '@astrojs/markdown-remark';
-import rehypeProse from './src/lib/rehype-prose.mjs';
+import rehypeProse from './src/lib/rehype-prose';
 
 // https://astro.build/config
 export default defineConfig({

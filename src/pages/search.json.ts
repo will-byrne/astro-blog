@@ -1,6 +1,7 @@
+import type { APIRoute } from "astro";
 import { getExcerpt, getPosts, plainText, postUrl } from "../lib/posts";
 
-export async function GET() {
+export const GET: APIRoute = async () => {
   const posts = await getPosts();
   const index = posts.map((post) => ({
     title: post.data.title,
@@ -11,4 +12,4 @@ export async function GET() {
     content: plainText(post.body ?? ""),
   }));
   return new Response(JSON.stringify(index), { headers: { "Content-Type": "application/json" } });
-}
+};

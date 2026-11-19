@@ -1,9 +1,11 @@
 // Adds the extras rendered Markdown needs: labelled code blocks, heading anchors and scrollable tables.
 
-const el = (tagName, properties = {}, children = []) => ({ type: 'element', tagName, properties, children });
-const text = (value) => ({ type: 'text', value });
+import type { Element, ElementContent, Parent, Properties, Root, Text } from 'hast';
 
-const LANGUAGE_LABELS = {
+const el = (tagName: string, properties: Properties = {}, children: ElementContent[] = []): Element => ({ type: 'element', tagName, properties, children });
+const text = (value: string): Text => ({ type: 'text', value });
+
+const LANGUAGE_LABELS: Record<string, string> = {
   bash: 'Shell',
   sh: 'Shell',
   shell: 'Shell',
@@ -14,8 +16,8 @@ const LANGUAGE_LABELS = {
   plaintext: 'Text',
 };
 
-function codeBlock(pre) {
-  const language = pre.properties.dataLanguage ?? 'plaintext';
+function codeBlock(pre: Element) {
+  const language = String(pre.properties.dataLanguage ?? 'plaintext');
   const label = LANGUAGE_LABELS[language] ?? language.charAt(0).toUpperCase() + language.slice(1);
   // The stylesheet sets the code block background
   delete pre.properties.style;
@@ -29,8 +31,8 @@ function codeBlock(pre) {
   ]);
 }
 
-function transform(parent) {
-  parent.children = (parent.children ?? []).map((node) => {
+function transform(parent: Root | Element) {
+  (parent as Parent).children = parent.children.map((node) => {
     if (node.type !== 'element') return node;
 
     if (node.tagName === 'pre') return codeBlock(node);
@@ -48,5 +50,5 @@ function transform(parent) {
 }
 
 export default function rehypeProse() {
-  return (tree) => transform(tree);
+  return (tree: Root) => transform(tree);
 }

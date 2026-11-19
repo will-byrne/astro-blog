@@ -1,10 +1,11 @@
 import { rehypeHeadingIds } from '@astrojs/markdown-remark';
+import type { Root } from 'hast';
 import rehypeStringify from 'rehype-stringify';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { unified } from 'unified';
 import { describe, expect, it } from 'vitest';
-import rehypeProse from '../../src/lib/rehype-prose.mjs';
+import rehypeProse from '../../src/lib/rehype-prose';
 
 // Shiki marks code blocks with data-language; plain remark does not, so code blocks are built by hand
 const pre = (properties: Record<string, unknown>) => ({
@@ -15,7 +16,7 @@ const pre = (properties: Record<string, unknown>) => ({
 });
 
 function transformTree(children: unknown[]) {
-  const tree = { type: 'root', children };
+  const tree = { type: 'root', children } as Root;
   rehypeProse()(tree);
   return tree.children as any[];
 }

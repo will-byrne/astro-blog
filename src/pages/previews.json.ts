@@ -1,8 +1,9 @@
+import type { APIRoute } from "astro";
 import { getImage } from "astro:assets";
 import { formatDate, getExcerpt, getPosts, getReadingTime, postUrl } from "../lib/posts";
 
 // The cards shown when hovering a link to another post, keyed by the post's URL. Fetched on the first hover.
-export async function GET() {
+export const GET: APIRoute = async () => {
   const posts = await getPosts();
   const entries = await Promise.all(
     posts.map(async (post) => [
@@ -18,4 +19,4 @@ export async function GET() {
     ]),
   );
   return new Response(JSON.stringify(Object.fromEntries(entries)), { headers: { "Content-Type": "application/json" } });
-}
+};

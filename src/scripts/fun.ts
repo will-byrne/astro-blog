@@ -23,7 +23,7 @@ const statusRegion = document.getElementById('fun-status');
 const PALETTE = ['--mauve', '--pink', '--peach', '--yellow', '--green', '--teal', '--sapphire', '--blue'];
 
 /** Tells screen reader users what changed */
-function announce(message) {
+function announce(message: string) {
   if (!statusRegion) return;
   statusRegion.textContent = '';
   // A new text node each time, so the same message is read again
@@ -32,7 +32,7 @@ function announce(message) {
   });
 }
 
-function remember(key, on) {
+function remember(key: string, on: boolean) {
   try {
     if (on) sessionStorage.setItem(key, 'on');
     else sessionStorage.removeItem(key);
@@ -42,8 +42,8 @@ function remember(key, on) {
 }
 
 /** Keys pressed while typing in a field, or with a dialog open, are not shortcuts */
-function isTyping(event) {
-  return event.target.closest?.('input, textarea, select, [contenteditable]') || document.querySelector('dialog[open]');
+function isTyping(event: KeyboardEvent) {
+  return (event.target as Element).closest?.('input, textarea, select, [contenteditable]') || document.querySelector('dialog[open]');
 }
 
 // Console hello: a unicorn by Maija Haavisto, from https://www.asciiart.eu/art/9dc62e405ad2e304.
@@ -82,7 +82,7 @@ console.log(
 );
 
 // Sparkles
-function sparkle(x, y, colour) {
+function sparkle(x: number, y: number, colour: string) {
   const star = document.createElement('span');
   star.className = 'sparkle';
   star.setAttribute('aria-hidden', 'true');
@@ -119,12 +119,12 @@ function rainbowSparkle() {
 
 // Sparkle cursor: a switch in the footer, remembered between visits. Hidden when motion is reduced, and on
 // touch-only devices (phones, tablets), where there's no cursor for it to trail.
-const sparkleToggle = document.querySelector('.sparkle-toggle');
+const sparkleToggle = document.querySelector<HTMLButtonElement>('.sparkle-toggle');
 const hasMouse = window.matchMedia('(any-hover: hover) and (any-pointer: fine)');
 let sparkleCursor = false;
 let lastSparkle = 0;
 
-function setSparkleCursor(on) {
+function setSparkleCursor(on: boolean) {
   sparkleCursor = on;
   sparkleToggle?.setAttribute('aria-pressed', String(on));
   try {
@@ -137,7 +137,7 @@ if (sparkleToggle && !reducedMotion.matches) {
   const showToggle = () => (sparkleToggle.hidden = !hasMouse.matches);
   showToggle();
   hasMouse.addEventListener('change', showToggle);
-  let saved;
+  let saved: string | null = null;
   try {
     saved = localStorage.getItem('sparkles');
   } catch {}
@@ -162,11 +162,11 @@ window.addEventListener(
 
 // Unicorn mode
 const NEIGH = '🦄 Neigh! ';
-let unicornSparkles;
+let unicornSparkles: ReturnType<typeof setInterval> | undefined;
 const unicornButton = document.querySelector('[data-unicorn-toggle]');
 const moonButton = document.querySelector('[data-night-toggle]');
 
-function setUnicornMode(on) {
+function setUnicornMode(on: boolean) {
   unicornButton?.setAttribute('aria-pressed', String(on));
   if (on) root.dataset.unicorn = '';
   else delete root.dataset.unicorn;
@@ -224,8 +224,8 @@ function coffeeRain() {
 }
 
 // The caffeine meter
-const coffeeButton = document.querySelector('[data-coffee]');
-const coffeeNote = document.querySelector('.coffee-note');
+const coffeeButton = document.querySelector<HTMLElement>('[data-coffee]');
+const coffeeNote = document.querySelector<HTMLElement>('.coffee-note');
 const DECAF = 10;
 const CUPS = [
   "Ah, that's better",
@@ -240,7 +240,7 @@ const CUPS = [
   "That's enough. Switching to decaf",
 ];
 let cups = 0;
-let noteTimer;
+let noteTimer: ReturnType<typeof setTimeout> | undefined;
 
 try {
   cups = Math.min(DECAF - 1, Number(sessionStorage.getItem('coffee')) || 0);
@@ -252,7 +252,7 @@ function caffeinate() {
   else coffeeButton?.removeAttribute('data-cups');
   const run = document.querySelector('.unicorn-run');
   for (const animation of run?.getAnimations({ subtree: true }) ?? []) {
-    const gallop = animation.animationName === 'gallop';
+    const gallop = animation instanceof CSSAnimation && animation.animationName === 'gallop';
     animation.updatePlaybackRate(gallop ? Math.min(2, 1 + cups * 0.12) : 1 + cups * 0.25);
   }
 }
@@ -341,9 +341,9 @@ document.addEventListener('selectionchange', () => {
 });
 
 // The avatar on the About page: click it enough and it asks for coffee
-const avatar = document.querySelector('[data-coffee-avatar]');
+const avatar = document.querySelector<HTMLElement>('[data-coffee-avatar]');
+const bubble = avatar?.parentElement?.querySelector<HTMLElement>('.coffee-bubble');
 if (avatar) {
-  const bubble = avatar.parentElement.querySelector('.coffee-bubble');
   let clicks = 0;
   avatar.addEventListener('click', () => {
     clicks += 1;
@@ -353,10 +353,10 @@ if (avatar) {
     avatar.classList.add('wiggle');
     if (clicks < 5) return;
     clicks = 0;
-    bubble.hidden = false;
+    if (bubble) bubble.hidden = false;
     announce('NEED MORE COFFEE!');
     setTimeout(() => {
-      bubble.hidden = true;
+      if (bubble) bubble.hidden = true;
     }, 4000);
     coffeeRain();
   });

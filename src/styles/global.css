@@ -395,7 +395,7 @@ button {
   border-radius: 0.25rem;
 }
 
-/* Each new selection takes the next colour of the palette (see fun.js) */
+/* Each new selection takes the next colour of the palette (see fun.ts) */
 ::selection {
   background: color-mix(in srgb, var(--selection, var(--surface2)) 20%, var(--base));
   color: var(--text);
@@ -812,7 +812,7 @@ button {
   object-fit: contain;
 }
 
-/* The card shown when hovering a link to another post (see site.js) */
+/* The card shown when hovering a link to another post (see site.ts) */
 .post-preview {
   position: absolute;
   z-index: 30;

@@ -65,7 +65,7 @@ const social = socialCard
         root.dataset.theme = prideDefault;
       }
       if ((pride ? prideThemes : yearThemes).includes(theme)) root.dataset.theme = theme;
-      // Night vision (n) and unicorn mode (the Konami code) last for the visit; see fun.js
+      // Night vision (n) and unicorn mode (the Konami code) last for the visit; see fun.ts
       if (read('sessionStorage', 'night') === 'on') root.dataset.night = '';
       if (read('sessionStorage', 'unicorn') === 'on') root.dataset.unicorn = '';
     </script>
@@ -111,8 +111,8 @@ const social = socialCard
     </dialog>
     <p id="fun-status" class="sr-only" aria-live="polite"></p>
     <script>
-      import '../scripts/site.js';
-      import '../scripts/fun.js';
+      import '../scripts/site';
+      import '../scripts/fun';
     </script>
     <style>
       #back-to-top {

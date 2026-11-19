@@ -1,5 +1,5 @@
 /**
- * Choosing, saving and showing the theme, and pride mode, shared by the theme picker and the rainbow in fun.js.
+ * Choosing, saving and showing the theme, and pride mode, shared by the theme picker and the rainbow in fun.ts.
  * BaseLayout applies the saved theme, and pride mode, before the page paints; this keeps everything else in step.
  */
 import { DEFAULT_THEME, PRIDE_DEFAULT_THEME, PRIDE_MODE_KEY, PRIDE_STORAGE_KEY, STORAGE_KEY } from '../lib/themes';

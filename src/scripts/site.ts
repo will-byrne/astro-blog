@@ -2,15 +2,38 @@
  * Small page behaviours: search, image lightbox, copy and share buttons, back to top
  */
 
-// Search
-const searchDialog = document.getElementById('search');
-const searchInput = document.getElementById('search-input');
-const searchStatus = document.getElementById('search-status');
-const searchResults = document.getElementById('search-results');
-const SEARCH_LIMIT = 10;
-let searchIndex;
+/** A post in /search.json */
+interface SearchItem {
+  title: string;
+  url: string;
+  category: string;
+  tags: string;
+  snippet: string;
+  content: string;
+}
 
-function resultItem(item) {
+/** A post's card in /previews.json */
+interface Preview {
+  title: string;
+  date: string;
+  readingTime: number;
+  series?: string;
+  excerpt: string;
+  image?: string;
+}
+
+// These are always on the page (see BaseLayout.astro)
+const byId = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+
+// Search
+const searchDialog = byId<HTMLDialogElement>('search');
+const searchInput = byId<HTMLInputElement>('search-input');
+const searchStatus = byId('search-status');
+const searchResults = byId('search-results');
+const SEARCH_LIMIT = 10;
+let searchIndex: SearchItem[] | undefined;
+
+function resultItem(item: SearchItem) {
   const li = document.createElement('li');
   const link = document.createElement('a');
   link.href = item.url;
@@ -23,8 +46,8 @@ function resultItem(item) {
   return li;
 }
 
-async function runSearch(query) {
-  searchIndex ??= await fetch('/search.json').then((response) => response.json());
+async function runSearch(query: string) {
+  const index: SearchItem[] = (searchIndex ??= await fetch('/search.json').then((response) => response.json()));
   // The index may arrive after the input has changed
   if (searchInput.value !== query) return;
 
@@ -35,7 +58,7 @@ async function runSearch(query) {
     return;
   }
 
-  const matches = searchIndex
+  const matches = index
     .filter((item) => {
       const haystack = `${item.title} ${item.category} ${item.tags} ${item.content}`.toLowerCase();
       return terms.every((term) => haystack.includes(term));
@@ -58,7 +81,7 @@ searchInput.addEventListener('keydown', (event) => {
   searchDialog.close();
 });
 document.querySelectorAll('[data-search-open]').forEach((button) => button.addEventListener('click', openSearch));
-document.querySelector('[data-search-close]').addEventListener('click', () => searchDialog.close());
+document.querySelector('[data-search-close]')!.addEventListener('click', () => searchDialog.close());
 searchDialog.addEventListener('click', (event) => {
   if (event.target === searchDialog) searchDialog.close();
 });
@@ -67,19 +90,20 @@ document.addEventListener('keydown', (event) => {
   if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return;
   // After a dialog closes, Chrome leaves focus on its hidden input until the next frame, so a / pressed
   // straight away comes from there. That is not typing, so it still opens the search.
-  const typing = event.target.closest('input, textarea, select, [contenteditable]') && !event.target.closest('dialog:not([open])');
+  const target = event.target as Element;
+  const typing = target.closest('input, textarea, select, [contenteditable]') && !target.closest('dialog:not([open])');
   if (typing || document.querySelector('dialog[open]')) return;
   event.preventDefault();
   openSearch();
 });
 
 // Image lightbox
-const lightbox = document.getElementById('lightbox');
-const lightboxImage = lightbox.querySelector('img');
-const lightboxDrawing = lightbox.querySelector('.lightbox-drawing');
+const lightbox = byId<HTMLDialogElement>('lightbox');
+const lightboxImage = lightbox.querySelector('img')!;
+const lightboxDrawing = lightbox.querySelector<HTMLElement>('.lightbox-drawing')!;
 
 // The page only downloads the size it needs, so fetch the largest one when an image is opened
-function largestSource(img) {
+function largestSource(img: HTMLImageElement) {
   const candidates = img.srcset
     .split(',')
     .map((candidate) => candidate.trim().split(/\s+/))
@@ -88,7 +112,7 @@ function largestSource(img) {
   return candidates.reduce((best, next) => (parseFloat(next[1]) > parseFloat(best[1]) ? next : best))[0];
 }
 
-function openLightbox(img) {
+function openLightbox(img: HTMLImageElement) {
   lightboxImage.hidden = false;
   lightboxDrawing.hidden = true;
   lightboxImage.src = largestSource(img);
@@ -96,7 +120,7 @@ function openLightbox(img) {
   lightbox.showModal();
 }
 
-document.querySelectorAll('.prose img, [data-zoomable]').forEach((img) => {
+document.querySelectorAll<HTMLImageElement>('.prose img, [data-zoomable]').forEach((img) => {
   // Images inside links or buttons already do something when clicked
   if (img.closest('a, button')) return;
   img.setAttribute('data-zoomable', '');
@@ -115,7 +139,7 @@ document.querySelectorAll('.prose img, [data-zoomable]').forEach((img) => {
 document.querySelectorAll('[data-zoomable-svg]').forEach((button) => {
   button.addEventListener('click', () => {
     lightboxImage.hidden = true;
-    lightboxDrawing.replaceChildren(button.querySelector('svg').cloneNode(true));
+    lightboxDrawing.replaceChildren(button.querySelector('svg')!.cloneNode(true));
     lightboxDrawing.hidden = false;
     lightbox.showModal();
   });
@@ -129,9 +153,9 @@ lightbox.addEventListener('close', () => {
 
 // Copy buttons on code blocks
 document.addEventListener('click', async (event) => {
-  const button = event.target.closest('.copy-button');
+  const button = (event.target as Element).closest('.copy-button');
   if (!button) return;
-  const code = button.closest('.code-block').querySelector('pre').textContent;
+  const code = button.closest('.code-block')?.querySelector('pre')?.textContent ?? '';
   try {
     await navigator.clipboard.writeText(code);
     button.textContent = 'Copied';
@@ -146,7 +170,7 @@ document.addEventListener('click', async (event) => {
 // Share a post: the device's share sheet where there is one, otherwise copy the link
 const shareButton = document.getElementById('share');
 shareButton?.addEventListener('click', async () => {
-  const label = shareButton.querySelector('span');
+  const label = shareButton.querySelector('span')!;
   const url = window.location.href.split('#')[0];
   try {
     if (navigator.share) {
@@ -164,7 +188,7 @@ shareButton?.addEventListener('click', async () => {
 });
 
 // Back to top
-const backToTop = document.getElementById('back-to-top');
+const backToTop = byId<HTMLButtonElement>('back-to-top');
 const updateBackToTop = () => {
   backToTop.hidden = window.scrollY < 800;
 };
@@ -175,24 +199,24 @@ backToTop.addEventListener('click', () => window.scrollTo({ top: 0 }));
 // Previews of other posts: hovering, or tabbing to, a link to another post in the text shows a card with its title,
 // date, reading time and summary. The card only repeats what is behind the link, so screen readers skip it.
 const POST_PATH = /^\/posts\/[^/]+\/?$/;
-const previewLinks = [...document.querySelectorAll('.prose a[href]')].filter((link) => {
+const previewLinks = [...document.querySelectorAll<HTMLAnchorElement>('.prose a[href]')].filter((link) => {
   const url = new URL(link.href, window.location.href);
   return url.origin === window.location.origin && POST_PATH.test(url.pathname) && url.pathname.replace(/\/?$/, '/') !== window.location.pathname;
 });
 
 if (previewLinks.length) {
-  let previews;
-  let showTimer;
-  let current;
+  let previews: Record<string, Preview> | undefined;
+  let showTimer: ReturnType<typeof setTimeout> | undefined;
+  let current: HTMLAnchorElement | undefined;
   const card = document.createElement('div');
   card.className = 'post-preview';
   card.setAttribute('aria-hidden', 'true');
   card.hidden = true;
   document.body.append(card);
 
-  const pathOf = (link) => new URL(link.href, window.location.href).pathname.replace(/\/?$/, '/');
+  const pathOf = (link: HTMLAnchorElement) => new URL(link.href, window.location.href).pathname.replace(/\/?$/, '/');
 
-  function fill(preview) {
+  function fill(preview: Preview) {
     card.replaceChildren();
     if (preview.image) {
       const img = document.createElement('img');
@@ -213,7 +237,7 @@ if (previewLinks.length) {
   }
 
   // Below the link, or above it if there is no room below; kept inside the screen sideways
-  function position(link) {
+  function position(link: HTMLAnchorElement) {
     const rect = link.getClientRects()[0] ?? link.getBoundingClientRect();
     const width = card.offsetWidth;
     const height = card.offsetHeight;
@@ -224,10 +248,10 @@ if (previewLinks.length) {
     card.style.top = `${top + window.scrollY}px`;
   }
 
-  async function show(link) {
+  async function show(link: HTMLAnchorElement) {
     current = link;
     try {
-      previews ??= await fetch('/previews.json').then((response) => response.json());
+      previews ??= (await fetch('/previews.json').then((response) => response.json())) as Record<string, Preview>;
     } catch {
       return;
     }

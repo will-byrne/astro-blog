@@ -92,7 +92,7 @@ The resume page reads `resume.json` from a GitHub gist at build time. If the gis
 - Pride mode: press `p`, or the rainbow in the footer, to swap the themes for pride flags (Rainbow, Trans, Bi, Lesbian, Non-binary, Asexual and Pan), starting on Rainbow. It stays on until turned off, and is always on in June
 - A hello in the browser console
 
-All of these stay still for anyone who asks their device for reduced motion. The code is in `src/scripts/fun.js` and `src/styles/fun.css`.
+All of these stay still for anyone who asks their device for reduced motion. The code is in `src/scripts/fun.ts` and `src/styles/fun.css`.
 
 ## Project layout
 
